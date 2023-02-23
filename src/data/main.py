@@ -59,6 +59,20 @@ conn = pyodbc.connect('Driver={' + Driver +'};'
                       'Trusted_Connection=yes;')
 
 
+# just some print outs for checking the connection to local db
+print("_______________________________CONNECTION PASSED_______________________________")
+
+# Define a cursor to execute SQL queries
+cursor123 = conn.cursor()
+
+# Execute a simple SQL query to fetch data from the database
+cursor123.execute('SELECT * FROM Students WHERE Name = "MarkusZangl";')
+
+# Fetch the results and print them to the console
+results = cursor123.fetchall()
+for row in results:
+    print(row)
+
 print("_______________________________CONNECTION PASSED_______________________________")
 
 
@@ -137,6 +151,8 @@ def getConceptFeaturesFromCodeLines(df, featureCode):
         columnsFeatures = []
             
         try:
+            #print("___________________________FEATURECODE___________________________")
+            #print(j[featureCode])
             codeString = PythonCodeParser( j[featureCode] )
         
             newFeaturesArrForThisRow.append(j['PracticeStatisticsId'])
@@ -168,6 +184,8 @@ def getConceptFeaturesFromCodeLines(df, featureCode):
 
 def getConceptFeaturesFromCode(df, featureCode, featureError, featureOutput):
     
+    #print("___________________NOW IN THE GETCONCEPTFEATURESFROMCODE FUNCTION___________________")
+
     columnsFeatures = []
     dFeature  = []
     newConceptFeatures = list(conceptFeaturesMap.keys())
@@ -176,7 +194,14 @@ def getConceptFeaturesFromCode(df, featureCode, featureError, featureOutput):
     columnsFeatures.extend(df.columns)
     columnsFeatures = columnsFeatures + newConceptFeatures
 
-
+    #print(len(columnsFeatures))
+    #print(columnsFeatures)
+    #print(len(newConceptFeatures))
+    #print(newConceptFeatures)
+    #pd.set_option('display.max_columns', None)
+    #print(df.head())
+    #pd.reset_option('display.max_columns')
+    #print(df)
 
     for i, j in df.iterrows():
         newFeaturesArrForThisRow = []
@@ -202,13 +227,22 @@ def getConceptFeaturesFromCode(df, featureCode, featureError, featureOutput):
                 dFeature.append(newFeaturesArrForThisRow)
                 
             except SyntaxError:
-                dFeature.append( len(newConceptFeatures) * [0] )
+                dFeature.append( len(columnsFeatures) * [0] )
                 
         else:
-            dFeature.append( len(newConceptFeatures) * [0] )    
+            dFeature.append( len(columnsFeatures) * [0] )    
+
+    #print("___________________ABOUT TO CREATE THE DATAFRAME___________________")
+
+    #print(len(dFeature))
+    #print(dFeature)
+    #print(len(columnsFeatures))
+    #print(columnsFeatures)
 
     dfFeature = pd.DataFrame.from_records(dFeature,  columns = columnsFeatures )
     
+    print("___________________DATAFRAME CREATED WOHO___________________")
+
     return dfFeature    
 
 
@@ -300,6 +334,16 @@ def toFormatStringToBoolean(df, feature):
     
 def getPositionFeatures(df, featureName):     
 
+    # weird bug when getting the Position feature...the df columns RobotCollisionObstacle and RobotCollisionPosition are sometimes swapped
+    # QUICKFIX by swiching data is it is in the wrong column:
+
+    if all(name in df.columns for name in ['RobotCollisionsTime', 'RobotCollisionsObstacle', 'RobotCollisionsPosition', 'PracticeStatisticsId', 'StudentId']):
+        print("THIS SHOULD BE DONE ONLY ONE TIME")
+        for index, row in df.iterrows():
+            if row['RobotCollisionsPosition'] in ['Coin', 'Box', 'Bug', 'Door', 'MultiplayerRobot']:
+                # switch values in columns 'RobotCollisionsObstacle' and 'RobotCollisionsPosition' because of weird bug
+                df.loc[index, ['RobotCollisionsObstacle', 'RobotCollisionsPosition']] = [row['RobotCollisionsPosition'], row['RobotCollisionsObstacle']]
+
     posX  = []
     posY  = []
     posZ  = []
@@ -314,14 +358,23 @@ def getPositionFeatures(df, featureName):
         for i, j in df.iterrows(): 
             featureDataArr = j[positionFeatureName]
             positions = featureDataArr.strip('(').strip(')').split(',')
-            
+            #if (len(positions) >= 0) :
+            #    posX.append(positions[0])
+            #if (len(positions) > 0) :
+            #    posY.append(positions[1])
+            #if (len(positions) > 1) :
+            #    posZ.append(positions[2])
             if (len(positions) >= 0) :
                 posX.append(positions[0])
-            if (len(positions) > 0) :
-                posY.append(positions[1])
             if (len(positions) > 1) :
+                posY.append(positions[1])
+            if (len(positions) > 2) :
                 posZ.append(positions[2])
                 
+        #print("__________DEBUG__________")
+        #print(len(posY))
+        #print(len(df.index))
+
         df[positionFeatureXName] = posX
         df[positionFeatureYName] = posY
         df[positionFeatureZName] = posZ

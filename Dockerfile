@@ -24,7 +24,7 @@ RUN \
   export MYSQL_CONNECTOR_CHECKSUM='f2684bb246db22f2c9c440c4d905dde9' && \
   apt-get update && \
   apt-get install -y curl build-essential unixodbc-dev g++ apt-transport-https && \
-  #gpg --keyserver hkp://keys.gnupg.net --recv-keys 5072E1F5 && \
+  #gpg --keyserver hkp://keys.gnupg.net --recv-keys 5072E1F5 && \ # commented this because the dockerfile returned non zero error numbers
   #
   # Install pyodbc db drivers for MSSQL, PG and MySQL
   curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \

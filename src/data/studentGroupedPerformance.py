@@ -172,6 +172,8 @@ runsHasVariablesCount = dfRuns[dfRuns.hasVariables == 1].PracticeStatisticsId.va
 runsLineOfCodeCountAvg = dfRuns.groupby('PracticeStatisticsId')['lineOfCodeCount'].mean()
 
 
+# Parser can't parse None Code entries in data frame, drop these entries of the data frame
+dfPractice.dropna(subset=['Code'], inplace=True)
 
 #Code Concepts Used
 conceptFeaturesLines = main.getConceptFeaturesFromCodeLines(dfPractice, 'Code')
