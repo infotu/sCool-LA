@@ -8,4 +8,5 @@ Lot's of issues working with the local database (connecting issues...).
 Because of this issues updated Flask version from 1.1.2 to 2.1.0 and this seemed to trigger new minor bugs in the codebase.
 AspNetUsers table is not in the database...created one with schema template. One entrence for now (Markus)
 Server is finally running with local database clone.
-Start with first new feature 
+Start with first new feature, which is information bar on top of the web app about the person that is currently loged in.
+Navbar frontend is completed. Now let's code the backend.
