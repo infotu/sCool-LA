@@ -620,3 +620,11 @@ labelSelectLA = 'Select Learning Activity'
 
 
 
+
+
+#------------------------------------
+#-- Strings for Navbar
+#------------------------------------
+
+navbarEducator = "Educator"
+navbarAdmin = "Admin"

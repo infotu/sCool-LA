@@ -14,7 +14,7 @@ import dash_bootstrap_components as dbc
 from flask_login import logout_user, current_user, LoginManager, UserMixin
 
 from app import app, server, login_manager, User
-from apps import groups, learningActivityDetails, groupStudents, custom, home, sidebar, login
+from apps import groups, learningActivityDetails, groupStudents, custom, home, sidebar, login, searchAndUserInfo
 from data import studentGrouped
 
 import constants
@@ -123,7 +123,7 @@ content = html.Div(
 
 
 
-app.layout = html.Div([dcc.Location(id="url"), sidebar.sidebar, content,
+app.layout = html.Div([dcc.Location(id="url"), searchAndUserInfo.navbar, sidebar.sidebar, content,
                        ],
                        className = constants.THEME
                        )

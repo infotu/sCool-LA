@@ -15,16 +15,19 @@ html {
 }
 
 .page-main {
+	margin-top: 5rem;
 	margin-left: 16rem;
     padding: 2rem 1rem;
     padding-bottom: 5rem;
 	overflow-x: scroll;
 	min-height: 100vh;
+	z-index: 1;
 }
 .page-sidebar {
 	position: fixed;
+    margin-top: 5rem;
     top: 0;
-    left: 0;
+	left: 0;
     bottom: 0;
     width: 16rem;
     padding: 2rem 1rem;
@@ -32,6 +35,60 @@ html {
 }
 .page-content {
 	margin-top: 0.5rem;
+	z-index: 1;
+}
+
+.page-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5rem;
+    z-index: 10;
+	background-color: #1d1c1c;
+}
+
+.page-navbar-margin-top {
+	margin-top: 1rem;
+}
+
+.navbar-heading {
+	font-size: 2em;
+    color: #ffffff;
+}
+
+.navbar-username {
+	font-size: 1.2em;
+    color: #ffffff;
+	text-align: right;
+}
+
+.navbar-userrole {
+	font-size: 1em;
+    color: #ffffff;
+	text-align: right;
+}
+
+.navbar-searchinput {
+	background-color: #f8f9fa;
+	font-size: 1.2em;
+  	color: #505050;
+	padding-left: 10px;
+	height: 48px;
+}
+
+.navbar-searchinput:focus {
+	background-color: #f8f9fa;
+}
+
+.navbar-searchinput::placeholder {
+	font-size: 1.2em;
+	color: #505050;
+}
+
+.navbar-searchbutton {
+	font-size: 1.2em;
+	color: #ffffff;
 }
 
 .row {
@@ -540,17 +597,30 @@ html {
 
 
 
-@media only screen and (max-width: 80em) {
+@media only screen and (max-width: 85em) {
 	.theme-app, .theme-app .btn, .theme-app .c-container  {
 		font-size: 0.8rem;
+	}
+	.page-navbar {
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 5rem;
+		z-index: 10;
+	}
+	.navbar-heading {
+		font-size: 1.5em;
 	}
 	.page-sidebar  {
 		overflow-y: scroll;
 		width: 14rem;
 		padding: 0.5rem 1rem;
+		margin-top: 5rem;
 	}
 	.page-main  {
 		margin-left: 14rem;
+		margin-top: 5rem;
+		z-index: 1;
 	}
 	.theme-app h2  {
 		margin-top: 0;
@@ -605,13 +675,26 @@ html {
 }
 
 @media only screen and (max-width: 45em) {
+	.page-navbar {
+		top: 0;
+		left: 0;
+		height: 5rem;
+		z-index: 10;
+	}
+	.navbar-heading {
+		font-size: 1em;
+	}
 	.page-sidebar {
 		width: 100%;
 		position: initial;
+		margin-top: 5rem;
+		z-index: 1;
 	}
 	.page-main {
 		margin: 0;
 		padding: 0;
+		margin-top: 5rem;
+		z-index: 1;
 	}
 	.c-button-nav .c-button-nav-text {
 		display: none;
@@ -772,6 +855,9 @@ html {
 
 
 @media print {
+	.page-navbar {
+		display: none;
+	}
 	.page-sidebar {
 		display:none;
 	}
