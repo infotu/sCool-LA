@@ -493,6 +493,7 @@ labelNoData                 = "Has no game interactions"
 
 iconNameHome                = "fa-home"
 iconNameGroups              = "fa-list"
+iconNameClasses				= "fa-clipboard"
 iconNameDetails             = "fa-clipboard"
 iconNameStudents            = "fa-user-graduate"
 iconNameCustom              = "fa-wrench"
@@ -628,3 +629,6 @@ labelSelectLA = 'Select Learning Activity'
 
 navbarEducator = "Educator"
 navbarAdmin = "Admin"
+
+navbarTestUsername = "Markus Zangl"
+navbarTestRole = "Admin"

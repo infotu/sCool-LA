@@ -36,6 +36,7 @@ keyOnlyForAdmin     = constants.keyOnlyForAdmin
 
 iconNameHome        = constants.iconNameHome
 iconNameGroups      = constants.iconNameGroups
+iconNameClasses     = constants.iconNameClasses
 iconNameDetails     = constants.iconNameDetails
 iconNameStudents    = constants.iconNameStudents
 iconNameCustom      = constants.iconNameCustom
@@ -54,16 +55,21 @@ menuLink = {
                           "menu-sub-link-0", "menu-sub-link-1", "menu-sub-link-2"
                           ],  keyClassName : 'fas ' + iconNameGroups + ' m-right-small',
                           keyOnlyForAdmin : True    }
-    ,   "menu-link-2" : { keyLabel : 'Details', keyHref : '/Details' ,
+    ,   "menu-link-2" : { keyLabel : 'Classes', keyHref : '/Classes' ,
+                  keySubmenu : [
+                          "menu-sub-link-8", "menu-sub-link-9", "menu-sub-link-10"
+                          ],  keyClassName : 'fas ' + iconNameClasses + ' m-right-small',
+                          keyOnlyForAdmin : False    }                      
+    ,   "menu-link-3" : { keyLabel : 'Details', keyHref : '/Details' ,
                   keySubmenu : [
                           "menu-sub-link-3", "menu-sub-link-7", "menu-sub-link-4"
                           ],  keyClassName : 'fas ' + iconNameDetails + ' m-right-small',
                           keyOnlyForAdmin : False    }
-    ,   "menu-link-3" : { keyLabel : 'Students', keyHref : '/Students' ,
+    ,   "menu-link-4" : { keyLabel : 'Students', keyHref : '/Students' ,
                   keySubmenu : [ "menu-sub-link-5"  
                           ],  keyClassName : 'fas ' + iconNameStudents + ' m-right-small',
                           keyOnlyForAdmin : False    }
-    ,   "menu-link-4" : { keyLabel : 'Custom', keyHref : '/Custom' ,
+    ,   "menu-link-5" : { keyLabel : 'Custom', keyHref : '/Custom' ,
                   keySubmenu : [
                           "menu-sub-link-6"
                           ],  keyClassName : 'fas ' + iconNameCustom + ' m-right-small',
@@ -80,6 +86,9 @@ menuSubLink2Scroll = {
     ,"menu-sub-link-7" :  {keyLabel : "Concept Info", keyScrollTo: 'Concept-Information'}
     ,"menu-sub-link-5" :  {keyLabel : "Student Info", keyScrollTo: 'student-information'}
     ,"menu-sub-link-6" :  {keyLabel : "Custom", keyScrollTo: ''}
+    ,"menu-sub-link-8" :  {keyLabel : "Overview", keyScrollTo: 'Overview'}
+    ,"menu-sub-link-9" :  {keyLabel : "Concept Info", keyScrollTo: 'Concept-Information'}
+    ,"menu-sub-link-10" :  {keyLabel : "More Info", keyScrollTo: 'More-Information'}
 }
 
 

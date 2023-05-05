@@ -31,7 +31,7 @@ html {
     bottom: 0;
     width: 16rem;
     padding: 2rem 1rem;
-    background-color: #f8f9fa;
+    background-color: #f3f3f3;
 }
 .page-content {
 	margin-top: 0.5rem;
@@ -89,6 +89,26 @@ html {
 .navbar-searchbutton {
 	font-size: 1.2em;
 	color: #ffffff;
+}
+
+.option-buttons button {
+	background-color: #f3f3f3;
+	border: 1px solid #7c7c7c;
+	color: black;
+	padding: 10px 24px;
+	cursor: pointer;
+	width: 100%;
+	display: block;
+	font-size: 1.5em;
+}
+  
+  .option-buttons button:not(:last-child) {
+	border-bottom: none;
+}
+  
+  /* hover background color change*/
+  .option-buttons button:hover {
+	background-color: #b9b9b9;
 }
 
 .row {

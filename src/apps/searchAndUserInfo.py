@@ -20,10 +20,17 @@ from data import studentGrouped
 
 from apps import settings
 
-# in this fily the top bar, where user information is displayed, is managed
-# also users are able to open their own detail menu where detailed information about the user is displayed
+# in this file the top bar, where user information is displayed, is managed
+# also users are able to open their own detail menu where information about the user is displayed
 # and the users can change their username, password and so on
 
+# ignore for now
+def getUserRole():
+    username = "brrr"
+
+    print(current_user.get_id())
+
+    return username
 
 navbar = html.Div(
     html.Div(
@@ -46,7 +53,7 @@ navbar = html.Div(
                         ),
                         width=4,
                     ),
-                    dbc.Col([html.Div("Markus Zangl", className="navbar-username"), html.Div(constants.navbarEducator, className="navbar-userrole")], width=3),
+                    dbc.Col([html.Div(constants.navbarTestUsername, className="navbar-username"), html.Div(constants.navbarTestRole, className="navbar-userrole")], width=3),
                     dbc.Col(html.Img(src="/assets/user-icon.png", height="50px"), width=1),
                 ],
                 align="center"
