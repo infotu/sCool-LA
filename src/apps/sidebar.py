@@ -81,13 +81,13 @@ menuSubLink2Scroll = {
     "menu-sub-link-0"  :  {keyLabel : "Overview", keyScrollTo: ''}
     ,"menu-sub-link-1" :  {keyLabel : "Compare Groups", keyScrollTo: 'row-control-main-overview'}
     ,"menu-sub-link-2" :  {keyLabel : "Distribution", keyScrollTo: "Group-Distribution-Information"}
-    ,"menu-sub-link-3" :  {keyLabel : "Tasks Info", keyScrollTo: 'Task-Information'}
-    ,"menu-sub-link-4" :  {keyLabel : "General Info", keyScrollTo: 'General-Information'}
-    ,"menu-sub-link-7" :  {keyLabel : "Concept Info", keyScrollTo: 'Concept-Information'}
+    ,"menu-sub-link-3" :  {keyLabel : "Tasks Info", keyScrollTo: 'Task-Information-Classes'}
+    ,"menu-sub-link-4" :  {keyLabel : "General Info", keyScrollTo: 'General-Information-Classes'}
+    ,"menu-sub-link-7" :  {keyLabel : "Concept Info", keyScrollTo: 'Concept-Information-Classes'}
     ,"menu-sub-link-5" :  {keyLabel : "Student Info", keyScrollTo: 'student-information'}
     ,"menu-sub-link-6" :  {keyLabel : "Custom", keyScrollTo: ''}
     ,"menu-sub-link-8" :  {keyLabel : "Overview", keyScrollTo: 'Overview'}
-    ,"menu-sub-link-9" :  {keyLabel : "Concept Info", keyScrollTo: 'Concept-Information'}
+    ,"menu-sub-link-9" :  {keyLabel : "Concept Info", keyScrollTo: 'Concept-Information-Classes'}
     ,"menu-sub-link-10" :  {keyLabel : "More Info", keyScrollTo: 'More-Information'}
 }
 

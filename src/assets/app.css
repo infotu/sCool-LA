@@ -91,7 +91,7 @@ html {
 	color: #ffffff;
 }
 
-.option-buttons button {
+.choose-learning-activity-buttons button {
 	background-color: #f3f3f3;
 	border: 1px solid #7c7c7c;
 	color: black;
@@ -102,12 +102,12 @@ html {
 	font-size: 1.5em;
 }
   
-  .option-buttons button:not(:last-child) {
+  .choose-learning-activity-buttons button:not(:last-child) {
 	border-bottom: none;
 }
   
   /* hover background color change*/
-  .option-buttons button:hover {
+  .choose-learning-activity-buttons button:hover {
 	background-color: #b9b9b9;
 }
 
