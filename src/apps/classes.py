@@ -36,6 +36,7 @@ from data import studentGrouped
 
 from apps import settings
 import util
+import subprocess
 
 
 #--------------------------------- Const values START ----------------------------
@@ -138,9 +139,13 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
     graphIndex = 1
     graphs = []
     
+    
+        
+        
         
     try :
         groupOriginal = dfGroupedOriginal.get_group(school)
+        groupOriginal['CreatedAt'] = pd.to_datetime(groupOriginal['CreatedAt'])
         groupOriginal['CreatedAtDate'] = groupOriginal['CreatedAt'].dt.date
         
         if filterByDate:
@@ -156,6 +161,8 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                 groupOriginalTheory = dateGroup.get_group(filterByDate)
             
         except Exception as e: 
+            subprocess.Popen(['echo', 'plotSingleClass 1 '])
+            subprocess.Popen(['echo', str(e)])
             print('plotSingleClass 1 ')
             print(e)
         
@@ -266,6 +273,8 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                 ))
             graphIndex = graphIndex + 1
         except Exception as e: 
+                subprocess.Popen(['echo', 'plotSingleClass 1 '])
+                subprocess.Popen(['echo', str(e)])
                 print('plotSingleClass 1 ')
                 print(e)
                 
@@ -288,6 +297,8 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                     index_dfTaskWiseSuccessFailTheory += 1
 
             except Exception as e: 
+                subprocess.Popen(['echo', 'in the theory exception '])
+                subprocess.Popen(['echo', str(e)])
                 print('in the theory exception ')
                 print(e)
             
@@ -367,6 +378,8 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
             graphIndex = graphIndex + 1
         
         except Exception as e: 
+                subprocess.Popen(['echo', 'plotSingleClass 2 '])
+                subprocess.Popen(['echo', str(e)])
                 print('plotSingleClass 2 ')
                 print(e)
         
@@ -451,7 +464,9 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                         ),
                     className = " p-top_small "))  
 
-        except Exception as e:             
+        except Exception as e:   
+            subprocess.Popen(['echo', 'ERROR - ' + graphTitle])
+            subprocess.Popen(['echo', str(e)])          
             print( 'ERROR - ' + graphTitle )
             print(e)
         
@@ -514,11 +529,6 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
             graphs.append(html.Div( graphTitle,
                                    className= "heading-sub theory p-top_xx-large"
                         )) 
-            '''
-            graphs.append(html.Div(table ,
-                             className = "c-table c-table-oddeven font-size_small"
-                        ))     
-            '''
 
             graphs.append(html.Div(html.Details(
                         children = [
@@ -533,19 +543,26 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                     className = " p-top_small  p-bottom_x-large "))           
             
         except Exception as e: 
+            subprocess.Popen(['echo', 'ERROR - ' + graphTitle ])
+            subprocess.Popen(['echo', str(e)])
             print( 'ERROR - ' + graphTitle )  
             print(e)
         
         
 
     except Exception as e: 
+        subprocess.Popen(['echo', 'ERROR - plotSingleClass '])
+        subprocess.Popen(['echo', str(e)])
         print( 'ERROR - plotSingleClass ')
         print(e)
-
 
     return graphs        
 
 
+
+
+    
+    
 
     
 #-------------------------------------------------
@@ -562,9 +579,7 @@ def getGroupTaskWiseDetails(groupId, isGrouped = True, taskId = 0 , filterByDate
     
     graphs = []
     
-    
-    
-#     Step 1 : add the code of each student in table
+#   Step 1 : add the code of each student in table
     try :
         currentGroupData = dfGroupedOriginal.get_group(groupId)
         
@@ -618,7 +633,12 @@ def getGroupTaskWiseDetails(groupId, isGrouped = True, taskId = 0 , filterByDate
                         ))
             
             
+            
+              
+            
     except Exception as e: 
+                subprocess.Popen(['echo', 'plotGroupTaskWiseConcepts 1 '])
+                subprocess.Popen(['echo', str(e)])
                 print('plotGroupTaskWiseConcepts 1 ')
                 print(e)
             
@@ -626,11 +646,12 @@ def getGroupTaskWiseDetails(groupId, isGrouped = True, taskId = 0 , filterByDate
     #    Step 2 :- add the plot - concepts used by count of students
         graphs = graphs + plotGroupTaskWiseConcepts( groupId, isGrouped = isGrouped, taskId = taskId , filterByDate = filterByDate)    
     except Exception as e: 
+        subprocess.Popen(['echo', 'plotGroupTaskWiseConcepts 2 '])
+        subprocess.Popen(['echo', str(e)])
         print('plotGroupTaskWiseConcepts 2 ')
         print(e)
     
     return graphs
-    
     
     
 def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 , filterByDate = '' ) :
@@ -651,7 +672,6 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 , filterByDa
         
         
         studentWiseTaskWiseConceptPractice = pd.DataFrame()
-        
         
         
         if not taskId is None and  taskId > 0 and taskId in taskWiseConceptPracticeGrouped.groups.keys():
@@ -678,6 +698,8 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 , filterByDa
             try :
                 taskTitle =  dfPracticeTaskDetails[ dfPracticeTaskDetails['PracticeTaskId'] == taskId ]['Title'].astype(str).values[0]
             except Exception as e: 
+                subprocess.Popen(['echo', 'plotGroupTaskWiseConcepts 1 '])
+                subprocess.Popen(['echo', str(e)])
                 print('plotGroupTaskWiseConcepts 1 ')
                 print(e)
                 
@@ -710,7 +732,6 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 , filterByDa
             return graphs
 
 
-
 #  for Grouped data !!!
         for groupKeyTaskId, groupTask in taskWiseConceptPracticeGrouped:
             
@@ -740,6 +761,8 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 , filterByDa
             try :
                 taskTitle =  dfPracticeTaskDetails[ dfPracticeTaskDetails['PracticeTaskId'] == int(groupKeyTaskId) ]['Title'].astype(str).values[0]
             except Exception as e: 
+                subprocess.Popen(['echo', 'plotGroupTaskWiseConcepts 1 last '])
+                subprocess.Popen(['echo', str(e)])
                 print('plotGroupTaskWiseConcepts 1 last ')
                 print(e)
         
@@ -759,6 +782,8 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 , filterByDa
                 
         return graphs
     except Exception as e: 
+        subprocess.Popen(['echo', 'plotGroupTaskWiseConcepts  last '])
+        subprocess.Popen(['echo', str(e)])
         print('plotGroupTaskWiseConcepts  last ')
         print(e)               
 
@@ -789,12 +814,17 @@ def getGroupPTaskDoneOptions(groupId , filterByDate = '' ) :
                     
         return options
     except Exception as e: 
+        subprocess.Popen(['echo', 'getGroupPTaskDoneOptions'])
+        subprocess.Popen(['echo', str(e)])
         print('getGroupPTaskDoneOptions')
         print(e)    
     
     return options
 
 
+
+        
+        
         
 def plotGroupConceptDetails(groupId, filterByDate = '' ):
     
@@ -814,8 +844,7 @@ def plotGroupConceptDetails(groupId, filterByDate = '' ):
         
         
         
-        
-    #        sum - to get count of students who used the concept
+#       sum - to get count of students who used the concept
         studentWiseDataConcepts = groupPractice.sum()
                
         colY = hasFeatures
@@ -854,7 +883,7 @@ def plotGroupConceptDetails(groupId, filterByDate = '' ):
                 )
         )
         
-#        Task wise concepts used - grouped together
+#       Task wise concepts used - grouped together
         try :
             figBar = plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0, filterByDate = filterByDate )
             
@@ -881,10 +910,14 @@ def plotGroupConceptDetails(groupId, filterByDate = '' ):
             )))     
 
         except Exception as e: 
+                subprocess.Popen(['echo', 'Task Concepts used'])
+                subprocess.Popen(['echo', str(e)])
                 print('Task Concepts used')
                 print(e)                
       
     except Exception as e: 
+            subprocess.Popen(['echo', 'Task Concepts used'])
+            subprocess.Popen(['echo', str(e)])
             print('Task Concepts used')
             print(e)
 
@@ -952,6 +985,9 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
                 )
             )
         except Exception as e: 
+            subprocess.Popen(['echo', 'getFeaturePlot  1st  '])
+            subprocess.Popen(['echo', 'title  ' + title])
+            subprocess.Popen(['echo', str(e)])
             print('getFeaturePlot  1st  ')
             print('title  ' + title)
             print(e)
@@ -1002,11 +1038,19 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
                 )
             )
         except Exception as e: 
+            subprocess.Popen(['echo', 'getFeaturePlot  2nd  '])
+            subprocess.Popen(['echo', 'title  ' + title])
+            subprocess.Popen(['echo', str(e)])
             print('getFeaturePlot  2nd  ')
             print('title  ' + title)
             print(e)
                     
     
+    
+                    
+                    
+                    
+                
                     
                     
                     
@@ -1057,13 +1101,13 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
                 
             ))
     except Exception as e: 
+        subprocess.Popen(['echo', 'getFeaturePlot  hasDistribution '])
+        subprocess.Popen(['echo', str(e)])
         print('getFeaturePlot  hasDistribution ')
         print('title  ' + title)
         print(e)
         
         
-        
-
     return graphs, graphDistributions
 
 
@@ -1081,6 +1125,9 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
     featuresPractice            = dfPlayerStrategyPractice.columns
                              
     
+    
+        
+     
         
     try :
         groupPractice = dfGroupedPractice.get_group(school)
@@ -1101,6 +1148,8 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                 dateGroup = groupOriginalTheory.groupby(  [ groupOriginalTheory['CreatedAt'].dt.date ] )
                 groupOriginalTheory = dateGroup.get_group(filterByDate)
         except Exception as e: 
+            subprocess.Popen(['echo', ' plotSingleClassGeneral  groupOriginalTheory value set error '])
+            subprocess.Popen(['echo', str(e)])
             print(' plotSingleClassGeneral  groupOriginalTheory value set error ')
             print(e)
         
@@ -1161,6 +1210,8 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
             
             
         except Exception as e: 
+            subprocess.Popen(['echo', ' plotSingleClassGeneral  studentWiseDataTheory value set error !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! '])
+            subprocess.Popen(['echo', str(e)])
             print(' plotSingleClassGeneral  studentWiseDataTheory value set error !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ')
             print(e)
         
@@ -1203,7 +1254,6 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                                 className = "c-container"
                             ))
                             quantileIndex += 1
-                            
                             
                             
                             dfTheory2Plot = studentWiseDataTheory.groupby(['StudentId', 'Name', 'TaskType'], as_index=False).sum()
@@ -1268,14 +1318,15 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                     quantileIndex += 1
                     
                 except Exception as e: 
+                    subprocess.Popen(['echo', ' plotSingleClassGeneral  rowTheory Theory plots '])
+                    subprocess.Popen(['echo', str(e)])
                     print(' plotSingleClassGeneral  rowTheory Theory plots ')
                     print(e)
 
 
     except Exception as e: 
+        subprocess.Popen(['echo', str(e)])
         print(e)
-
-
 
     graphsMain.append(
         html.Div(html.Details(
@@ -1290,7 +1341,6 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                     className = "c-container "
     )))     
     
-
     return graphsMain      
 
 
@@ -1386,15 +1436,15 @@ def plotClassOverview(schoolKey, filterByDate = '' ):
         ))
         rows.append( dbc.Row( columns ) )
         
-    #    ---------------------------------------------
+#    ---------------------------------------------
             
-        
         graphs.append(html.Div(  rows  ))
     except Exception as e: 
+        subprocess.Popen(['echo', 'plotClassOverview 2 '])
+        subprocess.Popen(['echo', str(e)])
         print('plotClassOverview 2 ')
         print(e)
 
-    
     return graphs
 
 
@@ -1411,6 +1461,8 @@ def plotGroupOverview(groupId, filterByDate = '' ):
     #    if not studentDataDf is None and not studentDataDf.empty:
         plots = util.plotGroupOverview(groupId, groupStudents, studentDataDf, classes = "c-card-medium")
     except Exception as e: 
+        subprocess.Popen(['echo', 'plotGroupOverview '])
+        subprocess.Popen(['echo', str(e)])
         print('plotGroupOverview ')
         print(e)
 
@@ -1447,15 +1499,6 @@ def getUserLAOptions():
     
     return studentGrouped.BuildOptionsLA( [ groupId for groupId in  userLA  ] , isAdmin = True  )
 
-"""
-def getUserLAOptionsStrings(user_LA_options):
-    options_strings = []
-    
-    for option in user_LA_options:
-        options_strings.append(option["label"])
-
-    return options_strings
-"""
 
 def createUserLAOptionsButtons():
     buttons_list = []
@@ -1482,9 +1525,7 @@ def getUserLAOptionButtonsIndexes():
 
 user_LA_option_buttons = createUserLAOptionsButtons()
 buttons_indexes = getUserLAOptionButtonsIndexes()
-#user_LA_options = getUserLAOptions()
-#user_LA_options_strings = getUserLAOptionsStrings()
-#user_LA_buttons = [html.Button(option, id = f"button-{i}") for i, option in enumerate(user_LA_options_strings)]
+clicked_button = {}
 
 
 layout = html.Div(
@@ -1518,20 +1559,10 @@ layout = html.Div(
                                                href="", target="_blank",
                                                download='group-overview.csv' )
       )]),
-    
-    dbc.Row([
-            dbc.Col( 
-                    html.Div(html.H1("above"), id='Classes-Container-above', className = "c-table ")
-        )]),
 
     dbc.Row([
             dbc.Col( 
-                    html.Div(id='Classes-Container', className = "c-table ")
-        )]),
-
-    dbc.Row([
-            dbc.Col( 
-                    html.Div(html.H1("below"), id='Classes-Container-below', className = "c-table ")
+                    html.Div(id='Classes-Task-Information-Container', className = "c-table ")
         )]),
     
     dbc.Row([
@@ -1575,11 +1606,13 @@ layout = html.Div(
     [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes]
 )
 def update_output(*args):
+    global clicked_button
+
     ctx = dash.callback_context
     if ctx.triggered:
         button_id = ctx.triggered[0]['prop_id'].split('-')[1] #button_id looks like this: i.n_clicks
         button_index = int(button_id.split('.')[0])
-        #button_label = user_LA_options_strings[button_index]
+        clicked_button["buttonID"] = button_index
         return str(button_index)
     return "nothing pressed"
 
@@ -1596,7 +1629,7 @@ def update_output(selector):#, button_press):
 
 
 @app.callback(Output('Classes-Overview-Container', 'children'), 
-              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes] + [Input('Classes-selector-date', 'value') ])
+              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes] + [Input('Classes-selector-date', 'value')])
 def setClassOverview(*args):
     graphs = []
     button_index = -1 # per default invalid
@@ -1606,18 +1639,18 @@ def setClassOverview(*args):
         button_id = ctx.triggered[0]['prop_id'].split('-')[1]   # button_id looks like this: i.n_clicks
         button_index = int(button_id.split('.')[0])             # button_index equals the database LearningActivityId
 
-    if not util.isValidValueId(button_index) :
+    if not util.isValidValueId(button_index):
         return html.Div(graphs)
     
-    graphs = plotGroupOverview(button_index, filterByDate = args[len(buttons_indexes)] )  
+    graphs = plotGroupOverview(button_index, filterByDate = args[len(buttons_indexes)])  
     
-    graphs = graphs + plotClassOverview(button_index, filterByDate = args[len(buttons_indexes)] )  
+    graphs = graphs + plotClassOverview(button_index, filterByDate = args[len(buttons_indexes)])  
 
     return  html.Div(graphs)
 
 
-@app.callback(Output('Classes-Container', 'children'), 
-              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes] + [Input('Classes-selector-date', 'value') ])
+@app.callback(Output('Classes-Task-Information-Container', 'children'), 
+              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes] + [Input('Classes-selector-date', 'value')])
 def display_graphs(*args):
     graphs = []
     button_index = -1 # per default invalid
@@ -1627,42 +1660,54 @@ def display_graphs(*args):
         button_id = ctx.triggered[0]['prop_id'].split('-')[1]   # button_id looks like this: i.n_clicks
         button_index = int(button_id.split('.')[0])             # button_index equals the database LearningActivityId
     
-    if  not util.isValidValueId(button_index) :
+    if  not util.isValidValueId(button_index):
         return html.Div(graphs)
     
-    graphs = plotSingleClass('School', button_index, filterByDate = args[len(buttons_indexes)] )
+    graphs = plotSingleClass('School', button_index, filterByDate = args[len(buttons_indexes)])
     
-    graphs = [ html.Hr() ] + graphs + [ html.Hr() ]
+    graphs = [html.Hr()] + graphs + [html.Hr()]
     
     return html.Div(graphs)
 
 
 @app.callback(Output('Classes-General-Container', 'children'), 
-              [Input('group-selector-main', 'value')  ,  Input('Classes-selector-date', 'value') ])
-def display_class_general(learningActivitySelected, filterByDate):
+              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes] + [Input('Classes-selector-date', 'value') ])
+def display_class_general(*args):
     graphs = []
+    button_index = -1 # per default invalid
     
-    if  not util.isValidValueId(learningActivitySelected)  :
+    ctx = dash.callback_context
+    if ctx.triggered:
+        button_id = ctx.triggered[0]['prop_id'].split('-')[1]   # button_id looks like this: i.n_clicks
+        button_index = int(button_id.split('.')[0])             # button_index equals the database LearningActivityId
+
+    if  not util.isValidValueId(button_index):
         return html.Div(graphs)
     
-    graphs = plotSingleClassGeneral('School', int(learningActivitySelected), filterByDate = filterByDate )
+    graphs = plotSingleClassGeneral('School', button_index, filterByDate = args[len(buttons_indexes)])
 
-    graphs = graphs + [ html.Hr() ]
+    graphs = graphs + [html.Hr()]
     
     return html.Div(graphs)
 
 
 @app.callback(Output('Classes-Concept-Container', 'children'), 
-              [Input('group-selector-main', 'value')  ,  Input('Classes-selector-date', 'value') ])
-def display_class_concept(learningActivitySelected, filterByDate):
+              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes] + [Input('Classes-selector-date', 'value')])
+def display_class_concept(*args):
     graphs = []
+    button_index = -1 # per default invalid
     
-    if  not util.isValidValueId(learningActivitySelected)  :
+    ctx = dash.callback_context
+    if ctx.triggered:
+        button_id = ctx.triggered[0]['prop_id'].split('-')[1]   # button_id looks like this: i.n_clicks
+        button_index = int(button_id.split('.')[0])             # button_index equals the database LearningActivityId
+
+    if  not util.isValidValueId(button_index):
         return html.Div(graphs)
     
-    graphs = plotGroupConceptDetails(int(learningActivitySelected), filterByDate = filterByDate )
+    graphs = plotGroupConceptDetails(button_index, filterByDate = args[len(buttons_indexes)])
     
-    graphs = graphs + [ html.Hr() ]
+    graphs = graphs + [html.Hr()]
     
     return html.Div(graphs)
     
@@ -1671,48 +1716,60 @@ def display_class_concept(learningActivitySelected, filterByDate):
 @app.callback(
     [Output("Classes-taskId-selector", "options")
      ],
-    [Input("group-selector-main", "value") ,  Input('Classes-selector-date', 'value') ]
+    [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes] + [Input('Classes-selector-date', 'value') ]
 )
-def onSelectGroupSetTaskOptions(  groupId , filterByDate  ):
-    if util.isValidValueId(groupId) :
-        return [getGroupPTaskDoneOptions(groupId , filterByDate = filterByDate) ]
+def onSelectGroupSetTaskOptions(*args):
+
+    button_index = -1 # per default invalid
+    ctx = dash.callback_context
+    if ctx.triggered:
+        button_id = ctx.triggered[0]['prop_id'].split('-')[1]   # button_id looks like this: i.n_clicks
+        button_index = int(button_id.split('.')[0])             # button_index equals the database LearningActivityId
+
+    if util.isValidValueId(button_index) :
+        return [getGroupPTaskDoneOptions(button_index , filterByDate = args[len(buttons_indexes)])]
     
     return [[{'label': 'Select a group', 'value' : '0'}]]
     
 
 @app.callback(
-    [Output("Classes-taskId-container", "children")
-     ],
+    [Output("Classes-taskId-container", "children")],
     [Input("Classes-taskId-selector", "value")],
-    [State('group-selector-main', 'value'),
-     State('Classes-selector-date', 'value')
-     ],
+    [State('Classes-selector-date', 'value')],
 )
-def onSelectTaskShowTaskWiseConcept(taskId, groupId, filterByDate):
+def onSelectTaskShowTaskWiseConcept(taskId, filterByDate):
     graphs = []
     
-    if util.isValidValueId(taskId)  and  util.isValidValueId(groupId) :
-        graphs = getGroupTaskWiseDetails(int(groupId), isGrouped = False, taskId = int(taskId), filterByDate = filterByDate )
+    if util.isValidValueId(taskId)  and  util.isValidValueId(clicked_button["buttonID"]):
+        graphs = getGroupTaskWiseDetails(clicked_button["buttonID"], isGrouped = False, taskId = int(taskId), filterByDate = filterByDate)
         
-    graphs = graphs + [ html.Hr() ]
+    graphs = graphs + [html.Hr()]
     
     return  [html.Div(graphs)]
 
 
-#--------------------- data download callbacks 
+#--------------------- data download callback
 @app.callback(
     [ Output('classes_download_overview_link', 'href'),
-     Output('classes_download_overview_link', 'className'),
-     ],
-    [ Input("group-selector-main", "value"), ])
-def update_download_link__details_group(groupMain):
-    if  not util.isValidValueId(groupMain):
+     Output('classes_download_overview_link', 'className'),],
+    [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes])
+def update_download_link__details_group(*args):
+
+    button_index = -1 # per default invalid
+    ctx = dash.callback_context
+    if ctx.triggered:
+        button_id = ctx.triggered[0]['prop_id'].split('-')[1]   # button_id looks like this: i.n_clicks
+        button_index = int(button_id.split('.')[0])             # button_index equals the database LearningActivityId
+
+    if  not util.isValidValueId(button_index):
         return "", "hidden"
     
     csv_string = ""
     try:
-        csv_string = util.get_download_link_data_uri( studentGrouped.getStudentsOfLearningActivityDF(int(groupMain)) )
+        csv_string = util.get_download_link_data_uri( studentGrouped.getStudentsOfLearningActivityDF(button_index) )
     except Exception as e: 
+        subprocess.Popen(['echo', 'update_download_link__details_group '])
+        subprocess.Popen(['echo', str(e)])
         print('update_download_link__details_group ')
         print(e)
     

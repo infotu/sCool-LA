@@ -1,4 +1,4 @@
-This is the development log file for future Bachelor Thesis writing, it contains the steps (sorted in time) to the hopefully better LA-application.
+This is the development log file for future Bachelor Thesis writing, it contains the steps to the better LA-application.
 
 Downloaded Anil's Docker Container and started it on my Linux. Works fine with lots of Warnings in Server Terminal.
 Setup local MySQL Server with database dump of the production database that Alex sent me.
@@ -9,4 +9,10 @@ Because of this issues updated Flask version from 1.1.2 to 2.1.0 and this seemed
 AspNetUsers table is not in the database...created one with schema template. One entrence for now (Markus)
 Server is finally running with local database clone.
 Start with first new feature, which is information bar on top of the web app about the person that is currently loged in.
-Navbar frontend is completed. Now let's code the backend.
+Navbar/Searchbar/UserInfor frontend is completed.
+Remove selection section in Details Tab and Students Tab. Clickable lists are implemented in form of button lists. (Frontend-then Backend)
+Debugging old code because various Exceptions are thrown due to false datatype reasons. (weird...but maybe due to new versions of frameworks in use)
+Debugging takes way more time then expected, everytime I solve an issue, some other pops up. A lot of code reading/understanding and debugging required.
+Rename/rebuild of Details section into Classes section. Also some Code Refactoring in the process for better understanding variable names.
+More code refactoring due to the new design of clickable list and no dropdown menu for learning activity selection/user web app interactiveness.
+The whole new design implementation takes also way more time then expected, the dropdown menu which will be removed is userd and refered to in many other segments of the application. To go through all the references takes time end effort.
