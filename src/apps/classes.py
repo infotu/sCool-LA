@@ -1530,40 +1530,26 @@ clicked_button = {}
 
 layout = html.Div(
     [
-        html.H1('Select a Class'),
-        html.Div(user_LA_option_buttons, className='choose-learning-activity-buttons'),
-        html.H1(id="test-text"),
-        html.H1(id="value-output-h1"),
+    html.H1('Select a Class', id = 'select-a-class-heading'),
 
-        dbc.Row([
-            dbc.Col( 
-                    html.Div(
-                             children=[
-                                    html.P('Filter by date'),
-                                    dcc.Dropdown(
-                                        id = "Classes-selector-date",
-                                        placeholder="Filter by date", 
-                                        className = "hidden" ,
-                                    ),
-                                ], 
-                                className = "hidden" 
-                             )
-        )]
-    ) ,
-                             
-    html.Div(id='Classes-Overview-Container')
-    , dbc.Row([
+    html.Div(user_LA_option_buttons, className = 'choose-learning-activity-buttons', id = 'learning-activity-selection-div'),
+
+    html.Div(html.Button('Select other Class', id = "button-select-other-la"), className = 'choose-learning-activity-buttons hidden', id = "button-select-other-la-div"),
+      
+    html.Div(id='Classes-Overview-Container'),
+
+    dbc.Row([
             dbc.Col( 
                     html.A(children=[html.I(className="fas fa-download font-size_medium p_small"),
                        "download data : Group",], id = "classes_download_overview_link", className = "hidden" ,
                                                href="", target="_blank",
                                                download='group-overview.csv' )
-      )]),
+       )]),
 
     dbc.Row([
             dbc.Col( 
                     html.Div(id='Classes-Task-Information-Container', className = "c-table ")
-        )]),
+       )]),
     
     dbc.Row([
             dbc.Col( 
@@ -1585,12 +1571,12 @@ layout = html.Div(
                     ],
                     className = "  p-top_xx-large  p-bottom_large "
                 )
-    
        )]),
+
     dbc.Row([
           dbc.Col( 
                   html.Div(id='Classes-taskId-container', className = "c-container ")
-        )]),
+       )]),
                      
     dbc.Row([
             dbc.Col( 
@@ -1601,35 +1587,27 @@ layout = html.Div(
 )
 
 
-@app.callback(
-    Output("test-text", "children"),
-    [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes]
-)
-def update_output(*args):
-    global clicked_button
+@app.callback([Output('learning-activity-selection-div', 'className'), Output('select-a-class-heading', 'className'), Output('button-select-other-la-div', 'className')],
+              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes])
+def hideLearningActivitySelectionButtons(*args):
+    button_index = -1 # per default invalid
 
     ctx = dash.callback_context
     if ctx.triggered:
-        button_id = ctx.triggered[0]['prop_id'].split('-')[1] #button_id looks like this: i.n_clicks
-        button_index = int(button_id.split('.')[0])
-        clicked_button["buttonID"] = button_index
-        return str(button_index)
-    return "nothing pressed"
+        button_id = ctx.triggered[0]['prop_id'].split('-')[1]   # button_id looks like this: i.n_clicks
+        try:
+            button_index = int(button_id.split('.')[0])         # due to the button-select-other-la id this can crash, avoid this by try except block
+        except ValueError:
+            button_index = -1                                   # set invalid id --> means that button-select-other-la button was pressed
 
-
-@app.callback(
-    Output("value-output-h1", "children"),
-    [Input('group-selector-main', 'value')]
-)
-def update_output(selector):#, button_press):
-    ctx = dash.callback_context
-    if ctx.triggered:
-        return selector
-    return "nothing pressed"
+    if util.isValidValueId(button_index):
+        return "choose-learning-activity-buttons hidden", "hidden", "choose-learning-activity-buttons"
+    
+    return "choose-learning-activity-buttons", "", "choose-learning-activity-buttons hidden"
 
 
 @app.callback(Output('Classes-Overview-Container', 'children'), 
-              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes] + [Input('Classes-selector-date', 'value')])
+              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes])
 def setClassOverview(*args):
     graphs = []
     button_index = -1 # per default invalid
@@ -1642,15 +1620,14 @@ def setClassOverview(*args):
     if not util.isValidValueId(button_index):
         return html.Div(graphs)
     
-    graphs = plotGroupOverview(button_index, filterByDate = args[len(buttons_indexes)])  
-    
-    graphs = graphs + plotClassOverview(button_index, filterByDate = args[len(buttons_indexes)])  
+    graphs = plotGroupOverview(button_index, '')
+    graphs = graphs + plotClassOverview(button_index, '')
 
-    return  html.Div(graphs)
+    return html.Div(graphs)
 
 
 @app.callback(Output('Classes-Task-Information-Container', 'children'), 
-              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes] + [Input('Classes-selector-date', 'value')])
+              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes])
 def display_graphs(*args):
     graphs = []
     button_index = -1 # per default invalid
@@ -1660,18 +1637,17 @@ def display_graphs(*args):
         button_id = ctx.triggered[0]['prop_id'].split('-')[1]   # button_id looks like this: i.n_clicks
         button_index = int(button_id.split('.')[0])             # button_index equals the database LearningActivityId
     
-    if  not util.isValidValueId(button_index):
+    if not util.isValidValueId(button_index):
         return html.Div(graphs)
     
-    graphs = plotSingleClass('School', button_index, filterByDate = args[len(buttons_indexes)])
-    
+    graphs = plotSingleClass('School', button_index, '')
     graphs = [html.Hr()] + graphs + [html.Hr()]
     
     return html.Div(graphs)
 
 
 @app.callback(Output('Classes-General-Container', 'children'), 
-              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes] + [Input('Classes-selector-date', 'value') ])
+              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes])
 def display_class_general(*args):
     graphs = []
     button_index = -1 # per default invalid
@@ -1681,18 +1657,17 @@ def display_class_general(*args):
         button_id = ctx.triggered[0]['prop_id'].split('-')[1]   # button_id looks like this: i.n_clicks
         button_index = int(button_id.split('.')[0])             # button_index equals the database LearningActivityId
 
-    if  not util.isValidValueId(button_index):
+    if not util.isValidValueId(button_index):
         return html.Div(graphs)
     
-    graphs = plotSingleClassGeneral('School', button_index, filterByDate = args[len(buttons_indexes)])
-
+    graphs = plotSingleClassGeneral('School', button_index, '')
     graphs = graphs + [html.Hr()]
     
     return html.Div(graphs)
 
 
 @app.callback(Output('Classes-Concept-Container', 'children'), 
-              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes] + [Input('Classes-selector-date', 'value')])
+              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes])
 def display_class_concept(*args):
     graphs = []
     button_index = -1 # per default invalid
@@ -1702,22 +1677,18 @@ def display_class_concept(*args):
         button_id = ctx.triggered[0]['prop_id'].split('-')[1]   # button_id looks like this: i.n_clicks
         button_index = int(button_id.split('.')[0])             # button_index equals the database LearningActivityId
 
-    if  not util.isValidValueId(button_index):
+    if not util.isValidValueId(button_index):
         return html.Div(graphs)
     
-    graphs = plotGroupConceptDetails(button_index, filterByDate = args[len(buttons_indexes)])
-    
+    graphs = plotGroupConceptDetails(button_index, '')
     graphs = graphs + [html.Hr()]
     
     return html.Div(graphs)
     
 
 #On Select a Group - set Group Task Done Options - see task wise information             
-@app.callback(
-    [Output("Classes-taskId-selector", "options")
-     ],
-    [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes] + [Input('Classes-selector-date', 'value') ]
-)
+@app.callback([Output("Classes-taskId-selector", "options")],
+              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes])
 def onSelectGroupSetTaskOptions(*args):
 
     button_index = -1 # per default invalid
@@ -1726,33 +1697,29 @@ def onSelectGroupSetTaskOptions(*args):
         button_id = ctx.triggered[0]['prop_id'].split('-')[1]   # button_id looks like this: i.n_clicks
         button_index = int(button_id.split('.')[0])             # button_index equals the database LearningActivityId
 
-    if util.isValidValueId(button_index) :
-        return [getGroupPTaskDoneOptions(button_index , filterByDate = args[len(buttons_indexes)])]
+    if util.isValidValueId(button_index):
+        clicked_button['buttonID'] = button_index
+        return [getGroupPTaskDoneOptions(button_index , '')]
     
     return [[{'label': 'Select a group', 'value' : '0'}]]
     
 
-@app.callback(
-    [Output("Classes-taskId-container", "children")],
-    [Input("Classes-taskId-selector", "value")],
-    [State('Classes-selector-date', 'value')],
-)
-def onSelectTaskShowTaskWiseConcept(taskId, filterByDate):
+@app.callback([Output("Classes-taskId-container", "children")],
+              [Input("Classes-taskId-selector", "value")])
+def onSelectTaskShowTaskWiseConcept(taskId):
     graphs = []
     
-    if util.isValidValueId(taskId)  and  util.isValidValueId(clicked_button["buttonID"]):
-        graphs = getGroupTaskWiseDetails(clicked_button["buttonID"], isGrouped = False, taskId = int(taskId), filterByDate = filterByDate)
+    if util.isValidValueId(taskId) and util.isValidValueId(clicked_button["buttonID"]):
+        graphs = getGroupTaskWiseDetails(clicked_button["buttonID"], isGrouped = False, taskId = int(taskId), filterByDate = '')
         
     graphs = graphs + [html.Hr()]
     
-    return  [html.Div(graphs)]
+    return [html.Div(graphs)]
 
 
 #--------------------- data download callback
-@app.callback(
-    [ Output('classes_download_overview_link', 'href'),
-     Output('classes_download_overview_link', 'className'),],
-    [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes])
+@app.callback([Output('classes_download_overview_link', 'href'), Output('classes_download_overview_link', 'className')],
+              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes])
 def update_download_link__details_group(*args):
 
     button_index = -1 # per default invalid
