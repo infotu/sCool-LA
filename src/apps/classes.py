@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mar 14 10:25:00 2023
 
-@author: zangl
+"""
+Created on   Jun 11 19:04:59 2020
+Reworked on  Mar 14 10:25:00 2023
+
+@authors: tilan, zangl
 """
 
 import math
@@ -1521,6 +1523,14 @@ def getUserLAOptionButtonsIndexes():
         buttons_index_list.append(button_value)
     
     return buttons_index_list
+
+
+def getButtonLabel(button_id):
+    user_LA_options = getUserLAOptions()
+    for option in user_LA_options:
+        if(int(option["value"]) == button_id):
+            return option["label"]
+    return "Heading Error"
         
 
 user_LA_option_buttons = createUserLAOptionsButtons()
@@ -1530,7 +1540,7 @@ clicked_button = {}
 
 layout = html.Div(
     [
-    html.H1('Select a Class', id = 'select-a-class-heading'),
+    html.H1('Select a Class', id = 'select-a-class-heading', style = {'text-align': 'center'}),
 
     html.Div(user_LA_option_buttons, className = 'choose-learning-activity-buttons', id = 'learning-activity-selection-div'),
 
@@ -1560,7 +1570,8 @@ layout = html.Div(
             dbc.Col( 
                 html.Div(children=[
                         html.Div( 'Task wise code submission and concept details',
-                                    className= "heading-sub practice  p-bottom_small"
+                                  id = 'Classes-taskId-selector-heading',
+                                  className= "heading-sub practice  p-bottom_small hidden"
                         ),
                         dcc.Dropdown(
                             id = "Classes-taskId-selector",
@@ -1587,9 +1598,13 @@ layout = html.Div(
 )
 
 
-@app.callback([Output('learning-activity-selection-div', 'className'), Output('select-a-class-heading', 'className'), Output('button-select-other-la-div', 'className')],
-              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes])
-def hideLearningActivitySelectionButtons(*args):
+@app.callback([Output('learning-activity-selection-div', 'className'), Output('select-a-class-heading', 'children'),
+               Output('button-select-other-la-div', 'className'), Output('Classes-Overview-Container', 'className'),
+               Output('Classes-Task-Information-Container', 'className'), Output('Classes-General-Container', 'className'),
+               Output('Classes-Concept-Container', 'className'), Output("Classes-taskId-selector", "className"),
+               Output("Classes-taskId-container", "className"), Output("Classes-taskId-selector-heading", "className")],
+              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes] + [Input("button-select-other-la", "n_clicks")])
+def showHideLearningActivitySelectionButtons(*args):
     button_index = -1 # per default invalid
 
     ctx = dash.callback_context
@@ -1601,9 +1616,9 @@ def hideLearningActivitySelectionButtons(*args):
             button_index = -1                                   # set invalid id --> means that button-select-other-la button was pressed
 
     if util.isValidValueId(button_index):
-        return "choose-learning-activity-buttons hidden", "hidden", "choose-learning-activity-buttons"
+        return "choose-learning-activity-buttons hidden", getButtonLabel(button_index), "choose-learning-activity-buttons", "", "c-table ", "c-table ", "c-table ", " ", "c-container ", "heading-sub practice  p-bottom_small"
     
-    return "choose-learning-activity-buttons", "", "choose-learning-activity-buttons hidden"
+    return  "choose-learning-activity-buttons", "Select a Class", "choose-learning-activity-buttons hidden", "hidden", "c-table hidden", "c-table hidden", "c-table hidden", "hidden", "c-container hidden", "heading-sub practice  p-bottom_small hidden"
 
 
 @app.callback(Output('Classes-Overview-Container', 'children'), 
@@ -1719,25 +1734,29 @@ def onSelectTaskShowTaskWiseConcept(taskId):
 
 #--------------------- data download callback
 @app.callback([Output('classes_download_overview_link', 'href'), Output('classes_download_overview_link', 'className')],
-              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes])
+              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes] + [Input("button-select-other-la", "n_clicks")])
 def update_download_link__details_group(*args):
 
     button_index = -1 # per default invalid
+
     ctx = dash.callback_context
     if ctx.triggered:
         button_id = ctx.triggered[0]['prop_id'].split('-')[1]   # button_id looks like this: i.n_clicks
-        button_index = int(button_id.split('.')[0])             # button_index equals the database LearningActivityId
+        try:
+            button_index = int(button_id.split('.')[0])         # due to the button-select-other-la id this can crash, avoid this by try except block
+        except ValueError:
+            button_index = -1                                   # set invalid id --> means that button-select-other-la button was pressed
 
-    if  not util.isValidValueId(button_index):
-        return "", "hidden"
+    if  util.isValidValueId(button_index):
+        csv_string = ""
+        try:
+            csv_string = util.get_download_link_data_uri( studentGrouped.getStudentsOfLearningActivityDF(button_index) )
+        except Exception as e: 
+            subprocess.Popen(['echo', 'update_download_link__details_group '])
+            subprocess.Popen(['echo', str(e)])
+            print('update_download_link__details_group ')
+            print(e)
     
-    csv_string = ""
-    try:
-        csv_string = util.get_download_link_data_uri( studentGrouped.getStudentsOfLearningActivityDF(button_index) )
-    except Exception as e: 
-        subprocess.Popen(['echo', 'update_download_link__details_group '])
-        subprocess.Popen(['echo', str(e)])
-        print('update_download_link__details_group ')
-        print(e)
+        return csv_string, ""
     
-    return csv_string, ""
+    return "", "hidden"

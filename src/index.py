@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jun 11 18:04:10 2020
+Created on   Jun 11 18:04:10 2020
+Reworked on  Mar 14 10:25:00 2023
 
-@author: tilan
+@authors: tilan, zangl
 """
 
 # -*- coding: utf-8 -*-
@@ -14,7 +15,7 @@ import dash_bootstrap_components as dbc
 from flask_login import logout_user, current_user, LoginManager, UserMixin
 
 from app import app, server, login_manager, User
-from apps import groups, learningActivityDetails, groupStudents, custom, home, sidebar, login, searchAndUserInfo, classes
+from apps import groups, learningActivityDetails, groupStudents, custom, home, sidebar, login, searchAndUserInfo, classes, students
 from data import studentGrouped
 
 import constants
@@ -156,7 +157,9 @@ def render_page_content(pathname):
         elif pathname == "/Custom":
             return custom.layout
         elif pathname == "/Students":
-            return groupStudents.layout        
+            return groupStudents.layout
+        elif pathname == "/StudentsNew":
+            return students.layout
 
         return classes.layout
 

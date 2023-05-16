@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Jun 14 15:45:09 2020
+Created on   Jun 14 15:45:09 2020
+Reworked on  Mar 14 10:25:00 2023
 
-@author: tilan
+@authors: tilan, zangl
 """
 import numpy as np
 import dash
@@ -46,30 +47,40 @@ iconNameCustom      = constants.iconNameCustom
 # Used to generate Menu Links
 # provide href, where navigate to on click on the Menu Section
 menuLink = {
-     "menu-link-0" : { keyLabel : 'Game Data', keyHref : '/Home',
+    "menu-link-0" : { keyLabel : 'Game Data', keyHref : '/Home',
                   keySubmenu : [ 
                           ],  keyClassName : 'fas ' + iconNameHome + ' m-right-small',
-                          keyOnlyForAdmin : True }
-    ,   "menu-link-1" : { keyLabel : 'Groups', keyHref : '/Groups',
+                          keyOnlyForAdmin : True },
+
+    "menu-link-1" : { keyLabel : 'Groups', keyHref : '/Groups',
                   keySubmenu : [
                           "menu-sub-link-0", "menu-sub-link-1", "menu-sub-link-2"
                           ],  keyClassName : 'fas ' + iconNameGroups + ' m-right-small',
-                          keyOnlyForAdmin : True    }
-    ,   "menu-link-2" : { keyLabel : 'Classes', keyHref : '/Classes' ,
+                          keyOnlyForAdmin : True    },
+
+    "menu-link-2" : { keyLabel : 'Classes', keyHref : '/Classes' ,
                   keySubmenu : [
                           "menu-sub-link-8", "menu-sub-link-9", "menu-sub-link-10"
                           ],  keyClassName : 'fas ' + iconNameClasses + ' m-right-small',
-                          keyOnlyForAdmin : False    }                      
-    ,   "menu-link-3" : { keyLabel : 'Details', keyHref : '/Details' ,
+                          keyOnlyForAdmin : False    },
+
+    "menu-link-3" : { keyLabel : 'StudentsNew', keyHref : '/StudentsNew' ,
+                  keySubmenu : [ "menu-sub-link-11"  
+                          ],  keyClassName : 'fas ' + iconNameStudents + ' m-right-small',
+                          keyOnlyForAdmin : False    },  
+
+    "menu-link-4" : { keyLabel : 'Details', keyHref : '/Details' ,
                   keySubmenu : [
                           "menu-sub-link-3", "menu-sub-link-7", "menu-sub-link-4"
                           ],  keyClassName : 'fas ' + iconNameDetails + ' m-right-small',
-                          keyOnlyForAdmin : False    }
-    ,   "menu-link-4" : { keyLabel : 'Students', keyHref : '/Students' ,
+                          keyOnlyForAdmin : False    },
+
+    "menu-link-5" : { keyLabel : 'Students', keyHref : '/Students' ,
                   keySubmenu : [ "menu-sub-link-5"  
                           ],  keyClassName : 'fas ' + iconNameStudents + ' m-right-small',
-                          keyOnlyForAdmin : False    }
-    ,   "menu-link-5" : { keyLabel : 'Custom', keyHref : '/Custom' ,
+                          keyOnlyForAdmin : False    },
+
+    "menu-link-6" : { keyLabel : 'Custom', keyHref : '/Custom' ,
                   keySubmenu : [
                           "menu-sub-link-6"
                           ],  keyClassName : 'fas ' + iconNameCustom + ' m-right-small',
@@ -89,6 +100,7 @@ menuSubLink2Scroll = {
     ,"menu-sub-link-8" :  {keyLabel : "Overview", keyScrollTo: 'Overview'}
     ,"menu-sub-link-9" :  {keyLabel : "Concept Info", keyScrollTo: 'Concept-Information-Classes'}
     ,"menu-sub-link-10" :  {keyLabel : "More Info", keyScrollTo: 'More-Information'}
+    ,"menu-sub-link-11" :  {keyLabel : "Student Info", keyScrollTo: 'students-information'}
 }
 
 
