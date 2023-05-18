@@ -794,6 +794,7 @@ user_LA_option_buttons = createUserLAOptionsButtons()
 buttons_indexes = getUserLAOptionButtonsIndexes()
 clicked_button = {}
 
+global_students_id_list = []
         
 #-----------------------------------------
 # Layout-------------------------
@@ -881,14 +882,10 @@ layout = [
 
 
 @app.callback([Output('students-learning-activity-selection-div', 'className'), Output('students-select-a-class-heading', 'children'),
-               Output('students-button-select-other-la-div', 'className'), Output('students-information', 'className'),
-               Output('students-selector-dropdown-div', 'className'), Output('students-overview-container', 'className'),
-               Output('students-feature-overview-dropdown-div', 'className'), Output('students-features-overview-container', 'className'),
-               Output('students-date-dropdown-div', 'className'), Output('students-sort-order-dropdown-div', 'className'),
-               Output('students_details_download_link-A', 'className'), Output('Students-Container', 'className'),
+               Output('students-button-select-other-la-div', 'className'),
                Output('students-select-a-student-heading', 'className'), Output('students-selection-div', 'className')],
               [Input(f"students-la-button-{i}", 'n_clicks') for i in buttons_indexes] + [Input("students-button-select-other-la", "n_clicks")])
-def showHideLearningActivitySelectionButtons(*args):
+def showHideLearningActivityAndStudentsSelectionButtons(*args):
     button_index = -1 # per default invalid
 
     ctx = dash.callback_context
@@ -900,9 +897,32 @@ def showHideLearningActivitySelectionButtons(*args):
             button_index = -1                                   # set invalid id --> means that button-select-other-la button was pressed
 
     if util.isValidValueId(button_index):
-        return "choose-learning-activity-buttons hidden", classes.getButtonLabel(button_index), "choose-learning-activity-buttons", "c-container", "", "c-container m_small", "", "c-container m_small", "c-container", "c-container", "", "c-container p-bottom_15", "", "choose-students-buttons"
+        return "choose-learning-activity-buttons hidden", classes.getButtonLabel(button_index), "choose-learning-activity-buttons", "", "choose-students-buttons"
     
-    return "choose-learning-activity-buttons", "Select a Class", "choose-learning-activity-buttons hidden", "c-container hidden", "hidden", "c-container m_small hidden", "hidden", "c-container m_small hidden", "c-container hidden", "c-container hidden", "hidden", "c-container p-bottom_15 hidden", "hidden", "choose-students-buttons hidden"
+    return "choose-learning-activity-buttons", "Select a Class", "choose-learning-activity-buttons hidden", "hidden", "choose-students-buttons hidden"
+
+
+@app.callback([Output('students-information', 'className'),
+               Output('students-overview-container', 'className'),
+               Output('students-feature-overview-dropdown-div', 'className'), Output('students-features-overview-container', 'className'),
+               Output('students-date-dropdown-div', 'className'), Output('students-sort-order-dropdown-div', 'className'),
+               Output('students_details_download_link-A', 'className'), Output('Students-Container', 'className')],
+              [Input(f"student-selection-button-{i}", 'n_clicks') for i in global_students_id_list] + [Input("students-button-select-other-student", "n_clicks")])
+def showHideStudentsContentButtons(*args):
+    button_index = -1 # per default invalid
+
+    ctx = dash.callback_context
+    if ctx.triggered:
+        button_id = ctx.triggered[0]['prop_id'].split('-')[3]   # button_id looks like this: i.n_clicks
+        try:
+            button_index = int(button_id.split('.')[0])         # due to the button-select-other-la id this can crash, avoid this by try except block
+        except ValueError:
+            button_index = -1                                   # set invalid id --> means that button-select-other-la button was pressed
+
+    if util.isValidValueId(button_index):
+        return "c-container", "c-container m_small", "", "c-container m_small", "c-container", "c-container", "", "c-container p-bottom_15"
+    
+    return "c-container hidden", "c-container m_small hidden", "hidden", "c-container m_small hidden", "c-container hidden", "c-container hidden", "hidden", "c-container p-bottom_15 hidden"
 
 
 #-------- Students-------------
@@ -924,6 +944,7 @@ def setStudentOptions(*args):
         return []
     
     students_id_list = getStudentsOfLearningActivity(button_index)
+    global_students_id_list = students_id_list
     dfstudents = dfStudentDetails[dfStudentDetails[constants.STUDENT_ID_FEATURE].isin(students_id_list)][['StudentId', 'Name']].drop_duplicates(subset=['StudentId'], keep='first')
     
     for index, row in dfstudents.iterrows():
