@@ -29,7 +29,7 @@ from plotly import graph_objs as go
 import os
 
 from app import app
-
+from apps import classes
 
 
 from data import studentGrouped
@@ -758,6 +758,42 @@ def getFeatureOptions():
    
     return util.BuildOptionsFeatures( newFeatureOptionsList )
     
+
+def createUserLAOptionsButtons():
+    buttons_list = []
+
+    user_LA_options = classes.getUserLAOptions()
+    for option in user_LA_options:
+        button_label = option["label"]
+        button_value = int(option["value"])
+        buttons_list.append(html.Button(button_label, id = f"students-la-button-{button_value}"))
+
+    return buttons_list
+
+
+def getUserLAOptionButtonsIndexes():
+    buttons_index_list = []
+    
+    user_LA_options = classes.getUserLAOptions()
+    for option in user_LA_options:
+        button_value = int(option["value"])
+        buttons_index_list.append(button_value)
+    
+    return buttons_index_list
+
+
+def getButtonLabel(button_id):
+    user_LA_options = classes.getUserLAOptions()
+    for option in user_LA_options:
+        if(int(option["value"]) == button_id):
+            return option["label"]
+    return "Heading Error"
+
+
+user_LA_option_buttons = createUserLAOptionsButtons()
+buttons_indexes = getUserLAOptionButtonsIndexes()
+clicked_button = {}
+
         
 #-----------------------------------------
 # Layout-------------------------
@@ -766,12 +802,24 @@ def getFeatureOptions():
 layout = [
     html.Div([
 
+        html.H1('Select a Class', id = 'students-select-a-class-heading', style = {'text-align': 'center', 'margin-top': '10px'}),
+
+        html.Div(user_LA_option_buttons, className = 'choose-learning-activity-buttons', id = 'students-learning-activity-selection-div'),
+
+        html.Div(html.Button('Select other Class', id = "students-button-select-other-la"), className = 'choose-learning-activity-buttons hidden', id = "students-button-select-other-la-div"),
+
+        html.H1('Select a Student', id = 'students-select-a-student-heading', style = {'text-align': 'center', 'margin-top': '10px'}, className = 'hidden'),
+
+        html.Div(children = [], className = 'choose-students-buttons hidden', id = 'students-selection-div'),
+
+        html.Div(html.Button('Select other Student', id = "students-button-select-other-student"), className = 'choose-students-buttons hidden', id = "students-button-select-other-student-div"),
+
         dbc.Row([
             dbc.Col(html.Div(id = 'students-information', children = [html.H3('Student Information')], className = "c-container hidden"))
         ]),
 
         dbc.Row([
-            dbc.Col(html.Div([dcc.Dropdown(id = 'students-selector-dropdown', placeholder = "Select Student")], className = "hidden"), width = 12)
+            dbc.Col(html.Div([dcc.Dropdown(id = 'students-selector-dropdown', placeholder = "Select Student")], id = 'students-selector-dropdown-div', className = "hidden"), width = 12)
         ]),
 
         dbc.Row([
@@ -784,6 +832,7 @@ layout = [
                 html.Div([
                     dcc.Dropdown(id = 'students-feature-overview-dropdown', placeholder = "Select Overview Features", options = getFeatureOptions(),multi   = True)
                     ],
+                    id = 'students-feature-overview-dropdown-div',
                     className = "hidden"
                 )
                 , width = 12
@@ -796,7 +845,7 @@ layout = [
              
             
         dbc.Row([
-            dbc.Col(html.Div([dcc.Dropdown(id = 'students-date-dropdown', placeholder = "Select Date")],className = "c-container hidden"), width = 6),
+            dbc.Col(html.Div([dcc.Dropdown(id = 'students-date-dropdown', placeholder = "Select Date")], id = "students-date-dropdown-div", className = "c-container hidden"), width = 6),
 
             dbc.Col(
                 html.Div([
@@ -807,6 +856,7 @@ layout = [
                             placeholder = "Order",
                     )
                 ], 
+                id = "students-sort-order-dropdown-div",
                 className = "c-container hidden", 
                 )
                 , width  =  6
@@ -815,7 +865,7 @@ layout = [
                     
         dbc.Row([
             dbc.Col(html.A(children=[html.I(className="fas fa-download font-size_medium p_small"),"download data : Student",],
-                           id = "students_details_download_link", className = "hidden", href = "", target = "_blank", download = 'student.csv'))
+                           id = "students_details_download_link", className = "hidden", href = "", target = "_blank", download = 'student.csv'), id = "students_details_download_link-A", className = "hidden")
         ]),    
      
         dbc.Row([
@@ -828,6 +878,61 @@ layout = [
 #-----------------------------------------
 # callback functions---------------------
 #        ---------------------------------
+
+
+@app.callback([Output('students-learning-activity-selection-div', 'className'), Output('students-select-a-class-heading', 'children'),
+               Output('students-button-select-other-la-div', 'className'), Output('students-information', 'className'),
+               Output('students-selector-dropdown-div', 'className'), Output('students-overview-container', 'className'),
+               Output('students-feature-overview-dropdown-div', 'className'), Output('students-features-overview-container', 'className'),
+               Output('students-date-dropdown-div', 'className'), Output('students-sort-order-dropdown-div', 'className'),
+               Output('students_details_download_link-A', 'className'), Output('Students-Container', 'className'),
+               Output('students-select-a-student-heading', 'className'), Output('students-selection-div', 'className')],
+              [Input(f"students-la-button-{i}", 'n_clicks') for i in buttons_indexes] + [Input("students-button-select-other-la", "n_clicks")])
+def showHideLearningActivitySelectionButtons(*args):
+    button_index = -1 # per default invalid
+
+    ctx = dash.callback_context
+    if ctx.triggered:
+        button_id = ctx.triggered[0]['prop_id'].split('-')[3]   # button_id looks like this: i.n_clicks
+        try:
+            button_index = int(button_id.split('.')[0])         # due to the button-select-other-la id this can crash, avoid this by try except block
+        except ValueError:
+            button_index = -1                                   # set invalid id --> means that button-select-other-la button was pressed
+
+    if util.isValidValueId(button_index):
+        return "choose-learning-activity-buttons hidden", classes.getButtonLabel(button_index), "choose-learning-activity-buttons", "c-container", "", "c-container m_small", "", "c-container m_small", "c-container", "c-container", "", "c-container p-bottom_15", "", "choose-students-buttons"
+    
+    return "choose-learning-activity-buttons", "Select a Class", "choose-learning-activity-buttons hidden", "c-container hidden", "hidden", "c-container m_small hidden", "hidden", "c-container m_small hidden", "c-container hidden", "c-container hidden", "hidden", "c-container p-bottom_15 hidden", "hidden", "choose-students-buttons hidden"
+
+
+#-------- Students-------------
+@app.callback(Output('students-selection-div', 'children'), 
+              [Input(f"students-la-button-{i}", 'n_clicks') for i in buttons_indexes])
+def setStudentOptions(*args):
+    student_selection_children = []
+    button_index = -1
+        
+    ctx = dash.callback_context
+    if ctx.triggered:
+        button_id = ctx.triggered[0]['prop_id'].split('-')[3]   # button_id looks like this: i.n_clicks
+        try:
+            button_index = int(button_id.split('.')[0])         # due to the button-select-other-la id this can crash, avoid this by try except block
+        except ValueError:
+            button_index = -1                                   # set invalid id --> means that button-select-other-la button was pressed
+
+    if not util.isValidValueId(button_index):
+        return []
+    
+    students_id_list = getStudentsOfLearningActivity(button_index)
+    dfstudents = dfStudentDetails[dfStudentDetails[constants.STUDENT_ID_FEATURE].isin(students_id_list)][['StudentId', 'Name']].drop_duplicates(subset=['StudentId'], keep='first')
+    
+    for index, row in dfstudents.iterrows():
+        student_id = row['StudentId']
+        student_name = row['Name']
+        student_selection_children.append(html.Button(student_name, id = f"student-selection-button-{student_id}"))
+
+    return student_selection_children
+
 
 #-------- Students-------------
 @app.callback(Output('students-selector-dropdown', 'options') , 

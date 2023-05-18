@@ -111,6 +111,26 @@ html {
 	background-color: #b9b9b9;
 }
 
+.choose-students-buttons button {
+	background-color: #f3f3f3;
+	border: 1px solid #7c7c7c;
+	color: black;
+	padding: 10px 24px;
+	cursor: pointer;
+	width: 100%;
+	display: block;
+	font-size: 1.5em;
+}
+  
+  .choose-students-buttons button:not(:last-child) {
+	border-bottom: none;
+}
+  
+  /* hover background color change*/
+  .choose-students-buttons button:hover {
+	background-color: #b9b9b9;
+}
+
 .row {
 	margin-right: 0 !important;
 	margin-left: 0 !important;
