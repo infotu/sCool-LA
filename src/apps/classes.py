@@ -1514,17 +1514,6 @@ def createUserLAOptionsButtons():
     return buttons_list
 
 
-def getUserLAOptionButtonsIndexes():
-    buttons_index_list = []
-    
-    user_LA_options = getUserLAOptions()
-    for option in user_LA_options:
-        button_value = int(option["value"])
-        buttons_index_list.append(button_value)
-    
-    return buttons_index_list
-
-
 def getButtonLabel(class_id):
     user_LA_options = getUserLAOptions()
     for option in user_LA_options:
@@ -1534,7 +1523,6 @@ def getButtonLabel(class_id):
         
 
 user_LA_option_buttons = createUserLAOptionsButtons()
-buttons_indexes = getUserLAOptionButtonsIndexes()
 clicked_button = {}
 
 
