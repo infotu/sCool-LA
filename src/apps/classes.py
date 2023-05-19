@@ -28,7 +28,7 @@ import dash
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output, State
+from dash.dependencies import Input, Output, State, ALL
 
 from flask_login import logout_user, current_user, LoginManager, UserMixin
 
@@ -1509,7 +1509,7 @@ def createUserLAOptionsButtons():
     for option in user_LA_options:
         button_label = option["label"]
         button_value = int(option["value"])
-        buttons_list.append(html.Button(button_label, id = f"button-{button_value}"))
+        buttons_list.append(html.Button(button_label, id = {"button-type": "select-classes-button", "class-id": button_value}))
 
     return buttons_list
 
@@ -1525,10 +1525,10 @@ def getUserLAOptionButtonsIndexes():
     return buttons_index_list
 
 
-def getButtonLabel(button_id):
+def getButtonLabel(class_id):
     user_LA_options = getUserLAOptions()
     for option in user_LA_options:
-        if(int(option["value"]) == button_id):
+        if(int(option["value"]) == class_id):
             return option["label"]
     return "Heading Error"
         
@@ -1544,7 +1544,7 @@ layout = html.Div(
 
     html.Div(user_LA_option_buttons, className = 'choose-learning-activity-buttons', id = 'learning-activity-selection-div'),
 
-    html.Div(html.Button('Select other Class', id = "button-select-other-la"), className = 'choose-learning-activity-buttons hidden', id = "button-select-other-la-div"),
+    html.Div(html.Button('Select other Class', id = {"button-type": "select-other-classes-button"}), className = 'choose-learning-activity-buttons hidden', id = "button-select-other-la-div"),
       
     html.Div(id='Classes-Overview-Container'),
 
@@ -1598,130 +1598,156 @@ layout = html.Div(
 )
 
 
+#----------------------------------------------------------------------------------------------------------------------
 @app.callback([Output('learning-activity-selection-div', 'className'), Output('select-a-class-heading', 'children'),
                Output('button-select-other-la-div', 'className'), Output('Classes-Overview-Container', 'className'),
                Output('Classes-Task-Information-Container', 'className'), Output('Classes-General-Container', 'className'),
                Output('Classes-Concept-Container', 'className'), Output("Classes-taskId-selector", "className"),
                Output("Classes-taskId-container", "className"), Output("Classes-taskId-selector-heading", "className")],
-              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes] + [Input("button-select-other-la", "n_clicks")])
+              [Input({"button-type": "select-classes-button", "class-id": ALL}, "n_clicks"), Input({"button-type": "select-other-classes-button"}, "n_clicks")])
 def showHideLearningActivitySelectionButtons(*args):
-    button_index = -1 # per default invalid
 
     ctx = dash.callback_context
     if ctx.triggered:
-        button_id = ctx.triggered[0]['prop_id'].split('-')[1]   # button_id looks like this: i.n_clicks
-        try:
-            button_index = int(button_id.split('.')[0])         # due to the button-select-other-la id this can crash, avoid this by try except block
-        except ValueError:
-            button_index = -1                                   # set invalid id --> means that button-select-other-la button was pressed
+        triggered_id = ctx.triggered[0]['prop_id']             # example string for triggered_id: {"button-type":"select-classes-button","class-id":1}.n_clicks
 
-    if util.isValidValueId(button_index):
-        return "choose-learning-activity-buttons hidden", getButtonLabel(button_index), "choose-learning-activity-buttons", "", "c-table ", "c-table ", "c-table ", " ", "c-container ", "heading-sub practice  p-bottom_small"
-    
-    return  "choose-learning-activity-buttons", "Select a Class", "choose-learning-activity-buttons hidden", "hidden", "c-table hidden", "c-table hidden", "c-table hidden", "hidden", "c-container hidden", "heading-sub practice  p-bottom_small hidden"
+        # extract dictionary string and convert it to real dictionary
+        start_index = triggered_id.index('{')
+        end_index = triggered_id.rindex('}') + 1
+        dictionary_str = triggered_id[start_index:end_index]
+        triggered_id_dict = json.loads(dictionary_str)
 
+        if triggered_id_dict["button-type"] == "select-classes-button":
+            class_id = triggered_id_dict["class-id"]
+            return "choose-learning-activity-buttons hidden", getButtonLabel(class_id), "choose-learning-activity-buttons", "", "c-table ", "c-table ", "c-table ", " ", "c-container ", "heading-sub practice  p-bottom_small"
 
+    return "choose-learning-activity-buttons", "Select a Class", "choose-learning-activity-buttons hidden", "hidden", "c-table hidden", "c-table hidden", "c-table hidden", "hidden", "c-container hidden", "heading-sub practice  p-bottom_small hidden"
+
+#----------------------------------------------------------------------------------------------------------------------
 @app.callback(Output('Classes-Overview-Container', 'children'), 
-              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes])
-def setClassOverview(*args):
-    graphs = []
-    button_index = -1 # per default invalid
+              Input({"button-type": "select-classes-button", "class-id": ALL}, "n_clicks"))
+def setClassOverview(n_clicks):
 
+    graphs = []
     ctx = dash.callback_context
     if ctx.triggered:
-        button_id = ctx.triggered[0]['prop_id'].split('-')[1]   # button_id looks like this: i.n_clicks
-        button_index = int(button_id.split('.')[0])             # button_index equals the database LearningActivityId
+        triggered_id = ctx.triggered[0]['prop_id']
 
-    if not util.isValidValueId(button_index):
-        return html.Div(graphs)
-    
-    graphs = plotGroupOverview(button_index, '')
-    graphs = graphs + plotClassOverview(button_index, '')
+        # extract dictionary string and convert it to real dictionary
+        start_index = triggered_id.index('{')
+        end_index = triggered_id.rindex('}') + 1
+        dictionary_str = triggered_id[start_index:end_index]
+        triggered_id_dict = json.loads(dictionary_str)
+
+        if triggered_id_dict["button-type"] == "select-classes-button":
+            class_id = triggered_id_dict["class-id"]
+            graphs = plotGroupOverview(class_id, '')
+            graphs = graphs + plotClassOverview(class_id, '')
 
     return html.Div(graphs)
 
 
+#----------------------------------------------------------------------------------------------------------------------
 @app.callback(Output('Classes-Task-Information-Container', 'children'), 
-              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes])
-def display_graphs(*args):
-    graphs = []
-    button_index = -1 # per default invalid
+              Input({"button-type": "select-classes-button", "class-id": ALL}, "n_clicks"))
+def display_graphs(n_clicks):
 
+    graphs = []
     ctx = dash.callback_context
     if ctx.triggered:
-        button_id = ctx.triggered[0]['prop_id'].split('-')[1]   # button_id looks like this: i.n_clicks
-        button_index = int(button_id.split('.')[0])             # button_index equals the database LearningActivityId
-    
-    if not util.isValidValueId(button_index):
-        return html.Div(graphs)
-    
-    graphs = plotSingleClass('School', button_index, '')
-    graphs = [html.Hr()] + graphs + [html.Hr()]
-    
+        triggered_id = ctx.triggered[0]['prop_id']
+
+        # extract dictionary string and convert it to real dictionary
+        start_index = triggered_id.index('{')
+        end_index = triggered_id.rindex('}') + 1
+        dictionary_str = triggered_id[start_index:end_index]
+        triggered_id_dict = json.loads(dictionary_str)
+
+        if triggered_id_dict["button-type"] == "select-classes-button":
+            class_id = triggered_id_dict["class-id"]
+            graphs = plotSingleClass('School', class_id, '')
+            graphs = [html.Hr()] + graphs + [html.Hr()]
+
     return html.Div(graphs)
 
 
+#----------------------------------------------------------------------------------------------------------------------
 @app.callback(Output('Classes-General-Container', 'children'), 
-              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes])
-def display_class_general(*args):
+              Input({"button-type": "select-classes-button", "class-id": ALL}, "n_clicks"))
+def display_class_general(n_clicks):
+
     graphs = []
-    button_index = -1 # per default invalid
-    
     ctx = dash.callback_context
     if ctx.triggered:
-        button_id = ctx.triggered[0]['prop_id'].split('-')[1]   # button_id looks like this: i.n_clicks
-        button_index = int(button_id.split('.')[0])             # button_index equals the database LearningActivityId
+        triggered_id = ctx.triggered[0]['prop_id']
 
-    if not util.isValidValueId(button_index):
-        return html.Div(graphs)
-    
-    graphs = plotSingleClassGeneral('School', button_index, '')
-    graphs = graphs + [html.Hr()]
-    
+        # extract dictionary string and convert it to real dictionary
+        start_index = triggered_id.index('{')
+        end_index = triggered_id.rindex('}') + 1
+        dictionary_str = triggered_id[start_index:end_index]
+        triggered_id_dict = json.loads(dictionary_str)
+
+        if triggered_id_dict["button-type"] == "select-classes-button":
+            class_id = triggered_id_dict["class-id"]
+            graphs = plotSingleClassGeneral('School', class_id, '')
+            graphs = graphs + [html.Hr()]
+
     return html.Div(graphs)
 
 
+#----------------------------------------------------------------------------------------------------------------------
 @app.callback(Output('Classes-Concept-Container', 'children'), 
-              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes])
-def display_class_concept(*args):
+              Input({"button-type": "select-classes-button", "class-id": ALL}, "n_clicks"))
+def display_class_concept(n_clicks):
+
     graphs = []
-    button_index = -1 # per default invalid
-    
     ctx = dash.callback_context
     if ctx.triggered:
-        button_id = ctx.triggered[0]['prop_id'].split('-')[1]   # button_id looks like this: i.n_clicks
-        button_index = int(button_id.split('.')[0])             # button_index equals the database LearningActivityId
+        triggered_id = ctx.triggered[0]['prop_id']
 
-    if not util.isValidValueId(button_index):
-        return html.Div(graphs)
-    
-    graphs = plotGroupConceptDetails(button_index, '')
-    graphs = graphs + [html.Hr()]
-    
+        # extract dictionary string and convert it to real dictionary
+        start_index = triggered_id.index('{')
+        end_index = triggered_id.rindex('}') + 1
+        dictionary_str = triggered_id[start_index:end_index]
+        triggered_id_dict = json.loads(dictionary_str)
+
+        if triggered_id_dict["button-type"] == "select-classes-button":
+            class_id = triggered_id_dict["class-id"]
+            graphs = plotGroupConceptDetails(class_id, '')
+            graphs = graphs + [html.Hr()]
+
     return html.Div(graphs)
     
 
+#----------------------------------------------------------------------------------------------------------------------
 #On Select a Group - set Group Task Done Options - see task wise information             
 @app.callback([Output("Classes-taskId-selector", "options")],
-              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes])
-def onSelectGroupSetTaskOptions(*args):
+              Input({"button-type": "select-classes-button", "class-id": ALL}, "n_clicks"))
+def onSelectGroupSetTaskOptions(n_clicks):
 
-    button_index = -1 # per default invalid
     ctx = dash.callback_context
     if ctx.triggered:
-        button_id = ctx.triggered[0]['prop_id'].split('-')[1]   # button_id looks like this: i.n_clicks
-        button_index = int(button_id.split('.')[0])             # button_index equals the database LearningActivityId
+        triggered_id = ctx.triggered[0]['prop_id']
 
-    if util.isValidValueId(button_index):
-        clicked_button['buttonID'] = button_index
-        return [getGroupPTaskDoneOptions(button_index , '')]
+        # extract dictionary string and convert it to real dictionary
+        start_index = triggered_id.index('{')
+        end_index = triggered_id.rindex('}') + 1
+        dictionary_str = triggered_id[start_index:end_index]
+        triggered_id_dict = json.loads(dictionary_str)
+
+        if triggered_id_dict["button-type"] == "select-classes-button":
+            class_id = triggered_id_dict["class-id"]
+            clicked_button['buttonID'] = class_id
+            return [getGroupPTaskDoneOptions(class_id , '')]
     
     return [[{'label': 'Select a group', 'value' : '0'}]]
     
 
+#----------------------------------------------------------------------------------------------------------------------
 @app.callback([Output("Classes-taskId-container", "children")],
               [Input("Classes-taskId-selector", "value")])
 def onSelectTaskShowTaskWiseConcept(taskId):
+
     graphs = []
     
     if util.isValidValueId(taskId) and util.isValidValueId(clicked_button["buttonID"]):
@@ -1732,31 +1758,33 @@ def onSelectTaskShowTaskWiseConcept(taskId):
     return [html.Div(graphs)]
 
 
+#----------------------------------------------------------------------------------------------------------------------
 #--------------------- data download callback
 @app.callback([Output('classes_download_overview_link', 'href'), Output('classes_download_overview_link', 'className')],
-              [Input(f"button-{i}", 'n_clicks') for i in buttons_indexes] + [Input("button-select-other-la", "n_clicks")])
+              [Input({"button-type": "select-classes-button", "class-id": ALL}, "n_clicks"), Input({"button-type": "select-other-classes-button"}, "n_clicks")])
 def update_download_link__details_group(*args):
-
-    button_index = -1 # per default invalid
 
     ctx = dash.callback_context
     if ctx.triggered:
-        button_id = ctx.triggered[0]['prop_id'].split('-')[1]   # button_id looks like this: i.n_clicks
-        try:
-            button_index = int(button_id.split('.')[0])         # due to the button-select-other-la id this can crash, avoid this by try except block
-        except ValueError:
-            button_index = -1                                   # set invalid id --> means that button-select-other-la button was pressed
+        triggered_id = ctx.triggered[0]['prop_id']
 
-    if  util.isValidValueId(button_index):
-        csv_string = ""
-        try:
-            csv_string = util.get_download_link_data_uri( studentGrouped.getStudentsOfLearningActivityDF(button_index) )
-        except Exception as e: 
-            subprocess.Popen(['echo', 'update_download_link__details_group '])
-            subprocess.Popen(['echo', str(e)])
-            print('update_download_link__details_group ')
-            print(e)
+        # extract dictionary string and convert it to real dictionary
+        start_index = triggered_id.index('{')
+        end_index = triggered_id.rindex('}') + 1
+        dictionary_str = triggered_id[start_index:end_index]
+        triggered_id_dict = json.loads(dictionary_str)
+
+        if triggered_id_dict["button-type"] == "select-classes-button":
+            class_id = triggered_id_dict["class-id"]
+            csv_string = ""
+            try:
+                csv_string = util.get_download_link_data_uri( studentGrouped.getStudentsOfLearningActivityDF(class_id))
+            except Exception as e: 
+                subprocess.Popen(['echo', 'update_download_link__details_group '])
+                subprocess.Popen(['echo', str(e)])
+                print('update_download_link__details_group ')
+                print(e)
     
-        return csv_string, ""
-    
+            return csv_string, ""
+
     return "", "hidden"

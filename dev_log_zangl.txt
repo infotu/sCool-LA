@@ -17,4 +17,5 @@ Rename/rebuild of Details section into Classes section. Also some Code Refactori
 More code refactoring due to the new design of clickable list and no dropdown menu for learning activity selection/user web app interactiveness.
 The whole new design implementation takes also way more time then expected, the dropdown menu which will be removed is userd and refered to in many other segments of the application. To go through all the references takes time end effort.
 Callback priority maybe has to be adopted for classes.py. This is due the usage of an global clicklist for saving the status of chosen Learning Activity.
-A lot of warings occur refering to the way data is collected from the SQL database. (pandas library warnings)
+A lot of warnings occur refering to the way data is collected from the SQL database. (pandas library warnings)
+Complete rework of callback funtions in classes.py - now all implemented with advanced dynamic callbacks.
