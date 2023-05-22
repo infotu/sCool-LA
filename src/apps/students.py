@@ -829,11 +829,10 @@ layout = [
             dbc.Col(html.Div(id = 'students-overview-container', className = "c-container m_small hidden"))
         ]),
              
-
         dbc.Row([
             dbc.Col(
                 html.Div([
-                    dcc.Dropdown(id = 'students-feature-overview-dropdown', placeholder = "Select Overview Features", options = getFeatureOptions(),multi   = True)
+                    dcc.Dropdown(id = 'students-feature-overview-dropdown', placeholder = "Select Overview Features", options = getFeatureOptions(), multi = True)
                     ],
                     id = 'students-feature-overview-dropdown-div',
                     className = "hidden"
@@ -846,7 +845,6 @@ layout = [
             dbc.Col(html.Div(id = 'students-features-overview-container', className = "c-container m_small hidden"))
         ]),
              
-            
         dbc.Row([
             dbc.Col(html.Div([dcc.Dropdown(id = 'students-date-dropdown', placeholder = "Select Date")], id = "students-date-dropdown-div", className = "c-container hidden"), width = 6),
 
@@ -886,10 +884,12 @@ layout = [
                Output('students-button-select-other-la-div', 'className'), Output('students-select-a-student-heading', 'className'),
                Output('students-selection-div', 'children'), Output('students-selection-div', 'className'),
                Output('students-select-a-student-heading', 'children'), Output('students-button-select-other-student-div', 'className'),
-               Output('students-information', 'className'), Output('students-overview-container', 'className'),
+               Output('students-information', 'className'),
                Output('students-feature-overview-dropdown-div', 'className'), Output('students-features-overview-container', 'className'),
                Output('students-date-dropdown-div', 'className'), Output('students-sort-order-dropdown-div', 'className'),
-               Output('students_details_download_link-A', 'className'), Output('Students-Container', 'className')],
+               Output('students_details_download_link-A', 'className'), Output('Students-Container', 'className'),
+
+               Output('students-overview-container', 'children'), Output('students-overview-container', 'className')],
 
                Input({"button-type": "students-select-classes-button", "class-id": ALL}, "n_clicks"),
                Input({"button-type": "students-select-student-button", "student-id": ALL}, "n_clicks"))
@@ -922,10 +922,11 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
                     "choose-learning-activity-buttons", "",
                     createStudentButtonsFromClassId(class_id), "choose-students-buttons",
                     "Select a Student", "choose-students-buttons hidden", 
-                    "c-container hidden", "c-container m_small hidden",
+                    "c-container hidden",
                     "hidden", "c-container m_small hidden",
                     "c-container hidden", "c-container hidden",
-                    "hidden", "c-container p-bottom_15 hidden"]
+                    "hidden", "c-container p-bottom_15 hidden",
+                    [], "c-container m_small hidden"]
         
         elif triggered_id_dict["button-type"] == "students-select-student-button" and triggered_id_dict["student-id"] >= 0:
             subprocess.Popen(['echo', 'callback - ' + str(triggered_id_dict["button-type"])])
@@ -933,14 +934,20 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
             student_id = triggered_id_dict["student-id"]
             current_student = student_id
 
+            student_overview_graphs = []
+
+            if isStudentInGroup(student_id, current_class):
+                student_overview_graphs = plotStudentOverview(student_id, current_class)
+
             return ["choose-learning-activity-buttons hidden", dash.no_update,
                     "choose-learning-activity-buttons", "",
                     [], "choose-students-buttons hidden",
                     getButtonLabel(student_id), "choose-students-buttons", 
-                    "c-container", "c-container m_small",
+                    "c-container",
                     "", "c-container m_small",
                     "c-container", "c-container",
-                    "", "c-container p-bottom_15"]
+                    "", "c-container p-bottom_15",
+                    student_overview_graphs, "c-container m_small"]
         
         elif triggered_id_dict["button-type"] == "students-select-student-button" and triggered_id_dict["student-id"] == -1:
             subprocess.Popen(['echo', 'callback - ' + str(triggered_id_dict["button-type"])])
@@ -951,10 +958,11 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
                     "choose-learning-activity-buttons", "",
                     createStudentButtonsFromClassId(current_class), "choose-students-buttons",
                     "Select a Student", "choose-students-buttons hidden", 
-                    "c-container hidden", "c-container m_small hidden",
+                    "c-container hidden",
                     "hidden", "c-container m_small hidden",
                     "c-container hidden", "c-container hidden",
-                    "hidden", "c-container p-bottom_15 hidden"]
+                    "hidden", "c-container p-bottom_15 hidden",
+                    [], "c-container m_small hidden"]
 
     current_class = -1
     current_student = -1
@@ -963,10 +971,11 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
             "choose-learning-activity-buttons hidden", "hidden",
             [], "choose-students-buttons hidden",
             "Select a Student", "choose-students-buttons hidden", 
-            "c-container hidden", "c-container m_small hidden",
+            "c-container hidden",
             "hidden", "c-container m_small hidden",
             "c-container hidden", "c-container hidden",
-            "hidden", "c-container p-bottom_15 hidden"]
+            "hidden", "c-container p-bottom_15 hidden",
+            [], "c-container m_small hidden"]
 
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -1030,38 +1039,6 @@ def display_graphs_student(students_n_clicks, studentSelectedDate, studentGraphD
                 studentSelectedDate = ''
     
             graphs = plotStudent(student_id, current_class, format(studentSelectedDate), studentGraphDirection)
-    
-    return html.Div(graphs)
-
-
-#----------------------------------------------------------------------------------------------------------------------
-@app.callback(
-         Output('students-overview-container', 'children'), 
-         Input({"button-type": "students-select-student-button", "student-id": ALL}, "n_clicks") 
-)
-def display_graphs_student_overview(n_clicks):
-
-    global current_class
-    graphs = []
-
-    ctx = dash.callback_context
-    if ctx.triggered:
-        triggered_id = ctx.triggered[0]['prop_id']             # example string for triggered_id: {"button-type":"students-select-classes-button","class-id":1}.n_clicks
-
-        # extract dictionary string and convert it to real dictionary
-        start_index = triggered_id.index('{')
-        end_index = triggered_id.rindex('}') + 1
-        dictionary_str = triggered_id[start_index:end_index]
-        triggered_id_dict = json.loads(dictionary_str)
-
-        if triggered_id_dict["button-type"] == "students-select-student-button" and triggered_id_dict["student-id"] >= 0:
-            student_id = triggered_id_dict["student-id"]
-
-            if not isStudentInGroup(student_id, current_class):
-                return graphs
-     
-            graphs = plotStudentOverview(student_id, current_class)
-            subprocess.Popen(['echo', f"about to return in callback function 4 with - studentid and currentclass and graphs {student_id} {current_class} {len(graphs)}"])
     
     return html.Div(graphs)
 
