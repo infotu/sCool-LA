@@ -745,7 +745,9 @@ html {
 
 
 
-
+.hr_custom_style {
+	border: 1px solid rgb(99, 99, 99);
+}
 
 .align-left {
 	text-align : left;

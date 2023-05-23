@@ -177,7 +177,7 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
         
         graphs.append(html.Div(id='Task-Information-Classes',
                                children = [html.H2('Task Information')], 
-                               className = "c-container p_medium p-top_xx-large", 
+                               className = "c-container p_medium p-top_large", 
                     ))
 
 #---------------------------        Datatable task wise success fail    ---------------------------
@@ -444,7 +444,7 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
             
             
             graphs.append(html.Div( graphTitle,
-                                   className= "heading-sub practice  p-top_xx-large"
+                                   className= "heading-sub practice  p-top_large"
                         )) 
             '''
             graphs.append(html.Div(table ,
@@ -529,7 +529,7 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
             
             
             graphs.append(html.Div( graphTitle,
-                                   className= "heading-sub theory p-top_xx-large"
+                                   className= "heading-sub theory p-top_large"
                         )) 
 
             graphs.append(html.Div(html.Details(
@@ -834,7 +834,7 @@ def plotGroupConceptDetails(groupId, filterByDate = '' ):
     
     graphs.append(html.Div(id='Concept-Information-Classes',
                            children = [html.H2('Concept Information')], 
-                           className = "c-container p_medium p-top_xx-large", 
+                           className = "c-container p_medium p-top_large", 
                 ))
       
     try :
@@ -908,7 +908,7 @@ def plotGroupConceptDetails(groupId, filterByDate = '' ):
                                         )
                                     ),
                             ],
-                            className = " c-container p-top_xx-large  p-bottom_large  "
+                            className = "c-container p-top_large p-bottom_large"
             )))     
 
         except Exception as e: 
@@ -1119,8 +1119,8 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
     graphsMain = []
     
     graphsMain.append(html.Div(id='General-Information-Classes',
-                       children = [html.H2('General Information')], 
-                       className = "c-container p_medium p-top_xx-large", 
+                       children = [html.H2('Class Statistics')], 
+                       className = "c-container p_medium p-top_large", 
             ))
     
       
@@ -1404,9 +1404,6 @@ def plotClassOverview(schoolKey, filterByDate = '' ):
                                             , left_index=False, right_index=False
                                             , how='inner')
         
-        rows.append( dbc.Row( html.Div([
-                    html.H3('Overview'), 
-                ]) ) )
         fig1Table = dash_table.DataTable(
             columns=[
                 {"name": constants.feature2UserNamesDict.get(i) if i in constants.feature2UserNamesDict.keys() else i , "id": i, "selectable": True} for i in studentDataDfSum[features2Plot].columns
@@ -1548,16 +1545,11 @@ layout = html.Div(
             dbc.Col( 
                     html.Div(id='Classes-Task-Information-Container', className = "c-table ")
        )]),
-    
-    dbc.Row([
-            dbc.Col( 
-                html.Div(id='Classes-Concept-Container', className = "c-table ")
-       )]),
                     
     dbc.Row([
             dbc.Col( 
                 html.Div(children=[
-                        html.Div( 'Task wise code submission and concept details',
+                        html.Div( 'Task code submissions',
                                   id = 'Classes-taskId-selector-heading',
                                   className= "heading-sub practice  p-bottom_small hidden"
                         ),
@@ -1568,14 +1560,19 @@ layout = html.Div(
                             className = " "
                         )
                     ],
-                    className = "  p-top_xx-large  p-bottom_large "
+                    className = "p-top_large p-bottom_large"
                 )
        )]),
 
     dbc.Row([
-          dbc.Col( 
-                  html.Div(id='Classes-taskId-container', className = "c-container ")
-       )]),
+            dbc.Col( 
+                html.Div(id='Classes-taskId-container', className = "c-container ")
+        )]),
+
+    dbc.Row([
+            dbc.Col( 
+                html.Div(id='Classes-Concept-Container', className = "c-table ")
+        )]),
                      
     dbc.Row([
             dbc.Col( 
@@ -1607,9 +1604,17 @@ def showHideLearningActivitySelectionButtons(*args):
 
         if triggered_id_dict["button-type"] == "select-classes-button":
             class_id = triggered_id_dict["class-id"]
-            return "choose-learning-activity-buttons hidden", getButtonLabel(class_id), "choose-learning-activity-buttons", "", "c-table ", "c-table ", "c-table ", " ", "c-container ", "heading-sub practice  p-bottom_small"
+            return ["choose-learning-activity-buttons hidden", getButtonLabel(class_id),
+                    "choose-learning-activity-buttons", "",
+                    "c-table ", "c-table ",
+                    "c-table ", " ",
+                    "c-container ", "heading-sub practice  p-bottom_small"]
 
-    return "choose-learning-activity-buttons", "Select a Class", "choose-learning-activity-buttons hidden", "hidden", "c-table hidden", "c-table hidden", "c-table hidden", "hidden", "c-container hidden", "heading-sub practice  p-bottom_small hidden"
+    return ["choose-learning-activity-buttons", "Select a Class",
+            "choose-learning-activity-buttons hidden", "hidden",
+            "c-table hidden", "c-table hidden",
+            "c-table hidden", "hidden",
+            "c-container hidden", "heading-sub practice  p-bottom_small hidden"]
 
 #----------------------------------------------------------------------------------------------------------------------
 @app.callback(Output('Classes-Overview-Container', 'children'), 
@@ -1630,7 +1635,7 @@ def setClassOverview(n_clicks):
         if triggered_id_dict["button-type"] == "select-classes-button":
             class_id = triggered_id_dict["class-id"]
             graphs = plotGroupOverview(class_id, '')
-            graphs = graphs + plotClassOverview(class_id, '')
+            graphs = [html.Hr(id = 'classes-overview-hr', className = "hr_custom_style")] + graphs + plotClassOverview(class_id, '')
 
     return html.Div(graphs)
 
@@ -1654,7 +1659,7 @@ def display_graphs(n_clicks):
         if triggered_id_dict["button-type"] == "select-classes-button":
             class_id = triggered_id_dict["class-id"]
             graphs = plotSingleClass('School', class_id, '')
-            graphs = [html.Hr()] + graphs + [html.Hr()]
+            graphs = [html.Hr(id = 'classes-task-information-hr', className = "hr_custom_style")] + graphs + [html.Hr(id = 'classes-code-submission-hr', className = "hr_custom_style")]
 
     return html.Div(graphs)
 
@@ -1678,7 +1683,7 @@ def display_class_general(n_clicks):
         if triggered_id_dict["button-type"] == "select-classes-button":
             class_id = triggered_id_dict["class-id"]
             graphs = plotSingleClassGeneral('School', class_id, '')
-            graphs = graphs + [html.Hr()]
+            graphs = graphs + [html.Hr(className = "hr_custom_style")]
 
     return html.Div(graphs)
 
@@ -1702,7 +1707,7 @@ def display_class_concept(n_clicks):
         if triggered_id_dict["button-type"] == "select-classes-button":
             class_id = triggered_id_dict["class-id"]
             graphs = plotGroupConceptDetails(class_id, '')
-            graphs = graphs + [html.Hr()]
+            graphs = graphs + [html.Hr(id = 'classes-stats-hr', className = "hr_custom_style")]
 
     return html.Div(graphs)
     
@@ -1741,7 +1746,7 @@ def onSelectTaskShowTaskWiseConcept(taskId):
     if util.isValidValueId(taskId) and util.isValidValueId(clicked_button["buttonID"]):
         graphs = getGroupTaskWiseDetails(clicked_button["buttonID"], isGrouped = False, taskId = int(taskId), filterByDate = '')
         
-    graphs = graphs + [html.Hr()]
+    graphs = graphs + [html.Hr(id = 'classes-concept-hr', className = "hr_custom_style")]
     
     return [html.Div(graphs)]
 

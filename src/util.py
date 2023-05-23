@@ -36,7 +36,8 @@ def plotGroupOverview(groupSelected, groupStudents, studentDataDf, classes = "")
         )
         return plots
     
-    
+    plots.append(html.Div(html.H2('Class Overview'), className = "c-container p_medium p-top_medium"))
+
     plotRow = []
     
     plotRow.append( html.Div([],

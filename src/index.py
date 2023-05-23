@@ -15,7 +15,7 @@ import dash_bootstrap_components as dbc
 from flask_login import logout_user, current_user, LoginManager, UserMixin
 
 from app import app, server, login_manager, User
-from apps import groups, learningActivityDetails, groupStudents, custom, home, sidebar, login, searchAndUserInfo, classes, students
+from apps import groups, custom, home, sidebar, login, searchAndUserInfo, classes, students
 from data import studentGrouped
 
 import constants
@@ -150,15 +150,11 @@ def render_page_content(pathname):
             return home.layout
         if pathname in ["/Overview", "/Groups"]:
             return groups.layout
-        elif pathname == "/Classes":
+        elif pathname  in ["/", "/Classes"]:
             return classes.layout
-        elif pathname  in ["/", "/Details"]:
-            return learningActivityDetails.layout
         elif pathname == "/Custom":
             return custom.layout
         elif pathname == "/Students":
-            return groupStudents.layout
-        elif pathname == "/StudentsNew":
             return students.layout
 
         return classes.layout
