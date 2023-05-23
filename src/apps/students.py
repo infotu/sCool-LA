@@ -832,7 +832,7 @@ layout = [
         dbc.Row([
             dbc.Col(
                 html.Div([
-                    dcc.Dropdown(id = 'students-feature-overview-dropdown', placeholder = "Select Overview Features", options = getFeatureOptions(), multi = True)
+                    dcc.Dropdown(id = 'students-feature-overview-dropdown', placeholder = "Select Overview Features", options = [], multi = True)
                     ],
                     id = 'students-feature-overview-dropdown-div',
                     className = "hidden"
@@ -881,31 +881,94 @@ layout = [
 #        ---------------------------------
 #----------------------------------------------------------------------------------------------------------------------
 @app.callback([Output('students-learning-activity-selection-div', 'className'), Output('students-select-a-class-heading', 'children'),
-               Output('students-button-select-other-la-div', 'className'), Output('students-select-a-student-heading', 'className'),
-               Output('students-selection-div', 'children'), Output('students-selection-div', 'className'),
-               Output('students-select-a-student-heading', 'children'), Output('students-button-select-other-student-div', 'className'),
-               Output('students-information', 'className'),
-               Output('students-feature-overview-dropdown-div', 'className'), Output('students-features-overview-container', 'className'),
-               Output('students-date-dropdown-div', 'className'), Output('students-sort-order-dropdown-div', 'className'),
-               Output('students_details_download_link-A', 'className'), Output('Students-Container', 'className'),
+               Output('students-button-select-other-la-div', 'className'),      Output('students-select-a-student-heading', 'className'),
+               Output('students-selection-div', 'children'),                    Output('students-selection-div', 'className'),
+               Output('students-select-a-student-heading', 'children'),         Output('students-button-select-other-student-div', 'className'),
+               Output('students-information', 'className'),                     Output('students-feature-overview-dropdown', 'options'),
+               Output('students-feature-overview-dropdown-div', 'className'),   Output('students-features-overview-container', 'className'),
+               Output('students-date-dropdown-div', 'className'),               Output('students-sort-order-dropdown-div', 'className'),
+               Output('students_details_download_link-A', 'className'),         Output('Students-Container', 'className'),
 
-               Output('students-overview-container', 'children'), Output('students-overview-container', 'className')],
+               Output('students-overview-container', 'children'),               Output('students-overview-container', 'className'),
+               Output("students-date-dropdown", "className"),                   Output("students-sort-order-dropdown", "className"),
+               Output("students-feature-overview-dropdown", "className"),
+               Output('Students-Container', 'children'),                        Output('students-date-dropdown', 'options'),
+               Output('students_details_download_link', 'href'),                Output('students_details_download_link', 'className')],
 
                Input({"button-type": "students-select-classes-button", "class-id": ALL}, "n_clicks"),
-               Input({"button-type": "students-select-student-button", "student-id": ALL}, "n_clicks"))
-def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clicks):
+               Input({"button-type": "students-select-student-button", "student-id": ALL}, "n_clicks"),
+               Input('students-date-dropdown', 'value'),
+               Input('students-sort-order-dropdown', 'value'),
+               State(component_id = 'students-date-dropdown', component_property = 'className'),
+               State(component_id = 'students-sort-order-dropdown', component_property = 'className'),
+               State(component_id = 'students-feature-overview-dropdown', component_property = 'className')
+)
+def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clicks, studentSelectedDate, studentGraphDirection, initialClassDate, initialClassDir, initialClassFeatures):
 
     global current_class
     global current_student
+    initialClassDateS = set()
+    initialClassDirS = set()
+    initialClassFeaturesS = set()
+
+    if not None is initialClassDate:
+        initialClassDateS = set(initialClassDate.split(' ')) 
+    if not None is initialClassDir:
+        initialClassDirS = set(initialClassDir.split(' ')) 
+    if not None is initialClassFeatures:
+        initialClassFeaturesS = set(initialClassFeatures.split(' '))
+
+    initialClassDateS.add('disabled') 
+    initialClassDirS.add('disabled') 
+    initialClassFeaturesS.add('disabled')
 
     ctx = dash.callback_context
     subprocess.Popen(['echo', 'callback - initial trigger ' + str(ctx.triggered[0]['prop_id'])])
     if ctx.triggered:
-        triggered_id = ctx.triggered[0]['prop_id']             # example string for triggered_id: {"button-type":"students-select-classes-button","class-id":1}.n_clicks
+        triggered_id = ctx.triggered[0]['prop_id']        # triggered_id can be: {"button-type":"students-select-classes-button","class-id":1}.n_clicks OR 'students-date-dropdown.value' OR 'students-sort-order-dropdown.value'
 
         subprocess.Popen(['echo', 'callback - ' + 'ctx triggered'])
         subprocess.Popen(['echo', 'callback - ' + str(triggered_id)])
 
+        if triggered_id == 'students-date-dropdown.value' or triggered_id == 'students-sort-order-dropdown.value':
+            student_overview_graphs = []
+            student_container_graphs = []
+            student_date_dropdown_options = []
+            if studentSelectedDate is None  or  studentSelectedDate == '':
+                studentSelectedDate = ''
+            if isStudentInGroup(current_student, current_class):
+                student_overview_graphs = plotStudentOverview(current_student, current_class)
+                student_container_graphs = plotStudent(current_student, current_class, format(studentSelectedDate), studentGraphDirection)
+                dfStudentData = getStudentData(current_student, current_class)
+                if not (dfStudentData is None or dfStudentData.empty == True):
+                    student_date_dropdown_options = [{'label': d, 'value': d} for d in dfStudentData['Start'].dt.date.unique()]
+
+                csv_string = ""
+                try:    
+                    csv_string = util.get_download_link_data_uri(getStudentData(student_id, current_class, format(studentSelectedDate)))
+                except Exception as e:
+                    subprocess.Popen(['echo', 'download - callback Exception'])
+                    subprocess.Popen(['echo', str(e)]) 
+                    print('groupStudents update_download_link__details_student ')
+                    print(e)
+
+            initialClassDateS.discard('disabled')
+            initialClassDirS.discard('disabled')
+            initialClassFeaturesS.discard('disabled')
+
+            return ["choose-learning-activity-buttons hidden", dash.no_update,
+                    "choose-learning-activity-buttons", "",
+                    [], "choose-students-buttons hidden",
+                    getButtonLabel(current_student), "choose-students-buttons", 
+                    "c-container", getFeatureOptions(),
+                    "", "c-container m_small",
+                    "c-container", "c-container",
+                    "", "c-container p-bottom_15",
+                    student_overview_graphs, "c-container m_small",
+                    ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS),
+                    student_container_graphs, student_date_dropdown_options,
+                    csv_string, ""]
+        
         # extract dictionary string and convert it to real dictionary
         start_index = triggered_id.index('{')
         end_index = triggered_id.rindex('}') + 1
@@ -922,11 +985,14 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
                     "choose-learning-activity-buttons", "",
                     createStudentButtonsFromClassId(class_id), "choose-students-buttons",
                     "Select a Student", "choose-students-buttons hidden", 
-                    "c-container hidden",
+                    "c-container hidden", [],
                     "hidden", "c-container m_small hidden",
                     "c-container hidden", "c-container hidden",
                     "hidden", "c-container p-bottom_15 hidden",
-                    [], "c-container m_small hidden"]
+                    [], "c-container m_small hidden",
+                    ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS),
+                    [], [],
+                    "", "disabled"]
         
         elif triggered_id_dict["button-type"] == "students-select-student-button" and triggered_id_dict["student-id"] >= 0:
             subprocess.Popen(['echo', 'callback - ' + str(triggered_id_dict["button-type"])])
@@ -935,19 +1001,42 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
             current_student = student_id
 
             student_overview_graphs = []
-
+            student_container_graphs = []
+            student_date_dropdown_options = []
+            if studentSelectedDate is None  or  studentSelectedDate == '':
+                studentSelectedDate = ''
             if isStudentInGroup(student_id, current_class):
                 student_overview_graphs = plotStudentOverview(student_id, current_class)
+                student_container_graphs = plotStudent(student_id, current_class, format(studentSelectedDate), studentGraphDirection)
+                dfStudentData                     = getStudentData(student_id, current_class)
+                if not (dfStudentData is None or dfStudentData.empty == True):
+                    student_date_dropdown_options = [{'label': d, 'value': d} for d  in dfStudentData['Start'].dt.date.unique()]
+                
+                csv_string = ""
+                try:    
+                    csv_string = util.get_download_link_data_uri(getStudentData(student_id, current_class, format(studentSelectedDate)))
+                except Exception as e:
+                    subprocess.Popen(['echo', 'download - callback Exception'])
+                    subprocess.Popen(['echo', str(e)]) 
+                    print('groupStudents update_download_link__details_student ')
+                    print(e)
+
+            initialClassDateS.discard('disabled')
+            initialClassDirS.discard('disabled')
+            initialClassFeaturesS.discard('disabled')
 
             return ["choose-learning-activity-buttons hidden", dash.no_update,
                     "choose-learning-activity-buttons", "",
                     [], "choose-students-buttons hidden",
                     getButtonLabel(student_id), "choose-students-buttons", 
-                    "c-container",
+                    "c-container", getFeatureOptions(),
                     "", "c-container m_small",
                     "c-container", "c-container",
                     "", "c-container p-bottom_15",
-                    student_overview_graphs, "c-container m_small"]
+                    student_overview_graphs, "c-container m_small",
+                    ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS),
+                    student_container_graphs, student_date_dropdown_options,
+                    csv_string, ""]
         
         elif triggered_id_dict["button-type"] == "students-select-student-button" and triggered_id_dict["student-id"] == -1:
             subprocess.Popen(['echo', 'callback - ' + str(triggered_id_dict["button-type"])])
@@ -958,11 +1047,14 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
                     "choose-learning-activity-buttons", "",
                     createStudentButtonsFromClassId(current_class), "choose-students-buttons",
                     "Select a Student", "choose-students-buttons hidden", 
-                    "c-container hidden",
+                    "c-container hidden", [],
                     "hidden", "c-container m_small hidden",
                     "c-container hidden", "c-container hidden",
                     "hidden", "c-container p-bottom_15 hidden",
-                    [], "c-container m_small hidden"]
+                    [], "c-container m_small hidden",
+                    ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS),
+                    [], [],
+                    "", "disabled"]
 
     current_class = -1
     current_student = -1
@@ -971,76 +1063,14 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
             "choose-learning-activity-buttons hidden", "hidden",
             [], "choose-students-buttons hidden",
             "Select a Student", "choose-students-buttons hidden", 
-            "c-container hidden",
+            "c-container hidden", [],
             "hidden", "c-container m_small hidden",
             "c-container hidden", "c-container hidden",
             "hidden", "c-container p-bottom_15 hidden",
-            [], "c-container m_small hidden"]
-
-
-#----------------------------------------------------------------------------------------------------------------------
-@app.callback(
-        Output('students-date-dropdown', 'options'), 
-        Input({"button-type": "students-select-student-button", "student-id": ALL}, "n_clicks")
-)
-def setStudentDateOptions(n_clicks):
-
-    global current_class
-
-    ctx = dash.callback_context
-    if ctx.triggered:
-        triggered_id = ctx.triggered[0]['prop_id']             # example string for triggered_id: {"button-type":"students-select-classes-button","class-id":1}.n_clicks
-
-        # extract dictionary string and convert it to real dictionary
-        start_index = triggered_id.index('{')
-        end_index = triggered_id.rindex('}') + 1
-        dictionary_str = triggered_id[start_index:end_index]
-        triggered_id_dict = json.loads(dictionary_str)
-
-        if triggered_id_dict["button-type"] == "students-select-student-button" and triggered_id_dict["student-id"] >= 0:
-            student_id = triggered_id_dict["student-id"]
-    
-            if isStudentInGroup(student_id, current_class):
-                dfStudentData                     = getStudentData(student_id, current_class)
-
-                if dfStudentData is None or dfStudentData.empty == True:
-                    return []
-    
-                return [{'label': d, 'value': d} for d  in dfStudentData['Start'].dt.date.unique()]
-    
-    return []
-
-
-#----------------------------------------------------------------------------------------------------------------------
-@app.callback(Output('Students-Container', 'children'),               
-              [Input({"button-type": "students-select-student-button", "student-id": ALL}, "n_clicks"), 
-               Input('students-date-dropdown', 'value') ,
-               Input('students-sort-order-dropdown', 'value')]             
-)
-def display_graphs_student(students_n_clicks, studentSelectedDate, studentGraphDirection):
-
-    global current_class
-    graphs = []
-
-    ctx = dash.callback_context
-    if ctx.triggered:
-        triggered_id = ctx.triggered[0]['prop_id']             # example string for triggered_id: {"button-type":"students-select-classes-button","class-id":1}.n_clicks
-
-        # extract dictionary string and convert it to real dictionary
-        start_index = triggered_id.index('{')
-        end_index = triggered_id.rindex('}') + 1
-        dictionary_str = triggered_id[start_index:end_index]
-        triggered_id_dict = json.loads(dictionary_str)
-
-        if triggered_id_dict["button-type"] == "students-select-student-button" and triggered_id_dict["student-id"] >= 0:
-            student_id = triggered_id_dict["student-id"]
-    
-            if studentSelectedDate is None  or  studentSelectedDate == '':
-                studentSelectedDate = ''
-    
-            graphs = plotStudent(student_id, current_class, format(studentSelectedDate), studentGraphDirection)
-    
-    return html.Div(graphs)
+            [], "c-container m_small hidden",
+            ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS),
+            [], [],
+            "", "disabled"]
 
 
 # Update bar plot
@@ -1061,93 +1091,3 @@ def onSelectFeatureOverview(selectedFeatures):
     graphs = plotStudentOverviewFeatures(current_student, current_class, selectedFeatures)    
     
     return  html.Div(graphs)
-    
-    
-#----------------------------------------------------------------------------------------------------------------------
-@app.callback(
-    [Output("students-date-dropdown", "className"),
-     Output("students-sort-order-dropdown", "className"),
-     Output("students-feature-overview-dropdown", "className")],
-    Input({"button-type": "students-select-student-button", "student-id": ALL}, "n_clicks"),
-    state=[State(component_id = 'students-date-dropdown', component_property = 'className'),
-           State(component_id = 'students-sort-order-dropdown', component_property = 'className'),
-           State(component_id = 'students-feature-overview-dropdown', component_property = 'className')]
-)
-def update_no_student_selectors_class_disabled(n_clicks, initialClassDate, initialClassDir, initialClassFeatures):  
-
-    initialClassDateS = set()
-    initialClassDirS = set()
-    initialClassFeaturesS = set()
-    
-    if not None is initialClassDate:
-        initialClassDateS = set(initialClassDate.split(' ')) 
-    if not None is initialClassDir:
-        initialClassDirS = set(initialClassDir.split(' ')) 
-    if not None is initialClassFeatures:
-        initialClassFeaturesS = set(initialClassFeatures.split(' ')) 
-
-    ctx = dash.callback_context
-    if ctx.triggered:
-        triggered_id = ctx.triggered[0]['prop_id']             # example string for triggered_id: {"button-type":"students-select-classes-button","class-id":1}.n_clicks
-
-        # extract dictionary string and convert it to real dictionary
-        start_index = triggered_id.index('{')
-        end_index = triggered_id.rindex('}') + 1
-        dictionary_str = triggered_id[start_index:end_index]
-        triggered_id_dict = json.loads(dictionary_str)
-
-        if triggered_id_dict["button-type"] == "students-select-student-button" and triggered_id_dict["student-id"] >= 0:
-            initialClassDateS.add('disabled')
-            initialClassDirS.add('disabled')
-            initialClassFeaturesS.add('disabled')
-        else:
-            initialClassDateS.discard('disabled')
-            initialClassDirS.discard('disabled')
-            initialClassFeaturesS.discard('disabled')
-
-    return ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS)
-
-
-#--------------------- data download callbacks 
-#----------------------------------------------------------------------------------------------------------------------
-@app.callback(
-    [ Output('students_details_download_link', 'href'),
-     Output('students_details_download_link', 'className'),
-     ],
-    [Input({"button-type": "students-select-student-button", "student-id": ALL}, "n_clicks"), Input('students-date-dropdown', 'value')]   
-)
-def update_download_link__details_student(n_clicks, studentSelectedDate):
-
-    defaultValues = ["", "disabled"]
-    global current_class
-    
-    ctx = dash.callback_context
-    if ctx.triggered:
-        triggered_id = ctx.triggered[0]['prop_id']             # example string for triggered_id: {"button-type":"students-select-classes-button","class-id":1}.n_clicks
-
-        # extract dictionary string and convert it to real dictionary
-        start_index = triggered_id.index('{')
-        end_index = triggered_id.rindex('}') + 1
-        dictionary_str = triggered_id[start_index:end_index]
-        triggered_id_dict = json.loads(dictionary_str)
-
-        if triggered_id_dict["button-type"] == "students-select-student-button" and triggered_id_dict["student-id"] >= 0:
-            student_id = triggered_id_dict["student-id"]
-    
-            if studentSelectedDate is None  or  studentSelectedDate == '':
-                studentSelectedDate = ''
-        
-            #    the student is not in the group
-            if isStudentInGroup(student_id, current_class) :
-                csv_string = ""
-                try:    
-                    csv_string = util.get_download_link_data_uri(getStudentData(student_id, current_class, format(studentSelectedDate)))
-                except Exception as e:
-                    subprocess.Popen(['echo', 'download - callback Exception'])
-                    subprocess.Popen(['echo', str(e)]) 
-                    print('groupStudents update_download_link__details_student ')
-                    print(e)
-    
-                return csv_string, ""
-
-    return ["", "disabled"]
