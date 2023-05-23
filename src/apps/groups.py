@@ -20,7 +20,7 @@ from plotly import graph_objs as go
 
 from app import app
 
-
+from flask_login import current_user
 from data import studentGrouped
 import constants
 import util
@@ -306,7 +306,7 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
             
         
     #--------------------------------Total of each Features ----------------------------------             
-            graphs.append(html.Div(id='Group-Overview-Information', children = []))   
+            graphs.append(html.Div(id='Groups-Overview-Information', children = []))   
             
             studentDataDfSum = studentDataDf.groupby([constants.GROUPBY_FEATURE, constants.COUNT_STUDENT_FEATURE], as_index=False).sum()
     #        studentDataDfSumGrouped = studentDataDfSum.groupby([constants.GROUPBY_FEATURE], as_index = False)
@@ -361,7 +361,7 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         
 
             rows.append( dbc.Row( html.Div([
-                        html.H3('Overview', id='group-overview-title'), 
+                        html.H3('Overview', id='groups-overview-title'), 
                     ]) ) )
             
             rows.append( html.Br() )
@@ -470,16 +470,13 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
                         html.H4('Standard Deviation'), 
                     ]) ) )
             rows.append( dbc.Row( columns2 ) )
-
-
-            
+ 
     #        --------------------------------------------------------------------------
-            
-    #        -------------------
+
     #        the Quantile Plots - distribution for each feature
-            rows.append(html.Div(id='Group-Distribution-Information', children = []))
+            rows.append(html.Div(id='Groups-Distribution-Information', children = []))
             rows.append( dbc.Row( html.Div([
-                        html.H3('Distributions', id='group-distribution-title'), 
+                        html.H3('Distributions', id='groups-distribution-title'), 
                     ]) ) )
             rows.append( html.Br() )
 
@@ -523,7 +520,6 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
             columns3 = []
             columns3.append(dbc.Col(
                     
-                    
                     dcc.Graph(
                         figure= figQuantile
                     )
@@ -535,9 +531,6 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
                         
                         , config  =  dict (locale   =  constants.languageLocal   ) 
                     )
-                    
-                    
-                    
                     
                     
                     , align="center"))    
@@ -554,8 +547,6 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
             columns3.append(dbc.Col(
                     
                     
-                    
-                
                     dcc.Graph(
                         figure= figQuantile
                     )
@@ -583,9 +574,7 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
             columns3 = []
             columns3.append(dbc.Col(
                     
-                    
-                    
-                
+
                     dcc.Graph(
                         figure= figQuantile
                     )
@@ -597,42 +586,11 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
                         
                         , config  =  dict (locale   =  constants.languageLocal   ) 
                     )
-                    
-                    
-                    
-                    
+
                     
                     , align="center"))    
             rows.append( dbc.Row( columns3 ) )      
             rows.append( html.Br() )             
-
-
-    #        fig = go.Figure()        
-    #        for groupId, group in studentDataDfStudentSum.groupby([constants.GROUPBY_FEATURE], as_index=False):
-    #            groupDataStudent = getStudentWiseData(group)
-    #            fig.add_trace(go.Box(
-    #                y               = groupDataStudent['itemsCollectedCount'],                    
-    #                marker_color    = 'rgb(214,12,140)',
-    #                name            = groupId,
-    #                boxpoints       = 'all',
-    #                text            = groupDataStudent['Name'],
-    #            ))
-    #        
-    #        fig.update_layout(
-    #            title           ='Distribution of Items Collected',
-    #            paper_bgcolor   = 'rgb(243, 243, 243)',
-    #            plot_bgcolor    = 'rgb(243, 243, 243)',
-    #            yaxis_title     ='Item Collected Count', 
-    #            xaxis_title     = 'Group',
-    #        )
-    #        columns3 = []
-    #        columns3.append(dbc.Col(
-    #                                dcc.Graph(
-    #                                        figure = fig
-    #                                )  , align="center"))    
-    #        rows.append( dbc.Row( columns3 ) )          
-
-            
             graphs.append(html.Div(  rows,
                         className = "width-100"  ))
         
@@ -643,26 +601,24 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
     return graphs
 
 
-
-
 def generateControlCard():
     """
     :return: A Div containing controls for graphs.
     """
     return html.Div(
-        id="Control-Card-Overview",
+        id="groups-Control-Card-Overview",
         children=[
 
             html.P("Select Group for Comparision"),
             dcc.Dropdown(
-                id      ="group-selector-comparision-overview",
+                id      ="groups-selector-comparision-overview",
                 options = GroupSelector_options,
                 multi   = True,
             ),
             html.Div(
-                id="reset-btn-outer",
+                id="groups-reset-btn-outer",
                 children =  
-                        dbc.Button( "Reset", id="reset-btn", 
+                        dbc.Button( "Reset", id="groups-reset-btn", 
                            outline=True, color="primary", className="mr-1", n_clicks=0
                         ),
             ),
@@ -671,19 +627,86 @@ def generateControlCard():
     )
 
 
+def generateLearningActivityControlCard():
+    """
+    :return: A Div containing Learning Analytics Selection.
+    """
+    return html.Div(
+        id="groups-control-card-index",
+        children=[
+            html.P(constants.labelSelectLA),
+            dcc.Dropdown(
+                id = "groups-selector-main",
+                className = "dropdown-main",
+            ),
+        ]
+    )
+
+
+def getUserLA():
+    if current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated:
+        currentUserId = current_user.id
+        
+        if  current_user.isAdmin : 
+            return studentGrouped.dfLearningActivityDetails[constants.GROUPBY_FEATURE].unique().astype(str)
+        else:
+            return studentGrouped.dfLearningActivityDetails[studentGrouped.dfLearningActivityDetails['User_Id'] == 
+                                                            currentUserId][constants.GROUPBY_FEATURE].unique().astype(str)
+
+    return studentGrouped.dfLearningActivityDetails[constants.GROUPBY_FEATURE].unique()
+
+
+
+
+def getUserLAOptions():
+    userLA = getUserLA()
+    
+    if current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated:
+        return studentGrouped.BuildOptionsLA( [ groupId for groupId in  userLA  ] , isAdmin =  current_user.isAdmin ) 
+    
+    return studentGrouped.BuildOptionsLA( [ groupId for groupId in  userLA  ] , isAdmin = True  )
+
+
 #----------------------------------Functions END --------------------------------------------
 
 
 
 
-
-
 layout = [
+
+    dbc.Row([
+            dbc.Navbar(
+                children = [
+                        dbc.Row([
+                                dbc.Col(
+                                    # Left column
+                                    html.Div(
+                                        id="groups-row-control-main-index",
+                                        className="",
+                                        children=[ generateLearningActivityControlCard() ]
+                                        + [
+                                            html.Div(
+                                                ["initial child"], id="groups-row-control-main-output-clientside-index", style={"display": "none"}
+                                            )
+                                        ],
+                                    ),
+                            ),
+                        ],
+                            className = "row w-100  selector-main-row"
+                        ),                
+                ],
+                id="groups-page-topbar", 
+                sticky          = "top" ,
+                light           = False ,
+                className       = "navbar-main p-bottom_medium",
+                style           = {'width': '100%'}
+            ),
+    ], className = "p-top_medium p-bottom_medium",),
             
     dbc.Row([
             dbc.Col(
                 html.Div(
-                    id="group-main-overview",
+                    id="groups-main-overview",
                     className="",
                     children=  [html.H1("Group")]  ,
                 ),
@@ -692,7 +715,7 @@ layout = [
     dbc.Row([
             dbc.Col(
                 html.Div(
-                    id="group-main-overview-content",
+                    id="groups-main-overview-content",
                     className="overview m-bottom_medium ",
                     children= []  ,
                 ),
@@ -703,14 +726,14 @@ layout = [
             dbc.Col(
                 # Left column
                 html.Div(
-                    id="row-control-main-overview",
+                    id="groups-row-control-main-overview",
                     className="p-top_large m-bottom_medium",
                     children=
                     [html.H1("Group Comparision")] +
                     [ generateControlCard() ]
                     + [
                         html.Div(
-                            ["initial child"], id="row-control-main-output-clientside-overview", className="hidden"
+                            ["initial child"], id="groups-row-control-main-output-clientside-overview", className="hidden"
                         )
                     ],
                 ),
@@ -719,16 +742,36 @@ layout = [
         
                     
 
-    html.Div(id='group-comparision-container', className = "row group-comparision-container c-table" )
+    html.Div(id='groups-comparision-container', className = "row groups-comparision-container c-table" )
     
     
 ]
                 
-                
+@app.callback([Output("groups-selector-main", "options"), Output("groups-selector-main", "value")], 
+              [Input("url", "pathname")],
+              state=[State(component_id = "groups-selector-main", component_property='options'),
+                     State(component_id = "groups-selector-main", component_property='value')]
+    )
+def render_main_selector_content(pathname, selectorOptions, selectorValue ):
+    
+    if current_user and current_user.is_authenticated  :
+        userOptions = getUserLAOptions()
+        value = ''
+
+        if selectorOptions and selectorValue:
+           return selectorOptions, selectorValue
+        
+        if len(userOptions) == 1:
+            value = userOptions[0]['value']
+        
+        return userOptions, value
+    
+    
+    return [], ''
                                 
 @app.callback(
     [ 
-         Output("group-selector-comparision-overview", "value"), 
+         Output("groups-selector-comparision-overview", "value"), 
     ],
     [
         Input("reset-btn", "n_clicks")
@@ -754,10 +797,10 @@ def on_reset(reset_click):
 
 # Update bar plot
 @app.callback(
-    Output("group-comparision-container", "children"),
+    Output("groups-comparision-container", "children"),
     [
-        Input("group-selector-main", "value"),
-        Input("group-selector-comparision-overview", "value"),
+        Input("groups-selector-main", "value"),
+        Input("groups-selector-comparision-overview", "value"),
     ],
 )
 def update_bar(groupMain, groupComparision ):    
@@ -778,9 +821,9 @@ def update_bar(groupMain, groupComparision ):
 
 # Update bar plot
 @app.callback(
-    Output("group-main-overview-content", "children"),
+    Output("groups-main-overview-content", "children"),
     [
-        Input("group-selector-main", "value"),
+        Input("groups-selector-main", "value"),
     ],
 )
 def update_main_overview(groupMain):    
@@ -802,8 +845,8 @@ def update_main_overview(groupMain):
 
 @app.callback(
     Output('groups_download_overview_link', 'href'),
-    [ Input("group-selector-main", "value"),
-        Input("group-selector-comparision-overview", "value"), ])
+    [ Input("groups-selector-main", "value"),
+        Input("groups-selector-comparision-overview", "value"), ])
 def update_download_link(groupMain, groupComparision):
     if  not util.isValidValueId(groupMain) :
         return ""

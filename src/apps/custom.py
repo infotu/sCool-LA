@@ -21,15 +21,11 @@ from app import app
 
 
 
-
+from flask_login import current_user
 from data import studentGrouped
 import constants
 import util
 
-
-
-
-idApp             = "custom"
 
 
 #--------------------- school selection START ----------------------
@@ -235,7 +231,7 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
 def generateControlCardCustomPlotForm():
     
     return util.generateControlCardCustomPlotForm(
-            idApp                   = idApp , 
+            idApp                   = "custom", 
             feature1Options         = FeaturesCustom + FeaturesCustomPractice + FeaturesCustomTheory , 
             feature2Options         = featureGroupByOptions + FeaturesCustom + FeaturesCustomPractice + FeaturesCustomTheory , 
             feature3Options         = FeaturesCustom + FeaturesCustomPractice + FeaturesCustomTheory , 
@@ -247,6 +243,47 @@ def generateControlCardCustomPlotForm():
             featureGroupByOptions   = featureGroupByOptions ,
     )
 
+
+def generateLearningActivityControlCard():
+    """
+    :return: A Div containing Learning Analytics Selection.
+    """
+    return html.Div(
+        id="custom-control-card-index",
+        children=[
+            html.P(constants.labelSelectLA),
+            dcc.Dropdown(
+                id = "custom-selector-main",
+                className = "dropdown-main",
+            ),
+        ]
+    )
+
+
+def getUserLA():
+    if current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated:
+        currentUserId = current_user.id
+        
+        if  current_user.isAdmin : 
+            return studentGrouped.dfLearningActivityDetails[constants.GROUPBY_FEATURE].unique().astype(str)
+        else:
+            return studentGrouped.dfLearningActivityDetails[studentGrouped.dfLearningActivityDetails['User_Id'] == 
+                                                            currentUserId][constants.GROUPBY_FEATURE].unique().astype(str)
+
+    return studentGrouped.dfLearningActivityDetails[constants.GROUPBY_FEATURE].unique()
+
+
+
+
+def getUserLAOptions():
+    userLA = getUserLA()
+    
+    if current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated:
+        return studentGrouped.BuildOptionsLA( [ groupId for groupId in  userLA  ] , isAdmin =  current_user.isAdmin ) 
+    
+    return studentGrouped.BuildOptionsLA( [ groupId for groupId in  userLA  ] , isAdmin = True  )
+
+
 #------------------------------------------------------------------------------------------------
 #---------------------------LAYOUT --------------------------------------------------------------
 
@@ -254,21 +291,50 @@ def generateControlCardCustomPlotForm():
 layout = [
 
     dbc.Row([
+            dbc.Navbar(
+                children = [
+                        dbc.Row([
+                                dbc.Col(
+                                    # Left column
+                                    html.Div(
+                                        id="custom-row-control-main-index",
+                                        className="",
+                                        children=[ generateLearningActivityControlCard() ]
+                                        + [
+                                            html.Div(
+                                                ["initial child"], id="custom-row-control-main-output-clientside-index", style={"display": "none"}
+                                            )
+                                        ],
+                                    ),
+                            ),
+                        ],
+                            className = "row w-100  selector-main-row"
+                        ),                
+                ],
+                id="custom-page-topbar", 
+                sticky          = "top" ,
+                light           = False ,
+                className       = "navbar-main p-bottom_medium",
+                style           = {'width': '100%'}
+            ),
+    ], className = "p-top_medium p-bottom_medium"),
+
+    dbc.Row([
             dbc.Col(
                 # Left column
                 html.Div(
-                    id= idApp + "-row-control-main",
+                    id= "custom-row-control-main",
                     className="",
                     children=[ generateControlCardCustomPlotForm() ]
                 ),
         ),
     ])
 
-    , html.Div(id = idApp + "-main-container", className = "row custom-main-container m-top_small" )
+    , html.Div(id = "custom-main-container", className = "row custom-main-container m-top_small" )
     
     , html.A(children=[html.I(className="fas fa-download font-size_medium p_small"),
                        "download data",], 
-                    id = idApp + "-download-main-link", className = "disabled" ,
+                    id = "custom-download-main-link", className = "disabled" ,
                                                href="", target =  "_blank",
                                                download='data.csv' )
 ]
@@ -280,23 +346,46 @@ layout = [
 #----------------------------------------------------------------------------------------------
     
     
+@app.callback([Output("custom-selector-main", "options"), Output("custom-selector-main", "value")], 
+              [Input("url", "pathname")],
+              state=[State(component_id = "custom-selector-main", component_property='options'),
+                     State(component_id = "custom-selector-main", component_property='value')]
+    )
+def render_main_selector_content(pathname, selectorOptions, selectorValue ):
+    
+    if current_user and current_user.is_authenticated  :
+        userOptions = getUserLAOptions()
+        value = ''
+
+        if selectorOptions and selectorValue:
+           return selectorOptions, selectorValue
+        
+        if len(userOptions) == 1:
+            value = userOptions[0]['value']
+        
+        return userOptions, value
+    
+    
+    return [], ''
+
+
 # Form Submission  - Update plot container with new selected plot
 @app.callback(
-    Output( idApp + "-main-container", "children"),
+    Output( "custom-main-container", "children"),
     [
-        Input( idApp + "-form-submit-btn", "n_clicks")
+        Input( "custom-form-submit-btn", "n_clicks")
     ],
-     state=[ State(component_id  =  'group-selector-main', component_property='value'),
-                State(component_id = idApp + "-form-feature-1", component_property='value'),
-                State(component_id = idApp + "-form-feature-2", component_property='value'),
-                State(component_id = idApp + "-form-feature-3", component_property='value'),
-                State(component_id = idApp + "-form-feature-axis", component_property='value'),
-                State(component_id = idApp + "-form-figure-type", component_property='value'),
-                State(component_id = idApp + "-form-feature-distribution", component_property='value'),
-                State(component_id = idApp + "-form-feature-color-group", component_property='value'),
-                State(component_id = idApp + "-form-feature-color-group-sub", component_property='value'),
-                State(component_id = idApp + "-form-feature-multi", component_property='value'),
-                State(component_id = idApp + "-main-container", component_property='children'),
+     state=[ State(component_id  =  'custom-selector-main', component_property='value'),
+                State(component_id = "custom-form-feature-1", component_property='value'),
+                State(component_id = "custom-form-feature-2", component_property='value'),
+                State(component_id = "custom-form-feature-3", component_property='value'),
+                State(component_id = "custom-form-feature-axis", component_property='value'),
+                State(component_id = "custom-form-figure-type", component_property='value'),
+                State(component_id = "custom-form-feature-distribution", component_property='value'),
+                State(component_id = "custom-form-feature-color-group", component_property='value'),
+                State(component_id = "custom-form-feature-color-group-sub", component_property='value'),
+                State(component_id = "custom-form-feature-multi", component_property='value'),
+                State(component_id = "custom-main-container", component_property='children'),
                 ]
 )
 def update_bar(n_clicks, groupMain, selectedFeature, selectedFeature1, selectedFeature3, selectedAxis, 
@@ -337,70 +426,56 @@ def update_bar(n_clicks, groupMain, selectedFeature, selectedFeature1, selectedF
 
 
 
-
 # Form Submission  - Update plot container with new selected plot
 @app.callback(
-    Output(idApp + "-form-feature-axis", "className"),
+    Output("custom-form-feature-axis", "className"),
     [
-        Input(idApp + "-form-figure-type", "value")
+        Input("custom-form-figure-type", "value")
     ],
-    state=[ State(component_id = idApp + "-form-feature-axis", component_property='className') ]
+    state=[ State(component_id = "custom-form-feature-axis", component_property='className') ]
 )
 def update_axis_selector_disabled(selectedFigureType, initialClass):  
     return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsAxisEnabled) 
 
 
 @app.callback(
-    Output(idApp + "-form-feature-3", "className"),
+    Output("custom-form-feature-3", "className"),
     [
-        Input(idApp + "-form-figure-type", "value")
+        Input("custom-form-figure-type", "value")
     ],
-    state=[ State(component_id = idApp +"-form-feature-3", component_property='className') ]
+    state=[ State(component_id = "custom-form-feature-3", component_property='className') ]
 )
 def update_feature_size_disabled(selectedFigureType, initialClass):   
     return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsFeature3Enabled)
 
 
 @app.callback(
-    Output(idApp + "-form-feature-distribution", "className"),
+    Output("custom-form-feature-distribution", "className"),
     [
-        Input(idApp + "-form-figure-type", "value")
+        Input("custom-form-figure-type", "value")
     ],
-    state=[ State(component_id = idApp +"-form-feature-distribution", component_property='className') ]
+    state=[ State(component_id = "custom-form-feature-distribution", component_property='className') ]
 )
 def update_feature_distribution_disabled(selectedFigureType, initialClass):   
     return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsDistributionEnabled)
 
 
 @app.callback(
-    Output(idApp + "-form-feature-multi", "className"),
+    Output("custom-form-feature-multi", "className"),
     [
-        Input(idApp + "-form-figure-type", "value")
+        Input("custom-form-figure-type", "value")
     ],
-    state=[ State(component_id = idApp + "-form-feature-multi", component_property='className') ]
+    state=[ State(component_id = "custom-form-feature-multi", component_property='className') ]
 )
 def update_feature_multi_disabled(selectedFigureType, initialClass): 
     return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsMultiFeatureEnabled)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 @app.callback(
-    [ Output(idApp + "-download-main-link", 'href'),
-     Output(idApp + "-download-main-link", 'className'),
+    [ Output("custom-download-main-link", 'href'),
+     Output("custom-download-main-link", 'className'),
      ],
-    [ Input("group-selector-main", "value") ],
+    [ Input("custom-selector-main", "value") ],
 )
 def update_download_link_custom_group(groupMain):
     if  not util.isValidValueId(groupMain) :
@@ -414,4 +489,3 @@ def update_download_link_custom_group(groupMain):
         print(e)
     
     return csv_string, ""
-

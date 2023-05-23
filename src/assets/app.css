@@ -15,7 +15,7 @@ html {
 }
 
 .page-main {
-	margin-top: 5rem;
+	margin-top: 3rem;
 	margin-left: 16rem;
     padding: 2rem 1rem;
     padding-bottom: 5rem;
@@ -34,7 +34,6 @@ html {
     background-color: #f3f3f3;
 }
 .page-content {
-	margin-top: 0.5rem;
 	z-index: 1;
 }
 
@@ -659,7 +658,7 @@ html {
 	}
 	.page-main  {
 		margin-left: 14rem;
-		margin-top: 5rem;
+		margin-top: 3rem;
 		z-index: 1;
 	}
 	.theme-app h2  {

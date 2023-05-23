@@ -1465,15 +1465,7 @@ def plotGroupOverview(groupId, filterByDate = '' ):
         print('plotGroupOverview ')
         print(e)
 
-
     return plots
-
-@login_manager.user_loader
-def load_user(usernameOrId):
-    userDB = studentGrouped.getUserFromUserId(usernameOrId)
-    
-    if  userDB is not None:        
-        return User(userDB['UserName'], userDB['Id'], active = True, isAdmin = userDB['IsAdmin'], securityStamp = userDB['SecurityStamp'] )
 
 
 def getUserLA():

@@ -872,7 +872,7 @@ layout = [
         dbc.Row([
             dbc.Col(html.Div(id = 'Students-Container', className = "c-container p-bottom_15 hidden"))
         ])
-    ])    
+    ], style = {'margin': '30px'})
 ]
 
 
