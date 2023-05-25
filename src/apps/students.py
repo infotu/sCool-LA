@@ -37,6 +37,7 @@ import constants
 import util
 import subprocess
 import traceback
+import datetime
 
 
 
@@ -190,6 +191,7 @@ def getStudentData(StudentId, schoolKey, selectedDate = '' ):
         return studentData
     
     if     None is not selectedDate         and         not selectedDate == ''     and   util.is_valid_date(selectedDate) :
+        selectedDate = datetime.datetime.strptime(selectedDate, '%Y-%m-%d').date()
         studentDataGroupedDate      = studentData.groupby([studentData['Start'].dt.date])
         studentData                 = studentDataGroupedDate.get_group(selectedDate)
     
