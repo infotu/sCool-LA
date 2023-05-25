@@ -436,7 +436,7 @@ html {
 .theme-app .btn-light:hover  i.fas, 
 .theme-app .btn-light:active  i.fas, 
 .theme-app .btn-light:hover  i.far, 
-.theme-app .btn-light:active  i.far,  {
+.theme-app .btn-light:active  i.far  {
 	color: var(--theme-background-color);
 }
 .theme-app .highlight:focus, 

@@ -36,6 +36,7 @@ from data import studentGrouped
 import constants
 import util
 import subprocess
+import traceback
 
 
 
@@ -184,19 +185,16 @@ def getStudentData(StudentId, schoolKey, selectedDate = '' ):
         subprocess.Popen(['echo', 'getStudentData second Exception'])
         subprocess.Popen(['echo', str(e)]) 
         print(e)
-        
-    
+
     if studentData is None         or     studentData.empty   :
         return studentData
     
-    
     if     None is not selectedDate         and         not selectedDate == ''     and   util.is_valid_date(selectedDate) :
-        studentDataGroupedDate      = studentData.groupby(  [studentData['Start'].dt.date] )
+        studentDataGroupedDate      = studentData.groupby([studentData['Start'].dt.date])
         studentData                 = studentDataGroupedDate.get_group(selectedDate)
     
-    
     studentData['StartStr']         = '@' + studentData['Start'].dt.strftime('%Y-%m-%d %H:%M:%S') + '-' + studentData['IndexCol'].astype(str)
-        
+
     return studentData
 
 
@@ -257,10 +255,8 @@ def plotStudentOverview(StudentId, groupId):
         graphs = util.plotStudentOverview(studentDataDf , classes = "c-card-small" )
         
         
-        
         plotRow = []
-        
-        
+    
         
         groupOriginal                           = dfGroupedOriginal.get_group(groupId)
         
@@ -278,7 +274,6 @@ def plotStudentOverview(StudentId, groupId):
         
         if studentDataDfSuccess is not None and studentDataDfSuccess.empty is False  and 'Task' in studentDataDfSuccess.columns:        
             plotRow.append( html.Div([  
-                    
                                         util.generateCardDetail([html.I(className="fas fa-cubes m-right-small"),   'No. of Tasks completed'], 
                                             '' + util.millify(len(studentDataDfSuccess['Task'].unique())), 
                                             '' + str(  len(studentDataDfSuccess[studentDataDfSuccess[constants.featureTaskType] == constants.TaskTypePractice ]['Task'].unique()) ), 
@@ -373,25 +368,10 @@ def plotStudentOverview(StudentId, groupId):
                 print(' student overview Concepts Used Error ')
                 print(e)
         
-        if studentDataDfSuccess is not None and studentDataDfSuccess.empty is False  and 'Task' in studentDataDfSuccess.columns:        
-    #        get tasks unique and courses
-            
-            print('skill studentdatadf')
-
-            tasksCompleted = studentDataDfSuccess['Task'].unique()
-            dfTasksCompleted = dfTaskDetails[dfTaskDetails['Task'].isin(tasksCompleted)]        
-            
-            for courseIdAttempt in dfTasksCompleted['CourseId'].unique():
-                plotRow.append( getCourseProgressCard(courseIdAttempt, dfTasksCompleted )  )
-
-        
-
-
         graphs.append(
                 html.Div(children  = plotRow,                
                         className = "row")
         )
-
     
     except Exception as e:
         subprocess.Popen(['echo', 'plotStudentOverview big Exception'])
@@ -403,7 +383,45 @@ def plotStudentOverview(StudentId, groupId):
     return graphs
 
 
-def getCourseProgressCard(courseId, dfTasksCompleted ):
+def createProgressChildren(studentId, classId):
+    
+    graphs = []
+
+    try:
+        if not isStudentInGroup(studentId, classId) :
+            return graphs
+
+        studentDataDf = getStudentData(studentId, classId)
+        
+        if studentDataDf is None or studentDataDf.empty == True :
+            graphs.append(util.getNoDataMsg())
+            return graphs
+
+        studentDataDf.fillna(0, inplace=True)
+        studentDataDfSuccess = studentDataDf[studentDataDf['Result'].astype('Int64') > 0 ]
+    
+        if studentDataDfSuccess is not None and studentDataDfSuccess.empty is False  and 'Task' in studentDataDfSuccess.columns:        
+            
+            print('skill studentdatadf')
+
+            tasksCompleted = studentDataDfSuccess['Task'].unique()
+            dfTasksCompleted = dfTaskDetails[dfTaskDetails['Task'].isin(tasksCompleted)] 
+
+            graphs.append(html.Hr(id = 'students-progress-tracker-hr', className = "hr_custom_style"))
+            graphs.append(html.H3("Student Courses Progress Tracker", className = "p-bottom_medium"))       
+
+            for courseIdAttempt in dfTasksCompleted['CourseId'].unique():
+                graphs.append( getCourseProgressCard(courseIdAttempt, dfTasksCompleted ))
+
+    except Exception as e:
+        subprocess.Popen(['echo', 'createProgressChildren Exception'])
+        subprocess.Popen(['echo', str(e)]) 
+        print(e)
+
+    return graphs
+
+
+def getCourseProgressCard(courseId, dfTasksCompleted):
     try:
         courseSkillIdAttempt = dfTasksCompleted[dfTasksCompleted['CourseId'] == courseId]['SkillId'].unique()
                 
@@ -575,11 +593,10 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
     
     try:    
     #    the student is not in the group
-        if not isStudentInGroup(StudentId, schoolKey) :
+        if not isStudentInGroup(StudentId, schoolKey):
             return graphs
         
-
-        studentData                     = getStudentData(StudentId, schoolKey, studentSelectedDate)
+        studentData = getStudentData(StudentId, schoolKey, studentSelectedDate)
 
         if studentData is None or studentData.empty == True :
             graphs.append(
@@ -587,7 +604,6 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
             )
             return graphs
         
-            
     #    studentData                     = studentData.sort_values(by='Start')
             
         isAscending = True
@@ -720,7 +736,8 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
     
     except Exception as e:
         subprocess.Popen(['echo', 'plotStudent Exception'])
-        subprocess.Popen(['echo', str(e)]) 
+        subprocess.Popen(['echo', str(e)])
+        subprocess.Popen(['echo', str(traceback.format_exc())])
         print(e)
 
     
@@ -815,31 +832,29 @@ layout = [
 
         html.Div(html.Button('Select other Class', id = {"button-type": "students-select-classes-button", "class-id": -1}), className = 'choose-learning-activity-buttons hidden', id = "students-button-select-other-la-div"),
 
-        html.H1('Select a Student', id = 'students-select-a-student-heading', style = {'text-align': 'center', 'margin-top': '10px'}, className = 'hidden'),
+        html.Div(children = [html.Hr(id = 'students-select-student-hr', className = "hr_custom_style"),
+                             html.H1('Select a Student', id = 'students-select-a-student-heading', style = {'text-align': 'center', 'margin-top': '10px'})],
+                             id = 'students-select-a-student-heading-div', className = 'hidden'
+        ),
 
         html.Div(children = [], className = 'choose-students-buttons hidden', id = 'students-selection-div'),
 
         html.Div(html.Button('Select other Student', id = {"button-type": "students-select-student-button", "student-id": -1}), className = 'choose-students-buttons hidden', id = "students-button-select-other-student-div"),
 
-        dbc.Row([
-            dbc.Col(html.Div(id = 'students-information', children = [html.H3('Student Information')], className = "c-container hidden"))
-        ]),
+        html.Div(children = [html.Hr(id = 'students-overview-hr', className = "hr_custom_style"),
+                             html.H3('Student Overview', className = "p-bottom_medium")],
+                             id = 'students-overview', className = "c-container hidden"
+        ),
 
-        dbc.Row([
-            dbc.Col(html.Div(id = 'students-overview-container', className = "c-container m_small hidden"))
-        ]),
+        html.Div(id = 'students-overview-container', className = "c-container hidden"),
+
+        html.Div(id = 'students-progress-tracker-container', className = "c-container hidden"),
              
-        dbc.Row([
-            dbc.Col(
-                html.Div([
-                    dcc.Dropdown(id = 'students-feature-overview-dropdown', placeholder = "Select Overview Features", options = [], multi = True)
-                    ],
-                    id = 'students-feature-overview-dropdown-div',
-                    className = "hidden"
-                )
-                , width = 12
-            ),
-        ]),
+        html.Div(children = [html.Hr(id = 'students-feature-overview-hr', className = "hr_custom_style"),
+                             dcc.Dropdown(id = 'students-feature-overview-dropdown', placeholder = "Select Overview Features", options = [], multi = True)],           
+                             id = 'students-feature-overview-dropdown-div',
+                             className = "p-top_medium hidden"
+        ),
                 
         dbc.Row([
             dbc.Col(html.Div(id = 'students-features-overview-container', className = "c-container m_small hidden"))
@@ -862,15 +877,15 @@ layout = [
                 )
                 , width  =  6
             )
-        ]),
-                    
-        dbc.Row([
-            dbc.Col(html.A(children=[html.I(className="fas fa-download font-size_medium p_small"),"download data : Student",],
-                           id = "students_details_download_link", className = "hidden", href = "", target = "_blank", download = 'student.csv'), id = "students_details_download_link-A", className = "hidden")
         ]),    
      
         dbc.Row([
             dbc.Col(html.Div(id = 'Students-Container', className = "c-container p-bottom_15 hidden"))
+        ]),
+
+        dbc.Row([
+            dbc.Col(html.A(children=[html.I(className="fas fa-download font-size_medium p_small"),"download data : Student",],
+                           id = "students_details_download_link", className = "hidden", href = "", target = "_blank", download = 'student.csv'), id = "students_details_download_link-A", className = "hidden")
         ])
     ], style = {'margin': '30px'})
 ]
@@ -881,15 +896,16 @@ layout = [
 #        ---------------------------------
 #----------------------------------------------------------------------------------------------------------------------
 @app.callback([Output('students-learning-activity-selection-div', 'className'), Output('students-select-a-class-heading', 'children'),
-               Output('students-button-select-other-la-div', 'className'),      Output('students-select-a-student-heading', 'className'),
+               Output('students-button-select-other-la-div', 'className'),      Output('students-select-a-student-heading-div', 'className'),
                Output('students-selection-div', 'children'),                    Output('students-selection-div', 'className'),
                Output('students-select-a-student-heading', 'children'),         Output('students-button-select-other-student-div', 'className'),
-               Output('students-information', 'className'),                     Output('students-feature-overview-dropdown', 'options'),
+               Output('students-overview', 'className'),                        Output('students-feature-overview-dropdown', 'options'),
                Output('students-feature-overview-dropdown-div', 'className'),   Output('students-features-overview-container', 'className'),
                Output('students-date-dropdown-div', 'className'),               Output('students-sort-order-dropdown-div', 'className'),
                Output('students_details_download_link-A', 'className'),         Output('Students-Container', 'className'),
 
                Output('students-overview-container', 'children'),               Output('students-overview-container', 'className'),
+               Output('students-progress-tracker-container', 'children'),       Output('students-progress-tracker-container', 'className'),
                Output("students-date-dropdown", "className"),                   Output("students-sort-order-dropdown", "className"),
                Output("students-feature-overview-dropdown", "className"),
                Output('Students-Container', 'children'),                        Output('students-date-dropdown', 'options'),
@@ -939,16 +955,18 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
             if isStudentInGroup(current_student, current_class):
                 student_overview_graphs = plotStudentOverview(current_student, current_class)
                 student_container_graphs = plotStudent(current_student, current_class, format(studentSelectedDate), studentGraphDirection)
+                student_progress_tracker_graphs = createProgressChildren(current_student, current_class)
                 dfStudentData = getStudentData(current_student, current_class)
                 if not (dfStudentData is None or dfStudentData.empty == True):
                     student_date_dropdown_options = [{'label': d, 'value': d} for d in dfStudentData['Start'].dt.date.unique()]
 
                 csv_string = ""
                 try:    
-                    csv_string = util.get_download_link_data_uri(getStudentData(student_id, current_class, format(studentSelectedDate)))
+                    csv_string = util.get_download_link_data_uri(getStudentData(current_student, current_class, format(studentSelectedDate)))
                 except Exception as e:
-                    subprocess.Popen(['echo', 'download - callback Exception'])
+                    subprocess.Popen(['echo', 'download - callback Exception 1'])
                     subprocess.Popen(['echo', str(e)]) 
+                    subprocess.Popen(['echo', str(traceback.format_exc())])
                     print('groupStudents update_download_link__details_student ')
                     print(e)
 
@@ -961,10 +979,11 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
                     [], "choose-students-buttons hidden",
                     getButtonLabel(current_student), "choose-students-buttons", 
                     "c-container", getFeatureOptions(),
-                    "", "c-container m_small",
+                    "p-top_medium", "c-container m_small",
                     "c-container", "c-container",
                     "", "c-container p-bottom_15",
-                    student_overview_graphs, "c-container m_small",
+                    student_overview_graphs, "c-container",
+                    student_progress_tracker_graphs, "c-container",
                     ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS),
                     student_container_graphs, student_date_dropdown_options,
                     csv_string, ""]
@@ -986,10 +1005,11 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
                     createStudentButtonsFromClassId(class_id), "choose-students-buttons",
                     "Select a Student", "choose-students-buttons hidden", 
                     "c-container hidden", [],
-                    "hidden", "c-container m_small hidden",
+                    "p-top_medium hidden", "c-container m_small hidden",
                     "c-container hidden", "c-container hidden",
                     "hidden", "c-container p-bottom_15 hidden",
-                    [], "c-container m_small hidden",
+                    [], "c-container hidden",
+                    [], "c-container hidden",
                     ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS),
                     [], [],
                     "", "disabled"]
@@ -1008,6 +1028,7 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
             if isStudentInGroup(student_id, current_class):
                 student_overview_graphs = plotStudentOverview(student_id, current_class)
                 student_container_graphs = plotStudent(student_id, current_class, format(studentSelectedDate), studentGraphDirection)
+                student_progress_tracker_graphs = createProgressChildren(current_student, current_class)
                 dfStudentData                     = getStudentData(student_id, current_class)
                 if not (dfStudentData is None or dfStudentData.empty == True):
                     student_date_dropdown_options = [{'label': d, 'value': d} for d  in dfStudentData['Start'].dt.date.unique()]
@@ -1016,8 +1037,9 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
                 try:    
                     csv_string = util.get_download_link_data_uri(getStudentData(student_id, current_class, format(studentSelectedDate)))
                 except Exception as e:
-                    subprocess.Popen(['echo', 'download - callback Exception'])
+                    subprocess.Popen(['echo', 'download - callback Exception 2'])
                     subprocess.Popen(['echo', str(e)]) 
+                    subprocess.Popen(['echo', str(traceback.format_exc())])
                     print('groupStudents update_download_link__details_student ')
                     print(e)
 
@@ -1030,10 +1052,11 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
                     [], "choose-students-buttons hidden",
                     getButtonLabel(student_id), "choose-students-buttons", 
                     "c-container", getFeatureOptions(),
-                    "", "c-container m_small",
+                    "p-top_medium", "c-container m_small",
                     "c-container", "c-container",
                     "", "c-container p-bottom_15",
-                    student_overview_graphs, "c-container m_small",
+                    student_overview_graphs, "c-container",
+                    student_progress_tracker_graphs, "c-container",
                     ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS),
                     student_container_graphs, student_date_dropdown_options,
                     csv_string, ""]
@@ -1048,10 +1071,11 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
                     createStudentButtonsFromClassId(current_class), "choose-students-buttons",
                     "Select a Student", "choose-students-buttons hidden", 
                     "c-container hidden", [],
-                    "hidden", "c-container m_small hidden",
+                    "p-top_medium hidden", "c-container m_small hidden",
                     "c-container hidden", "c-container hidden",
                     "hidden", "c-container p-bottom_15 hidden",
-                    [], "c-container m_small hidden",
+                    [], "c-container hidden",
+                    [], "c-container hidden",
                     ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS),
                     [], [],
                     "", "disabled"]
@@ -1064,10 +1088,11 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
             [], "choose-students-buttons hidden",
             "Select a Student", "choose-students-buttons hidden", 
             "c-container hidden", [],
-            "hidden", "c-container m_small hidden",
+            "p-top_medium hidden", "c-container m_small hidden",
             "c-container hidden", "c-container hidden",
             "hidden", "c-container p-bottom_15 hidden",
-            [], "c-container m_small hidden",
+            [], "c-container hidden",
+            [], "c-container hidden",
             ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS),
             [], [],
             "", "disabled"]
