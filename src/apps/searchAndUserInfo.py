@@ -41,7 +41,7 @@ navbar = html.Div(
                         [
                             html.Div("Learning Analytics Web Application", className="navbar-heading"),
                         ],
-                        width=4,
+                        width = 4,
                     ),
                     dbc.Col(
                         dbc.Row(
@@ -49,12 +49,13 @@ navbar = html.Div(
                                 dbc.Col(dbc.Input(type="text", placeholder="Search...", className="navbar-searchinput")),
                                 dbc.Col(dbc.Button("Search", color="primary", className="navbar-searchbutton"), width="auto")
                             ],
-                            align="center"
+                            id = "search-bar-row",
+                            align = "center"
                         ),
-                        width=4,
+                        width = 4,
                     ),
-                    dbc.Col([html.Div(constants.navbarTestUsername, className="navbar-username"), html.Div(constants.navbarTestRole, className="navbar-userrole")], width=3),
-                    dbc.Col(html.Img(src="/assets/user-icon.png", height="50px"), width=1),
+                    dbc.Col([html.Div(constants.navbarTestUsername, className="navbar-username"), html.Div(constants.navbarTestRole, className="navbar-userrole")], id = "user-info-name-role", width = 3),
+                    dbc.Col(html.Img(src="/assets/user-icon.png", height="50px"), id = "user-info-icon", width = 1),
                 ],
                 align="center"
             )

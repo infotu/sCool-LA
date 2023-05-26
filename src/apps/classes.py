@@ -1359,15 +1359,12 @@ def getPlotDistributionPlotChildrens(graphDistributions, quantileIndex = 0):
 
 
 #Student Interaction with Game - TIMELINE
-def plotClassOverview(schoolKey, filterByDate = '' ):
+def plotStudentsList(schoolKey, filterByDate = '' ):
     
     graphs = []
-    rows = []
-    columns = []
 
     features2Plot = ['Name', 'SessionDuration', 'PracticeSessionDuration', 'TheorySessionDuration', 
-                     'Attempts', 'Points' 
-                     ]
+                     'Attempts', 'Points']
 
     try:    
         studentDataDf = studentGrouped.getStudentsOfLearningActivityDF(schoolKey)
@@ -1419,35 +1416,21 @@ def plotClassOverview(schoolKey, filterByDate = '' ):
                     },
             ]) 
         )
-
-        columns.append(dbc.Col(
-                        html.Details(
-                                    children = [
-                                            html.Summary([  html.I(className="fas fa-info m-right-small"),
-                                            "Overview data " ]),
-                                            html.Div(fig1Table, 
-                                                    className = " p-top_medium  "),
-                                        ],
-                                            className = " c-container  p-top_medium  p-bottom_medium  "
-                                )  
-                        , align ="center"                    
-                        , className = "c-table "
-        ))
-        rows.append( dbc.Row( columns ) )
         
 #    ---------------------------------------------
             
-        graphs.append(html.Div(  rows  ))
+        graphs.append(html.Div(children = [html.H2("Students in this Class"), fig1Table], className = "p-top_medium"))
+
     except Exception as e: 
-        subprocess.Popen(['echo', 'plotClassOverview 2 '])
+        subprocess.Popen(['echo', 'plotStudentsList 2 '])
         subprocess.Popen(['echo', str(e)])
-        print('plotClassOverview 2 ')
+        print('plotStudentsList 2 ')
         print(e)
 
     return graphs
 
 
-def plotGroupOverview(groupId, filterByDate = '' ):
+def plotClassOverview(groupId, filterByDate = '' ):
     plots               = []
     try:    
         groupStudents     =  getStudentsOfLearningActivity(groupId)
@@ -1458,11 +1441,11 @@ def plotGroupOverview(groupId, filterByDate = '' ):
             studentDataDf = dateGroup.get_group(filterByDate)
 
     #    if not studentDataDf is None and not studentDataDf.empty:
-        plots = util.plotGroupOverview(groupId, groupStudents, studentDataDf, classes = "c-card-medium")
+        plots = util.plotClassOverview(groupId, groupStudents, studentDataDf, classes = "c-card-medium")
     except Exception as e: 
-        subprocess.Popen(['echo', 'plotGroupOverview '])
+        subprocess.Popen(['echo', 'plotClassOverview '])
         subprocess.Popen(['echo', str(e)])
-        print('plotGroupOverview ')
+        print('plotClassOverview ')
         print(e)
 
     return plots
@@ -1523,12 +1506,12 @@ layout = html.Div(
 
     html.Div(html.Button('Select other Class', id = {"button-type": "select-other-classes-button"}), className = 'choose-learning-activity-buttons hidden', id = "button-select-other-la-div"),
       
-    html.Div(id='Classes-Overview-Container'),
+    html.Div(id='Classes-Overview-Container', className = "c-table "),
 
     dbc.Row([
             dbc.Col( 
                     html.A(children=[html.I(className="fas fa-download font-size_medium p_small"),
-                       "download data : Group",], id = "classes_download_overview_link", className = "hidden" ,
+                       "download class data",], id = "classes_download_overview_link", className = "hidden" ,
                                                href="", target="_blank",
                                                download='group-overview.csv' )
        )]),
@@ -1597,13 +1580,13 @@ def showHideLearningActivitySelectionButtons(*args):
         if triggered_id_dict["button-type"] == "select-classes-button":
             class_id = triggered_id_dict["class-id"]
             return ["choose-learning-activity-buttons hidden", getButtonLabel(class_id),
-                    "choose-learning-activity-buttons", "",
+                    "choose-learning-activity-buttons", "c-table ",
                     "c-table ", "c-table ",
                     "c-table ", " ",
                     "c-container ", "heading-sub practice  p-bottom_small"]
 
     return ["choose-learning-activity-buttons", "Select a Class",
-            "choose-learning-activity-buttons hidden", "hidden",
+            "choose-learning-activity-buttons hidden", "c-table hidden",
             "c-table hidden", "c-table hidden",
             "c-table hidden", "hidden",
             "c-container hidden", "heading-sub practice  p-bottom_small hidden"]
@@ -1626,8 +1609,8 @@ def setClassOverview(n_clicks):
 
         if triggered_id_dict["button-type"] == "select-classes-button":
             class_id = triggered_id_dict["class-id"]
-            graphs = plotGroupOverview(class_id, '')
-            graphs = [html.Hr(id = 'classes-overview-hr', className = "hr_custom_style")] + graphs + plotClassOverview(class_id, '')
+            graphs = plotClassOverview(class_id, '')
+            graphs = [html.Hr(id = 'classes-overview-hr', className = "hr_custom_style")] + graphs + plotStudentsList(class_id, '')
 
     return html.Div(graphs)
 

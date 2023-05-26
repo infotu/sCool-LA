@@ -38,9 +38,9 @@ keyOnlyForAdmin     = constants.keyOnlyForAdmin
 iconNameHome        = constants.iconNameHome
 iconNameGroups      = constants.iconNameGroups
 iconNameClasses     = constants.iconNameClasses
-iconNameDetails     = constants.iconNameDetails
 iconNameStudents    = constants.iconNameStudents
 iconNameCustom      = constants.iconNameCustom
+iconNameTutorial    = constants.iconNameTutorial
 
 
 
@@ -48,8 +48,7 @@ iconNameCustom      = constants.iconNameCustom
 # provide href, where navigate to on click on the Menu Section
 menuLink = {
     "menu-link-0" : { keyLabel : 'Game Data', keyHref : '/Home',
-                  keySubmenu : [ 
-                          ],  keyClassName : 'fas ' + iconNameHome + ' m-right-small',
+                  keySubmenu : [],  keyClassName : 'fas ' + iconNameHome + ' m-right-small',
                           keyOnlyForAdmin : True },
 
     "menu-link-1" : { keyLabel : 'Groups', keyHref : '/Groups',
@@ -58,18 +57,22 @@ menuLink = {
                           ],  keyClassName : 'fas ' + iconNameGroups + ' m-right-small',
                           keyOnlyForAdmin : True    },
 
-    "menu-link-2" : { keyLabel : 'Classes', keyHref : '/Classes' ,
+    "menu-link-2" : { keyLabel : 'Tutorial', keyHref : '/Welcome' ,
+                  keySubmenu : [],  keyClassName : 'fas ' + iconNameTutorial + ' m-right-small',
+                          keyOnlyForAdmin : False    },
+
+    "menu-link-3" : { keyLabel : 'Classes', keyHref : '/Classes' ,
                   keySubmenu : [
                           "menu-sub-link-5", "menu-sub-link-6", "menu-sub-link-7", "menu-sub-link-8"
                           ],  keyClassName : 'fas ' + iconNameClasses + ' m-right-small',
                           keyOnlyForAdmin : False    },
 
-    "menu-link-3" : { keyLabel : 'Students', keyHref : '/Students' ,
+    "menu-link-4" : { keyLabel : 'Students', keyHref : '/Students' ,
                   keySubmenu : [ "menu-sub-link-3"  
                           ],  keyClassName : 'fas ' + iconNameStudents + ' m-right-small',
                           keyOnlyForAdmin : False    },  
 
-    "menu-link-4" : { keyLabel : 'Custom', keyHref : '/Custom' ,
+    "menu-link-5" : { keyLabel : 'Custom', keyHref : '/Custom' ,
                   keySubmenu : [
                           "menu-sub-link-4"
                           ],  keyClassName : 'fas ' + iconNameCustom + ' m-right-small',
@@ -242,6 +245,7 @@ sidebar = html.Div(
                     className = "c-modal-large"
                 ),
             ],
+            id = "menu-modal-help-div",
             className = "menu-modal-help"
         ) 
         , 

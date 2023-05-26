@@ -26,7 +26,7 @@ featureDescription = constants.featureDescription
 
 #-----------------------------------  DATA INFO  START ----------------------------
 
-def plotGroupOverview(groupSelected, groupStudents, studentDataDf, classes = ""):
+def plotClassOverview(groupSelected, groupStudents, studentDataDf, classes = ""):
     plots = []
     
     

@@ -32,7 +32,7 @@ Port = '3306'
 #---------------------------------------------------------------
 
 
-loginRedirect               = "/Details"
+loginRedirect               = "/Welcome"
 
 
 
@@ -497,6 +497,7 @@ iconNameClasses				= "fa-clipboard"
 iconNameDetails             = "fa-clipboard"
 iconNameStudents            = "fa-user-graduate"
 iconNameCustom              = "fa-wrench"
+iconNameTutorial            = "fa-question-circle"
 
 
 
@@ -632,3 +633,44 @@ navbarAdmin = "Admin"
 
 navbarTestUsername = "Markus Zangl"
 navbarTestRole = "Admin"
+
+
+
+
+#------------------------------------
+#-- Strings for Welcome Site
+#------------------------------------
+
+welcomeHeading = "Welcome to the sCool Learning Analytics Web Application!"
+
+welcomeText = ("This website will make tracking student progress and ensuring their success easy. "
+               "With this powerful analytics tool, you'll gain insights into your students' performance, enabling you to provide personalized support and drive their academic growth. "
+               "You are just a few clicks away from in-depth reports and comprehensive data visualizations, allowing you to easily monitor individual student needs and class-wide trends.")
+
+tutorialHeading = "Tutorial"
+
+tutorialText = "Here is a quick tutorial explaining the most important components of the website to help you take the first steps faster. You can click on the following headlines for better visibility of the explained website components."
+
+searchBarHeading = "Search Bar"
+
+searchBarText = "At the top of the page is a search bar that allows you to search for classes and students the fast way. Simply type in your wanted student or class and the available results will be displayed immediately."
+
+userInformationHeading = "User Information"
+
+userInformationText = "At the top of the page right next to the search bar, you can see the user information field where your account information is displayed. If you click on the user icon you will see some options for managing your user account."
+
+websiteTabsHeading = "Website Tabs"
+
+websiteTabsText = "On the left side of the screen, you can see your available tabs, which are:"
+
+tutorialTabText = "a.) Tutorial tab: This is the tab you currently see. It enables you to have a quick overview of the user interface."
+
+classesTabText = "b.) Classes tab: The classes tab offers class-wise information. It allows you to analyze trends and patterns within a specific group of students."
+
+studentsTabText = "c.) Students tab: The students' tab provides student-wise information. Gain valuable insights into individual student performance and engagement metrics."
+
+customTabText = "d.) Custom tab: In the Custom tab, you have the freedom to generate your own data visualizations."
+
+infoIconHeading = "Info Icon"
+
+infoIconText = "Located at the bottom left side of the screen, the info icon provides a help center, additional information about courses & tasks, and settings for the look of the webpage."

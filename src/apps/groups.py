@@ -230,12 +230,12 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
 
 
 
-def plotGroupOverview(groupSelected):
+def plotClassOverview(groupSelected):
     
     groupStudents     =  getStudentsOfLearningActivity(groupSelected)
     studentDataDf       = getGroupData(groupSelected, [])
     
-    plots = util.plotGroupOverview(groupSelected, groupStudents, studentDataDf)
+    plots = util.plotClassOverview(groupSelected, groupStudents, studentDataDf)
     
     return plots
 
@@ -833,7 +833,7 @@ def update_main_overview(groupMain):
         return html.Div(graphs)
  
     try:
-        graphs = plotGroupOverview(groupMain)  
+        graphs = plotClassOverview(groupMain)  
     except Exception as e: 
         print('groups update_main_overview ')
         print(e)

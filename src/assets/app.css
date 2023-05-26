@@ -91,7 +91,7 @@ html {
 }
 
 .choose-learning-activity-buttons button {
-	background-color: #f3f3f3;
+	background-color: #eeeeee;
 	border: 1px solid #7c7c7c;
 	color: black;
 	padding: 10px 24px;
@@ -111,7 +111,7 @@ html {
 }
 
 .choose-students-buttons button {
-	background-color: #f3f3f3;
+	background-color: #eeeeee;
 	border: 1px solid #7c7c7c;
 	color: black;
 	padding: 10px 24px;
@@ -195,10 +195,9 @@ html {
 	padding: 0.5em;
 }
 
-
-
 .c-card {
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  background-color: #eaeaea;
   transition: 0.3s;
   border-radius: 5px;
   margin: 1rem;
@@ -892,6 +891,46 @@ html {
 }
 .m-left-large {
 	margin-left: 3rem;
+}
+
+.welcome-button {
+	padding: 0;
+	border: none;
+	background: none;
+	outline: none;
+}
+
+.welcome-button:focus {
+	outline: none;
+}
+
+.welcome-heading {
+	color: #3aaab2;
+	font-size: 28px;
+	margin-bottom: 10px;
+	margin-top: 10px;
+}
+
+.welcome-heading-tutorial {
+	color: #3aaab2;
+	font-size: 24px;
+	margin-bottom: 10px;
+}
+
+.welcome-heading-smaller {
+	color: #3aaab2;
+	font-size: 22px;
+	margin-bottom: 10px;
+	cursor: pointer;
+}
+
+.welcome-paragraph {
+	font-size: 18px;
+	margin-bottom: 8px;
+}
+
+.welcome-highlight {
+	border: 2px solid rgb(255, 0, 0);
 }
 
 
