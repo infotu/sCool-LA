@@ -6,44 +6,12 @@ Created on   May 18 14:30:00 2023
 @authors: zangl
 """
 
-import math
-import json
-from datetime import date
-import dateutil.parser
-from dateutil.parser import parse
 
-import flask
-import dash_table
-from dash.exceptions import PreventUpdate
-import plotly.figure_factory as ff
-import chart_studio.plotly as py
-from plotly import graph_objs as go
-import os
-import util
-import numpy as np
-import pandas as pd
-import plotly.express as px
 import dash
-import dash_bootstrap_components as dbc
-import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output, State, ALL
-
-from flask_login import logout_user, current_user, LoginManager, UserMixin
-
-from app import app, login_manager, User
+from dash.dependencies import Input, Output
+from app import app
 import constants
-from data import studentGrouped
-
-from apps import settings
-import util
-import subprocess
-
-
-search_bar_clicks_old = 0
-user_information_clicks_old = 0
-website_tab_clicks_old = 0
-info_icon_clicks_old = 0
 
 
 layout = html.Div([
@@ -74,25 +42,50 @@ layout = html.Div([
 )
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function to show/hide a red highlight border on certain components based on user interaction. (clicking on headlines)
+# params:   searchBarClicks         (int) - number of clicks on a button with id = "search-bar-heading-button"
+#           userInformationClicks   (int) - number of clicks on a button with id = "user-information-heading-button"
+#           websiteTabClicks        (int) - number of clicks on a button with id = "website-tabs-heading-button"
+#           infoIconClicks          (int) - number of clicks on a button with id = "info-icon-heading-button"
+#           otherClicks             (int) - number of clicks on a html.Div with id = "welcome-div"
+# returns:  list containing classNames (CSS styling) of various web app components
 @app.callback(
     [Output("search-bar-row", "className"), Output("user-info-name-role", "className"), Output("user-info-icon", "className"),
-     Output("menu-main-nav", "className"), Output("menu-modal-help-div", "className"), Output("welcome-div", "className")],
+    Output("menu-main-nav", "className"), Output("menu-modal-help-div", "className")],
     [Input("search-bar-heading-button", "n_clicks"), Input("user-information-heading-button", "n_clicks"),
-     Input("website-tabs-heading-button", "n_clicks"), Input("info-icon-heading-button", "n_clicks"),
-     Input("welcome-div", "n_clicks")]
+    Input("website-tabs-heading-button", "n_clicks"), Input("info-icon-heading-button", "n_clicks"),
+    Input("welcome-div", "n_clicks")]
 )
-def update_highlighted_div(search_bar_clicks, user_information_clicks, website_tab_clicks, info_icon_clicks, other_clicks):
-    
+def show_hide_red_highlights(searchBarClicks, userInformationClicks, websiteTabClicks, infoIconClicks, otherClicks):
+
     ctx = dash.callback_context
     if ctx.triggered:
-        triggered_id = ctx.triggered[0]['prop_id']
-    
-    if search_bar_clicks and "search-bar-heading-button" in triggered_id:
-        return ["welcome-highlight", "", "", "", "menu-modal-help", "m_medium"]
-    elif user_information_clicks and "user-information-heading-button" in triggered_id:
-        return ["", "welcome-highlight", "welcome-highlight", "", "menu-modal-help", "m_medium"]
-    elif website_tab_clicks and "website-tabs-heading-button" in triggered_id:
-        return ["", "", "", "welcome-highlight", "menu-modal-help", "m_medium"]
-    elif info_icon_clicks and "info-icon-heading-button" in triggered_id:
-        return ["", "", "", "", "welcome-highlight menu-modal-help", "m_medium"]
-    return ["", "", "", "", "menu-modal-help", "m_medium"]
+        triggeredId = ctx.triggered[0]['prop_id']
+
+        if searchBarClicks and "search-bar-heading-button" in triggeredId:
+            return ["welcome-highlight", "", "", "", "menu-modal-help"]
+        elif userInformationClicks and "user-information-heading-button" in triggeredId:
+            return ["", "welcome-highlight", "welcome-highlight", "", "menu-modal-help"]
+        elif websiteTabClicks and "website-tabs-heading-button" in triggeredId:
+            return ["", "", "", "welcome-highlight", "menu-modal-help"]
+        elif infoIconClicks and "info-icon-heading-button" in triggeredId:
+            return ["", "", "", "", "welcome-highlight menu-modal-help"]
+    return ["", "", "", "", "menu-modal-help"]
+
+
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function to make sure red highlights are not visible when user chooses other tabs then welcome tab.
+# params:   pathname         (str) - string containing current pathname
+# returns:  list containing style properties of various web app components
+@app.callback(
+    [Output("search-bar-row", "style"), Output("user-info-name-role", "style"), Output("user-info-icon", "style"),
+    Output("menu-main-nav", "style"), Output("menu-modal-help-div", "style")],
+    [Input("url", "pathname")]
+)
+def hide_red_highlights(pathname):
+
+    if pathname != "/Welcome":
+        return [{"border": "0px"}, {"border": "0px"}, {"border": "0px"}, {"border": "0px"}, {"border": "0px"}]
+    else:
+        return [{}, {}, {}, {}, {}]
