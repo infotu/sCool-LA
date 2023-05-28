@@ -1405,16 +1405,26 @@ def plotStudentsList(schoolKey, filterByDate = '' ):
             columns=[
                 {"name": constants.feature2UserNamesDict.get(i) if i in constants.feature2UserNamesDict.keys() else i , "id": i, "selectable": True} for i in studentDataDfSum[features2Plot].columns
             ],
-            data            = studentDataDfSum[features2Plot].to_dict('records'),
-            filter_action       = "native",
-            sort_action         = "native",
-            sort_mode           = "multi",
-            style_data_conditional = ([ 
-                    {
-                        'if': {'row_index': 'odd'},
-                        'backgroundColor': constants.THEME_TABLE_ODDROW_COLOR_STYLE
-                    },
-            ]) 
+            data         = studentDataDfSum[features2Plot].to_dict('records'),
+            sort_action  = "native",
+            sort_mode    = "multi",
+            style_header = {
+                'textAlign': 'center',
+                'backgroundColor': 'rgb(210, 210, 210)',
+                'color': 'black',
+                'fontWeight': 'bold'
+            },
+            style_data = {
+                'textAlign': 'left',
+                'backgroundColor': 'white',
+                'color': 'black'
+            },
+            style_data_conditional = [
+                {
+                    'if': {'row_index': 'odd'},
+                    'backgroundColor': 'rgb(230, 230, 230)',
+                }
+            ],
         )
         
 #    ---------------------------------------------
