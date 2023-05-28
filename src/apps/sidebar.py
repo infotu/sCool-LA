@@ -227,16 +227,14 @@ sidebar = html.Div(
         
         , html.Div(
             [
-                html.Button(children=[
-                        html.I(className="fas fa-info font-size_medium p-right_xx-small"),
-#                        html.Span( 'Help', className = "menu-modal-help-button-text"  ) 
-                        ],
-                        id='menu-modal-setting-open', 
-                        className="c-button button w3-btn w3-xlarge menu-modal-help-button btn btn-outline-info ", n_clicks=0),
+                html.Button(html.I(className="fas fa-info font-size_medium p-right_xx-small"),
+                                   id='menu-modal-setting-open', 
+                                   className="c-button button w3-btn w3-xlarge menu-modal-help-button btn btn-outline-info ",
+                                   n_clicks=0),
                 dbc.Modal(
                     [
-                        dbc.ModalHeader("sCool Data Analysis Tool Information & Settings"),
-                        dbc.ModalBody(  children = getModalHelpBody()  ),
+                        dbc.ModalHeader("sCool Data Analysis Tool Help Center & Settings"),
+                        dbc.ModalBody(children = getModalHelpBody()),
                         dbc.ModalFooter(
                             dbc.Button("Close", id="menu-modal-setting-close", className="ml-auto")
                         ),

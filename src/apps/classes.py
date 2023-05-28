@@ -1419,7 +1419,7 @@ def plotStudentsList(schoolKey, filterByDate = '' ):
         
 #    ---------------------------------------------
             
-        graphs.append(html.Div(children = [html.H2("Students in this Class"), fig1Table], className = "p-top_medium"))
+        graphs.append(html.Div(children = [html.H2("Students in this Class", className = "p-left_medium"), fig1Table], className = "p-top_medium"))
 
     except Exception as e: 
         subprocess.Popen(['echo', 'plotStudentsList 2 '])
@@ -1494,76 +1494,72 @@ def getButtonLabel(class_id):
     return "Heading Error"
         
 
-user_LA_option_buttons = createUserLAOptionsButtons()
 clicked_button = {}
 
 
 layout = html.Div(
     [
-    html.H1('Select a Class', id = 'select-a-class-heading', style = {'text-align': 'center'}),
+    html.Div(html.H1('Select a Class', id = 'select-a-class-heading', className = "align-center"),
+                         id = "select-a-class-heading-div", className="stick-on-top-of-page"),
 
-    html.Div(user_LA_option_buttons, className = 'choose-learning-activity-buttons', id = 'learning-activity-selection-div'),
+    html.Div(createUserLAOptionsButtons(), id = 'learning-activity-selection-div',
+             className = 'm-top_small m-left-right-small choose-learning-activity-buttons'),
 
-    html.Div(html.Button('Select other Class', id = {"button-type": "select-other-classes-button"}), className = 'choose-learning-activity-buttons hidden', id = "button-select-other-la-div"),
+    html.Div(html.Button('Select other Class', id = {"button-type": "select-other-classes-button"}),
+             id = "button-select-other-la-div", className = 'm-top_small m-left-right-small choose-learning-activity-buttons hidden'),
       
-    html.Div(id='Classes-Overview-Container', className = "c-table "),
+    html.Hr(id = 'classes-overview-hr', className = "hr_custom_style hidden"),
 
-    dbc.Row([
-            dbc.Col( 
-                    html.A(children=[html.I(className="fas fa-download font-size_medium p_small"),
-                       "download class data",], id = "classes_download_overview_link", className = "hidden" ,
+    html.Div(id='classes-overview-container', className = "c-table m-left-right-medium"),
+
+    html.A(children=[html.I(className="fas fa-download font-size_medium p_small"),
+                       "download class data",], id = "classes_download_overview_link", className = "m-left-right-medium hidden" ,
                                                href="", target="_blank",
-                                               download='group-overview.csv' )
-       )]),
+                                               download='group-overview.csv' ),
 
-    dbc.Row([
-            dbc.Col( 
-                    html.Div(id='Classes-Task-Information-Container', className = "c-table ")
-       )]),
-                    
-    dbc.Row([
-            dbc.Col( 
-                html.Div(children=[
-                        html.Div( 'Task code submissions',
-                                  id = 'Classes-taskId-selector-heading',
-                                  className= "heading-sub practice  p-bottom_small hidden"
-                        ),
-                        dcc.Dropdown(
-                            id = "Classes-taskId-selector",
-                            placeholder = "Select Task to see details",
-                            options = [ {'label': 'Select a group', 'value' : '0'}  ],
-                            className = " "
-                        )
-                    ],
-                    className = "p-top_large p-bottom_large"
-                )
-       )]),
+    html.Hr(id = 'classes-task-information-hr', className = "hr_custom_style hidden"),
 
-    dbc.Row([
-            dbc.Col( 
-                html.Div(id='Classes-taskId-container', className = "c-container ")
-        )]),
+    html.Div(id='classes-task-information-container', className = "c-table m-left-right-medium"),
+    
+    html.Hr(id = 'classes-code-submission-hr', className = "hr_custom_style hidden"),
 
-    dbc.Row([
-            dbc.Col( 
-                html.Div(id='Classes-Concept-Container', className = "c-table ")
-        )]),
+    html.Div(children=[
+            html.Div('Task code submissions',
+                     id = 'Classes-taskId-selector-heading',
+                     className= "heading-sub practice  p-bottom_small hidden"
+            ),
+            dcc.Dropdown(id = "Classes-taskId-selector",
+                         placeholder = "Select Task to see details",
+                         options = [ {'label': 'Select a group', 'value' : '0'}  ],
+                         className = " "
+            )
+        ],
+        className = "p-top_large p-bottom_large m-left-right-medium"
+    ),
+
+    html.Div(id='Classes-taskId-container', className = "c-container m-left-right-medium"),
+
+    html.Hr(id = 'classes-concept-hr', className = "hr_custom_style hidden"),
+
+    html.Div(id='Classes-Concept-Container', className = "c-table m-left-right-medium"),
+
+    html.Hr(id = 'classes-stats-hr', className = "hr_custom_style hidden"),
                      
-    dbc.Row([
-            dbc.Col( 
-                html.Div(id='Classes-General-Container', className = "c-table ")
-       )])
-    ],
-    style = {'margin': '30px'}
+    html.Div(id='Classes-General-Container', className = "c-table m-left-right-medium")
+    ]
 )
 
 
 #----------------------------------------------------------------------------------------------------------------------
 @app.callback([Output('learning-activity-selection-div', 'className'), Output('select-a-class-heading', 'children'),
-               Output('button-select-other-la-div', 'className'), Output('Classes-Overview-Container', 'className'),
-               Output('Classes-Task-Information-Container', 'className'), Output('Classes-General-Container', 'className'),
+               Output('button-select-other-la-div', 'className'), Output('classes-overview-container', 'className'),
+               Output('classes-task-information-container', 'className'), Output('Classes-General-Container', 'className'),
                Output('Classes-Concept-Container', 'className'), Output("Classes-taskId-selector", "className"),
-               Output("Classes-taskId-container", "className"), Output("Classes-taskId-selector-heading", "className")],
+               Output("Classes-taskId-container", "className"), Output("Classes-taskId-selector-heading", "className"),
+               
+               Output('classes-overview-hr', 'className'), Output('classes-task-information-hr', 'className'),
+               Output('classes-code-submission-hr', 'className'), Output('classes-concept-hr', 'className'),
+               Output('classes-stats-hr', 'className')],
               [Input({"button-type": "select-classes-button", "class-id": ALL}, "n_clicks"), Input({"button-type": "select-other-classes-button"}, "n_clicks")])
 def showHideLearningActivitySelectionButtons(*args):
 
@@ -1579,20 +1575,26 @@ def showHideLearningActivitySelectionButtons(*args):
 
         if triggered_id_dict["button-type"] == "select-classes-button":
             class_id = triggered_id_dict["class-id"]
-            return ["choose-learning-activity-buttons hidden", getButtonLabel(class_id),
-                    "choose-learning-activity-buttons", "c-table ",
-                    "c-table ", "c-table ",
-                    "c-table ", " ",
-                    "c-container ", "heading-sub practice  p-bottom_small"]
+            return ["m-top_small m-left-right-small choose-learning-activity-buttons hidden", getButtonLabel(class_id),
+                    "m-top_small m-left-right-small choose-learning-activity-buttons", "c-table m-left-right-medium",
+                    "c-table m-left-right-medium", "c-table m-left-right-medium",
+                    "c-table m-left-right-medium", " ",
+                    "c-container m-left-right-medium", "heading-sub practice  p-bottom_small",
+                    "hr_custom_style", "hr_custom_style",
+                    "hr_custom_style", "hr_custom_style",
+                    "hr_custom_style"]
 
-    return ["choose-learning-activity-buttons", "Select a Class",
-            "choose-learning-activity-buttons hidden", "c-table hidden",
-            "c-table hidden", "c-table hidden",
-            "c-table hidden", "hidden",
-            "c-container hidden", "heading-sub practice  p-bottom_small hidden"]
+    return ["m-top_small m-left-right-small choose-learning-activity-buttons", "Select a Class",
+            "m-top_small m-left-right-small choose-learning-activity-buttons hidden", "c-table m-left-right-medium hidden",
+            "c-table m-left-right-medium hidden", "c-table m-left-right-medium hidden",
+            "c-table m-left-right-medium hidden", "hidden",
+            "c-container m-left-right-medium hidden", "heading-sub practice  p-bottom_small hidden",
+            "hr_custom_style hidden", "hr_custom_style hidden",
+            "hr_custom_style hidden", "hr_custom_style hidden",
+            "hr_custom_style hidden"]
 
 #----------------------------------------------------------------------------------------------------------------------
-@app.callback(Output('Classes-Overview-Container', 'children'), 
+@app.callback(Output('classes-overview-container', 'children'), 
               Input({"button-type": "select-classes-button", "class-id": ALL}, "n_clicks"))
 def setClassOverview(n_clicks):
 
@@ -1610,13 +1612,13 @@ def setClassOverview(n_clicks):
         if triggered_id_dict["button-type"] == "select-classes-button":
             class_id = triggered_id_dict["class-id"]
             graphs = plotClassOverview(class_id, '')
-            graphs = [html.Hr(id = 'classes-overview-hr', className = "hr_custom_style")] + graphs + plotStudentsList(class_id, '')
+            graphs = graphs + plotStudentsList(class_id, '')
 
     return html.Div(graphs)
 
 
 #----------------------------------------------------------------------------------------------------------------------
-@app.callback(Output('Classes-Task-Information-Container', 'children'), 
+@app.callback(Output('classes-task-information-container', 'children'), 
               Input({"button-type": "select-classes-button", "class-id": ALL}, "n_clicks"))
 def display_graphs(n_clicks):
 
@@ -1634,7 +1636,6 @@ def display_graphs(n_clicks):
         if triggered_id_dict["button-type"] == "select-classes-button":
             class_id = triggered_id_dict["class-id"]
             graphs = plotSingleClass('School', class_id, '')
-            graphs = [html.Hr(id = 'classes-task-information-hr', className = "hr_custom_style")] + graphs + [html.Hr(id = 'classes-code-submission-hr', className = "hr_custom_style")]
 
     return html.Div(graphs)
 
@@ -1658,7 +1659,6 @@ def display_class_general(n_clicks):
         if triggered_id_dict["button-type"] == "select-classes-button":
             class_id = triggered_id_dict["class-id"]
             graphs = plotSingleClassGeneral('School', class_id, '')
-            graphs = graphs + [html.Hr(className = "hr_custom_style")]
 
     return html.Div(graphs)
 
@@ -1682,7 +1682,6 @@ def display_class_concept(n_clicks):
         if triggered_id_dict["button-type"] == "select-classes-button":
             class_id = triggered_id_dict["class-id"]
             graphs = plotGroupConceptDetails(class_id, '')
-            graphs = graphs + [html.Hr(id = 'classes-stats-hr', className = "hr_custom_style")]
 
     return html.Div(graphs)
     
@@ -1720,8 +1719,6 @@ def onSelectTaskShowTaskWiseConcept(taskId):
     
     if util.isValidValueId(taskId) and util.isValidValueId(clicked_button["buttonID"]):
         graphs = getGroupTaskWiseDetails(clicked_button["buttonID"], isGrouped = False, taskId = int(taskId), filterByDate = '')
-        
-    graphs = graphs + [html.Hr(id = 'classes-concept-hr', className = "hr_custom_style")]
     
     return [html.Div(graphs)]
 
@@ -1753,6 +1750,6 @@ def update_download_link__details_group(*args):
                 print('update_download_link__details_group ')
                 print(e)
     
-            return csv_string, ""
+            return csv_string, "m-left-right-medium"
 
-    return "", "hidden"
+    return "", "m-left-right-medium hidden"

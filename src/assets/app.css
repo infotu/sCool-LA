@@ -14,12 +14,21 @@ html {
 	font-family: sans-serif;
 }
 
+.stick-on-top-of-page {
+    position: sticky;
+	top: 5rem;
+	color: white;
+    background-color: var(--theme-background-color);
+	z-index: 100;
+	padding-top: 1rem;
+	padding-bottom: 0.5rem;
+}
+
 .page-main {
-	margin-top: 3rem;
+	margin-top: 5rem;
 	margin-left: 16rem;
-    padding: 2rem 1rem;
     padding-bottom: 5rem;
-	overflow-x: scroll;
+	/*overflow-x: scroll;*/
 	min-height: 100vh;
 	z-index: 1;
 }
@@ -497,7 +506,7 @@ html {
 
 
 .theme-app .c-textarea {
-	overflow: hidden;
+	overflow: auto;
 	width: 100%;
 	border: none;    
 	opacity: initial;
@@ -740,9 +749,6 @@ html {
 }
 
 
-
-
-
 .hr_custom_style {
 	border: 1px solid rgb(99, 99, 99);
 }
@@ -752,6 +758,9 @@ html {
 }
 .align-right {
 	text-align : right;
+}
+.align-center {
+	text-align : center;
 }
 .width-100 {
 	width: 100%;
@@ -892,6 +901,18 @@ html {
 .m-left-large {
 	margin-left: 3rem;
 }
+.m-left-right-small {
+	margin-left: 1rem;
+	margin-right: 1rem;
+}
+.m-left-right-medium {
+	margin-left: 2rem;
+	margin-right: 2rem;
+}
+.m-left-right-large {
+	margin-left: 3rem;
+	margin-right: 3rem;
+}
 
 .welcome-button {
 	padding: 0;
@@ -908,7 +929,7 @@ html {
 	color: #3aaab2;
 	font-size: 28px;
 	margin-bottom: 10px;
-	margin-top: 10px;
+	margin-top: 6.5rem;
 }
 
 .welcome-heading-tutorial {

@@ -34,6 +34,7 @@ iconNameGroups      = constants.iconNameGroups
 iconNameDetails     = constants.iconNameDetails
 iconNameStudents    = constants.iconNameStudents
 iconNameCustom      = constants.iconNameCustom
+iconNameTutorial    = constants.iconNameTutorial
 
 
 
@@ -119,31 +120,38 @@ layoutModalBodyHelp = [
     html.Br(),
     
     html.H5( children = [ html.I(className="fas " + iconNameHome + " p-right_xx-small"),   "Game Details"  ] ),
-    html.P("Information about the game data"),
+    html.P("This tab is only visible for admins"),
+    html.P("Information about the global game data"),
     
     html.Hr(),
     html.Br(),
     
     html.H5( children = [ html.I(className="fas " + iconNameGroups + " p-right_xx-small"),   "Groups"  ] ),
-    html.P("Compare groups for quick informations"),
-    html.P("Main group is highlighted with application theme"),
-    html.P("The minimum values of other groups are highlighted"),
+    html.P("This tab is only visible for admins"),
+    html.P("Compare groups (classes) for quick informations"),
+    html.P("Main group (class) is highlighted with application theme"),
+    html.P("The minimum values of others are highlighted"),
     html.P("Distribution : distribution of various features"),
     
     html.Hr(),
     html.Br(),
+
+    html.H5( children = [ html.I(className="fas " + iconNameTutorial + " p-right_xx-small"),   "Tutorial"  ] ),
+    html.P("Starting screen where the UI is shortly explained"),
     
+    html.Hr(),
+    html.Br(),
     
-    html.H5( children = [ html.I(className="fas " + iconNameDetails + " p-right_xx-small"),   "Details"  ] ),
+    html.H5( children = [ html.I(className="fas " + iconNameDetails + " p-right_xx-small"),   "Classes"  ] ),
     html.P("Learning Activity details"),
-    html.P("Information about the group selected. Information like task completed, points etc as a Group."),
+    html.P("Information about the class selected. Information like task completed, points etc as a class."),
     
     html.Hr(),
     html.Br(),
     
     html.H5( children = [ html.I(className="fas " + iconNameStudents + " p-right_xx-small"),   "Students"  ] ),
     html.P("Learning Activity Student details"),
-    html.P("Information about a student in a Group. Detailed information about the student. Select features to view more information from multi select picklist"),
+    html.P("Information about a student in a Class. Detailed information about the student. Select features to view more information from multi select picklist"),
     html.P("Student Timeline :- shows the student game interactions at time details for each interaction"),
     
     html.Hr(),
@@ -153,7 +161,6 @@ layoutModalBodyHelp = [
     html.P("Create custom figures specifying various parameters"),
     html.P( children = [ html.I(className="fas fa-chart-bar font-size_medium p-right_xx-small"),   "Bar"  ]),
     html.P( children = [ html.I(className="fas fa-circle font-size_medium p-right_xx-small"),   "Scatter"  ] ),
-#    html.P( children = [ html.I(className="fas fa-chart-pie font-size_medium p-right_xx-small"),   "Pie"   ] ),
     html.P( children = [ html.I(className="fas fa-ellipsis-h font-size_medium p-right_xx-small"),   "Bubble" , " : values in third feature determines the size of points in the bubble plot (for e.g. Points1 = 50 has a larger point in the graph than Points2 = 10) " ] ),
     html.P( children = [ html.I(className="fas fa-chart-line font-size_medium p-right_xx-small"),   "Line" ] ),
     html.P( children = [ html.I(className="fas fa-table font-size_medium p-right_xx-small"),   "Table", " : multi select features to display values in a table " ] ),
@@ -273,7 +280,7 @@ settingsLayout = [
         
     dbc.Tabs(
         [
-            dbc.Tab( layoutModalBodyHelp , label="Help"),
+            dbc.Tab( layoutModalBodyHelp , label="Help Center"),
             dbc.Tab( getCourseTask() , label="Course & Tasks" , id = "tabCourseSkillTask"),
             dbc.Tab( layoutModalBodyCustomize , label="Customize"),
         ]
