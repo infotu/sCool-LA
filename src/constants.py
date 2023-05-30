@@ -213,7 +213,7 @@ featuresOverviewAvgNames = {
 
 
 
-countStudentCompletingTaskFeature   = "Number of Students Completing Task"
+countStudentCompletingTaskFeature   = "Number of Students"
 countTaskCompletedByStudentFeature  = "Number of Tasks Completed"
 featureSessionDuration              = "SessionDuration"
 featurePracticeTaskDesc             = "PracticeTaskDesc"
@@ -347,9 +347,9 @@ feature2UserNamesDict = {
         
         
         
-		, "PracticeSessionDuration" : "Time spend in Practice"
-		, "TheorySessionDuration" : "Time spend in Theory"
-        , featureSessionDuration : "Total Time spend"
+		, "PracticeSessionDuration" : "Time spent in Practice"
+		, "TheorySessionDuration" : "Time spent in Theory"
+        , featureSessionDuration : "Total Time spent"
         , COUNT_STUDENT_FEATURE : "Number of Students"
         
         
@@ -665,9 +665,9 @@ websiteTabsText = "On the left side of the screen, you can see your available ta
 
 tutorialTabText = "a.) Tutorial tab: This is the tab you currently see. It enables you to have a quick overview of the user interface."
 
-classesTabText = "b.) Classes tab: The classes tab offers class-wise information. It allows you to analyze trends and patterns within a specific group of students."
+classesTabText = "b.) Classes tab: The classes tab offers class-related information. It allows you to analyze trends and patterns within a specific group of students."
 
-studentsTabText = "c.) Students tab: The students' tab provides student-wise information. Gain valuable insights into individual student performance and engagement metrics."
+studentsTabText = "c.) Students tab: The students' tab provides student-related information. Gain valuable insights into individual student performance and engagement metrics."
 
 customTabText = "d.) Custom tab: In the Custom tab, you have the freedom to generate your own data visualizations."
 
