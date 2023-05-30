@@ -292,7 +292,7 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
             studentWiseDataOriginalTaskPerformed = studentWiseDataOriginalTaskPerformed.sort_values(by=[ countTaskCompletedByStudentFeature ], ascending=False)
             
             table_header = [
-                html.Thead(html.Tr([html.Th("Student"), html.Th("Number of Tasks completed"), html.Th("Practice Tasks", className="c-table-w-content-main")
+                html.Thead(html.Tr([html.Th("Student"), html.Th("Number of Tasks completed"), html.Th("Names of completed Practice Tasks", className="c-table-w-content-main")
                                     ]))
             ]
             rows = []
@@ -331,17 +331,50 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
             graphs.append(html.Div(table ,className = "c-table c-table-oddeven font-size_small p-top_medium"))
 
         except Exception as e:   
-            subprocess.Popen(['echo', 'ERROR - ' + graphTitle])
+            subprocess.Popen(['echo', 'ERROR - practice'])
             subprocess.Popen(['echo', str(e)])          
-            print( 'ERROR - ' + graphTitle )
+            print( 'ERROR - practice')
             print(e)
 
         
 
                 
         try :
+
+            graphs.append(html.Div( 'Theory Tasks',
+                                   className= "heading-sub theory p-top_large"
+                        )) 
             
-            graphTitle = 'Number of Students completing a Theory Task'
+            #       Plot 
+
+            pieDataTheory = groupOriginalTheory.groupby(['TheoryTaskId', 'StudentId'], as_index=False).sum()
+        
+            pieDataTheory.loc[pieDataTheory['Result'] > 0, 'Result'] = 1
+        
+            taskDataTheory = pieDataTheory.groupby(['TheoryTaskId'], as_index=False).sum()
+            taskDataTheory = taskDataTheory.rename(columns={"Result": countStudentCompletingTaskFeature})
+            taskDataTheory = taskDataTheory.merge(right= dfTheoryTaskDetails
+                                              , left_on='TheoryTaskId', right_on='TheoryTaskId'
+                                                , left_index=False, right_index=False
+                                                , how='inner')
+
+            taskDataTheory[featureTheoryTaskDesc] = taskDataTheory['Title'].astype(str) + ' (Id: ' + taskDataTheory['TheoryTaskId'].astype(str) + ")" 
+
+            taskDataTheory[featureTaskType] = constants.TaskTypeTheory
+            
+        
+            figStudents, graphQuantile = getFeaturePlot(taskDataTheory, 
+                           countStudentCompletingTaskFeature, 
+                           featureTheoryTaskDesc, 
+                           'Number of Students completing a Theory Task', 
+                           ['Title'], 
+                           isColored = True, hasMeanStd = False, hoverName = featureTheoryTaskDesc )
+                     
+           
+            graphs.append(html.Div(figStudents, className = "p-top_medium"))
+                          
+            graphIndex = graphIndex + 1
+
 
             dfTaskWiseSuccessFailTheory = pd.DataFrame(index=np.arange(0, 1), columns=['Task (Name and short Description)', constants.featureDescription, labelSuccess, labelFail, 'SessionDuration', 'Type',
                                                 'Skill', 'Course', constants.featureTaskId])
@@ -367,73 +400,36 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
             dfTaskWiseSuccessFailTheory[labelSuccess] = pd.to_numeric(dfTaskWiseSuccessFailTheory[labelSuccess], downcast='integer')
             dfTaskWiseSuccessFailTheory[labelFail] = pd.to_numeric(dfTaskWiseSuccessFailTheory[labelFail], downcast='integer')
             
+            dfTaskWiseSuccessFailForUserPresentationTheory = dfTaskWiseSuccessFailTheory
+            dfTaskWiseSuccessFailForUserPresentationTheory.drop(columns=["Type"], inplace = True)
+
+            for index, row in dfTaskWiseSuccessFailForUserPresentationTheory.iterrows():
+                timestamp = turnSecondsIntoFancyTimestamp(row["SessionDuration"])
+                dfTaskWiseSuccessFailForUserPresentationTheory.at[index,"SessionDuration"] = timestamp
             
             table_header = [
-                html.Thead(html.Tr([html.Th("Task"), html.Th(labelSuccess), html.Th(labelFail), html.Th('Session Duration(s)'), html.Th('Type'), html.Th('Skill'), html.Th('Course'), html.Th('TaskId') ]))
+                html.Thead(html.Tr([html.Th("Task Name and Description"), html.Th("Number of Students who succeeded"), html.Th("Number of Students who failed"), html.Th('Students total Time spent on Task'), html.Th('Skill Category'), html.Th('Course'), html.Th('Task ID') ]))
             ]
             rows = []
-            for index, row in dfTaskWiseSuccessFailTheory.iterrows():
+            for index, row in dfTaskWiseSuccessFailForUserPresentationTheory.iterrows():
 
                 tds = []
-                for feature in dfTaskWiseSuccessFailTheory.columns:
+                for feature in dfTaskWiseSuccessFailForUserPresentationTheory.columns:
                     if not feature == constants.featureDescription:
                         tds.append(html.Td(str(row[feature])))
 
                 rows.append(html.Tr(tds, className = ("type-theory")))
-                rows.append(html.Tr([html.Td(row[constants.featureDescription], colSpan = len(dfTaskWiseSuccessFailTheory.columns) - 1)]))
+                rows.append(html.Tr([html.Td(row[constants.featureDescription], colSpan = len(dfTaskWiseSuccessFailForUserPresentationTheory.columns) - 1)]))
                 
             
-            table_body = [html.Tbody(  rows   )]
+            table_body = [html.Tbody(rows)]
             
             table = dbc.Table(table_header + table_body, bordered=True)
             
-            graphs.append(html.Div( graphTitle,
-                                   className= "heading-sub theory p-top_large"
-                        )) 
             graphs.append(html.Div(table ,
                             className = "c-table c-table-oddeven font-size_small"
                         ))
             
-
-
-#       Plot 
-
-            pieDataTheory = groupOriginalTheory.groupby(['TheoryTaskId', 'StudentId'], as_index=False).sum()
-        
-            pieDataTheory.loc[pieDataTheory['Result'] > 0, 'Result'] = 1
-        
-            taskDataTheory = pieDataTheory.groupby(['TheoryTaskId'], as_index=False).sum()
-            taskDataTheory = taskDataTheory.rename(columns={"Result": countStudentCompletingTaskFeature})
-            taskDataTheory = taskDataTheory.merge(right= dfTheoryTaskDetails
-                                              , left_on='TheoryTaskId', right_on='TheoryTaskId'
-                                                , left_index=False, right_index=False
-                                                , how='inner')
-#            taskDataTheory[featureTheoryTaskDesc] = taskDataTheory['Title'].astype(str).str[10] + '... (Id: ' + taskDataTheory['TheoryTaskId'].astype(str) + ')' 
-            taskDataTheory[featureTheoryTaskDesc] = 'Id: ' + taskDataTheory['TheoryTaskId'].astype(str) 
-            taskDataTheory[featureTaskType] = constants.TaskTypeTheory
-            
-        
-            figStudents, graphQuantile = getFeaturePlot(taskDataTheory, 
-                           countStudentCompletingTaskFeature, 
-                           featureTheoryTaskDesc, 
-                           'Number of Students completing a Theory Task', 
-                           ['Title', 'TheoryTaskId'], 
-                           isColored = True, hasMeanStd = False, hoverName = featureTheoryTaskDesc )
-                     
-           
-            graphs.append(
-                    html.Div(
-                        children = html.Details(
-                                    children = [
-                                            html.Summary([  html.I(className="fas fa-info m-right-small"),
-                                            "Number of Students completing a Theory Task visualized" ]),
-                                            html.Div(figStudents,
-                                                    className = " p-top_medium "),
-                                        ],
-                                            className = " c-container "
-                                ) 
-                ))
-            graphIndex = graphIndex + 1
         
         except Exception as e: 
                 subprocess.Popen(['echo', 'plotSingleClass 2 '])
@@ -442,11 +438,12 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                 print(e)
         
 
-
-
-        
-        graphTitle = 'Count of Theory Tasks completed by Students'
         try: 
+
+            graphs.append(html.Div('Student-related Theory Task Information',
+                                   className= "heading-sub theory p-top_large"
+            )) 
+
             studentWiseDataOriginalTaskPerformedTheory = groupOriginalTheory
             studentWiseDataOriginalTaskPerformedTheory = studentWiseDataOriginalTaskPerformedTheory.merge(right= dfTheoryTaskDetails
                                               , left_on='TheoryTaskId', right_on='TheoryTaskId'
@@ -467,7 +464,7 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
             studentWiseDataOriginalTaskPerformedTheory = studentWiseDataOriginalTaskPerformedTheory.sort_values(by=[ countTaskCompletedByStudentFeature ], ascending=False)
             
             table_header = [
-                html.Thead(html.Tr([html.Th("Student"), html.Th("Number of Tasks completed"), html.Th("Theory Tasks", className="c-table-w-content-main")
+                html.Thead(html.Tr([html.Th("Student"), html.Th("Number of Tasks completed"), html.Th("Names of completed Theory Tasks", className="c-table-w-content-main")
                                     ]))
             ]
             rows = []
@@ -500,27 +497,13 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
             
             table = dbc.Table(table_header + table_body, bordered=True)
             
-            
-            graphs.append(html.Div( graphTitle,
-                                   className= "heading-sub theory p-top_large"
-                        )) 
 
-            graphs.append(html.Div(html.Details(
-                        children = [
-                                html.Summary([  html.I(className="fas fa-info m-right-small"),
-                                "Data : " + graphTitle ]),
-                                html.Div(table ,
-                                        className = "c-table c-table-oddeven font-size_small p-top_medium"
-                                ),
-                            ],
-                            className = " c-container  "
-                    ),
-                    className = " p-top_small  p-bottom_x-large "))           
+            graphs.append(html.Div(table ,className = "c-table c-table-oddeven font-size_small p-top_medium"))        
             
         except Exception as e: 
-            subprocess.Popen(['echo', 'ERROR - ' + graphTitle ])
+            subprocess.Popen(['echo', 'ERROR - theory'])
             subprocess.Popen(['echo', str(e)])
-            print( 'ERROR - ' + graphTitle )  
+            print( 'ERROR - theory')  
             print(e)
         
         
@@ -572,13 +555,13 @@ def getGroupTaskWiseDetails(groupId, isGrouped = True, taskId = 0 , filterByDate
         if not taskId is None and  taskId > 0 and taskId in taskWiseConceptPracticeGrouped.groups.keys():
             taskData = taskWiseConceptPracticeGrouped.get_group(taskId)
             
-            headThs = []
-            for feat in featureToPlotTask:
-                headThs.append(html.Th(feat))
-            
             table_header = [
-                html.Thead(html.Tr( headThs  ))
+                html.Thead(html.Tr([html.Th('Student'), html.Th('Submitted Code'), html.Th('Time spent writing Code')]))
             ]
+
+            for index, row in taskData.iterrows():
+                timestamp = turnSecondsIntoFancyTimestamp(row["SessionDuration"])
+                taskData.at[index, "SessionDuration"] = timestamp
             
             rows = []
             for index, row in taskData.iterrows():
@@ -586,21 +569,20 @@ def getGroupTaskWiseDetails(groupId, isGrouped = True, taskId = 0 , filterByDate
                 tds = []
                 for feature in featureToPlotTask:
                     if feature == "Code":
-                        codeWithBreaks = str(  row[feature]  ).split('\n')
+                        codeWithBreaks = str(row[feature]).split('\n')
                         codeLined = []
                         for codeLine in codeWithBreaks:
-                            codeLined.append( html.Pre( html.Span(codeLine) ,
-                                                       className = "c-pre" 
-                                                ))
+                            codeLined.append(html.Pre(html.Span(codeLine),
+                                                      className = "c-pre" 
+                                            ))
                         
-                        tds.append( html.Td(  codeLined  ) )
+                        tds.append(html.Td(codeLined))
                     else :
-                        tds.append( html.Td(  str(  row[feature]  )  ) )
+                        tds.append(html.Td(str(row[feature])))
     
-                rows.append(  html.Tr(  tds 
-                                      ) )
+                rows.append(html.Tr(tds))
 
-            table_body = [html.Tbody(  rows   )]            
+            table_body = [html.Tbody(rows)]            
             table = dbc.Table(table_header + table_body, bordered=True)
             
             graphs.append(html.Div(table ,
@@ -679,12 +661,12 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 , filterByDa
                 print(e)
                 
             figBar = px.bar(studentWiseDataConceptsTask
-                                , x             =   featureX
-                                , y             =   featureY
+                                , x             =  featureX
+                                , y             =  featureY
                                 , orientation   =  'h'
                                 , height        =   constants.graphHeight - 100
                                 , template      =   constants.graphTemplete   
-                                , title         =   "Practice Concepts used by Students in Task " + str(taskId) + '(TaskId)'+ "<br>" + str(taskTitle)  +   " (Number of Students used a Concept in Code)"
+                                , title         =   "Code Concepts used by Students in Task with Task ID " + str(taskId) + "<br>" + str(taskTitle)  +   " (Number of Students used a Concept in Code)"
                                 , labels        =   feature2UserNamesDict # customize axis label
                 )
             
@@ -748,7 +730,7 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 , filterByDa
                                 , height        =   constants.graphHeight - 100
                                 , hover_data    =  [ 'Title', 'PracticeTaskId',  ]
                                 , template      =   constants.graphTemplete   
-                                , title         =   "Practice Concepts used by Students in each Task <br> (Number of Students used a Concept in Code for a Task)"
+                                , title         =   "Code Concepts used by Students in each Task <br> (Number of Students used a Concept in Code for a Task)"
                                 , labels        =   feature2UserNamesDict # customize axis label
                                 , color         =   featurePracticeTaskGroup
                                 , barmode       =   'group'
@@ -840,7 +822,7 @@ def plotGroupConceptDetails(groupId, filterByDate = '' ):
                             , orientation   =  'h'
                             , height        =   constants.graphHeight - 100
                             , template      =   constants.graphTemplete   
-                            , title         =   "Practice Concepts used by Students of this Class (Number of Students using a Concept in Code)"
+                            , title         =   "Code Concepts used by Students of this Class (Number of Students using a Concept in Code)"
                             , labels        =   feature2UserNamesDict # customize axis label
             )
         graphs.append(
@@ -862,27 +844,9 @@ def plotGroupConceptDetails(groupId, filterByDate = '' ):
         try :
             figBar = plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0, filterByDate = filterByDate )
             
-            graphs.append(
-                html.Div(html.Details(
-                            children = [
-                                    html.Summary([  html.I(className="fas fa-info m-right-small"),
-                                    "Concepts used by students in each task"  ]),
-                                    html.Div(
-                                        dcc.Graph(
-                                            figure= figBar
-                                        )
-                                    
-                                        if  constants.languageLocal  != 'en' else
-                                    
-                                        dcc.Graph(
-                                            figure= figBar
-                                            
-                                            , config  =  dict (locale   =  constants.languageLocal   ) 
-                                        )
-                                    ),
-                            ],
-                            className = "c-container p-top_large p-bottom_large"
-            )))     
+            graphs.append(html.Div(
+                dcc.Graph(figure= figBar), className = "c-container p-top_large p-bottom_large")
+            )   
 
         except Exception as e: 
                 subprocess.Popen(['echo', 'Task Concepts used'])
@@ -1539,27 +1503,30 @@ layout = html.Div(
 
     html.Div(children=[
             html.Div('Task code submissions',
-                     id = 'Classes-taskId-selector-heading',
-                     className= "heading-sub practice  p-bottom_small hidden"
+                     id = 'classes-taskId-selector-heading',
+                     className= "heading-sub practice  p-bottom_small"
             ),
-            dcc.Dropdown(id = "Classes-taskId-selector",
+            html.Div(constants.codeSubmissionParagraph,
+                     className = "normal-paragraph m-bottom_small"),
+            dcc.Dropdown(id = "classes-taskId-selector",
                          placeholder = "Select Task to see details",
                          options = [ {'label': 'Select a group', 'value' : '0'}  ],
-                         className = " "
+                         className = "m-top_small"
             )
         ],
-        className = "p-top_large p-bottom_large m-left-right-medium"
+        id = "classes-taskid-selector-div",
+        className = "p-top_large p-bottom_large m-left-right-medium hidden"
     ),
 
-    html.Div(id='Classes-taskId-container', className = "c-container m-left-right-medium"),
+    html.Div(id='classes-taskId-container', className = "c-container m-left-right-medium"),
 
     html.Hr(id = 'classes-concept-hr', className = "hr_custom_style hidden"),
 
-    html.Div(id='Classes-Concept-Container', className = "c-table m-left-right-medium"),
+    html.Div(id='classes-concept-container', className = "c-table m-left-right-medium"),
 
     html.Hr(id = 'classes-stats-hr', className = "hr_custom_style hidden"),
                      
-    html.Div(id='Classes-General-Container', className = "c-table m-left-right-medium")
+    html.Div(id='classes-general-container', className = "c-table m-left-right-medium")
     ]
 )
 
@@ -1567,9 +1534,9 @@ layout = html.Div(
 #----------------------------------------------------------------------------------------------------------------------
 @app.callback([Output('learning-activity-selection-div', 'className'), Output('select-a-class-heading', 'children'),
                Output('button-select-other-la-div', 'className'), Output('classes-overview-container', 'className'),
-               Output('classes-task-information-container', 'className'), Output('Classes-General-Container', 'className'),
-               Output('Classes-Concept-Container', 'className'), Output("Classes-taskId-selector", "className"),
-               Output("Classes-taskId-container", "className"), Output("Classes-taskId-selector-heading", "className"),
+               Output('classes-task-information-container', 'className'), Output('classes-general-container', 'className'),
+               Output('classes-concept-container', 'className'), Output("classes-taskid-selector-div", "className"),
+               Output("classes-taskId-container", "className"),
                
                Output('classes-overview-hr', 'className'), Output('classes-task-information-hr', 'className'),
                Output('classes-code-submission-hr', 'className'), Output('classes-concept-hr', 'className'),
@@ -1592,8 +1559,8 @@ def showHideLearningActivitySelectionButtons(*args):
             return ["m-top_small m-left-right-small choose-learning-activity-buttons hidden", getButtonLabel(class_id),
                     "m-top_small m-left-right-small choose-learning-activity-buttons", "c-table m-left-right-medium",
                     "c-table m-left-right-medium", "c-table m-left-right-medium",
-                    "c-table m-left-right-medium", " ",
-                    "c-container m-left-right-medium", "heading-sub practice  p-bottom_small",
+                    "c-table m-left-right-medium", "p-top_large p-bottom_large m-left-right-medium",
+                    "c-container m-left-right-medium",
                     "hr_custom_style", "hr_custom_style",
                     "hr_custom_style", "hr_custom_style",
                     "hr_custom_style"]
@@ -1601,8 +1568,8 @@ def showHideLearningActivitySelectionButtons(*args):
     return ["m-top_small m-left-right-small choose-learning-activity-buttons", "Select a Class",
             "m-top_small m-left-right-small choose-learning-activity-buttons hidden", "c-table m-left-right-medium hidden",
             "c-table m-left-right-medium hidden", "c-table m-left-right-medium hidden",
-            "c-table m-left-right-medium hidden", "hidden",
-            "c-container m-left-right-medium hidden", "heading-sub practice  p-bottom_small hidden",
+            "c-table m-left-right-medium hidden", "p-top_large p-bottom_large m-left-right-medium hidden",
+            "c-container m-left-right-medium hidden",
             "hr_custom_style hidden", "hr_custom_style hidden",
             "hr_custom_style hidden", "hr_custom_style hidden",
             "hr_custom_style hidden"]
@@ -1655,7 +1622,7 @@ def display_graphs(n_clicks):
 
 
 #----------------------------------------------------------------------------------------------------------------------
-@app.callback(Output('Classes-General-Container', 'children'), 
+@app.callback(Output('classes-general-container', 'children'), 
               Input({"button-type": "select-classes-button", "class-id": ALL}, "n_clicks"))
 def display_class_general(n_clicks):
 
@@ -1678,7 +1645,7 @@ def display_class_general(n_clicks):
 
 
 #----------------------------------------------------------------------------------------------------------------------
-@app.callback(Output('Classes-Concept-Container', 'children'), 
+@app.callback(Output('classes-concept-container', 'children'), 
               Input({"button-type": "select-classes-button", "class-id": ALL}, "n_clicks"))
 def display_class_concept(n_clicks):
 
@@ -1702,7 +1669,7 @@ def display_class_concept(n_clicks):
 
 #----------------------------------------------------------------------------------------------------------------------
 #On Select a Group - set Group Task Done Options - see task wise information             
-@app.callback([Output("Classes-taskId-selector", "options")],
+@app.callback([Output("classes-taskId-selector", "options")],
               Input({"button-type": "select-classes-button", "class-id": ALL}, "n_clicks"))
 def onSelectGroupSetTaskOptions(n_clicks):
 
@@ -1725,8 +1692,8 @@ def onSelectGroupSetTaskOptions(n_clicks):
     
 
 #----------------------------------------------------------------------------------------------------------------------
-@app.callback([Output("Classes-taskId-container", "children")],
-              [Input("Classes-taskId-selector", "value")])
+@app.callback([Output("classes-taskId-container", "children")],
+              [Input("classes-taskId-selector", "value")])
 def onSelectTaskShowTaskWiseConcept(taskId):
 
     graphs = []

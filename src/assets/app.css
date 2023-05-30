@@ -361,7 +361,7 @@ html {
 }
 
 .heading-sub {
-	font-size: 20px;
+	font-size: 24px;
 }
 
 
@@ -952,6 +952,11 @@ html {
 
 .welcome-highlight {
 	border: 3px solid rgb(255, 0, 0);
+}
+
+.normal-paragraph {
+	font-size: 16px;
+	margin-bottom: 8px;
 }
 
 

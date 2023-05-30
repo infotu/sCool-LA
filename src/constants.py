@@ -611,7 +611,7 @@ markerfacecolors = ['navy', 'seagreen', 'red', 'cyan', 'magenta', 'maroon'
 
 
 
-
+codeSubmissionParagraph = "Select a task in the dropdown menu below to see the code submissions your students submitted and how long it took them to write the code. There will also be more information about how many students used certain coding concepts in the chosen task."
 
 
 
