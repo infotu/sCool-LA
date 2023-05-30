@@ -825,18 +825,10 @@ def plotGroupConceptDetails(groupId, filterByDate = '' ):
                             , title         =   "Code Concepts used by Students of this Class (Number of Students using a Concept in Code)"
                             , labels        =   feature2UserNamesDict # customize axis label
             )
+        
         graphs.append(
-            
                 dcc.Graph(
                     figure= figBar
-                )
-            
-                if  constants.languageLocal  != 'en' else
-            
-                dcc.Graph(
-                    figure= figBar
-                     
-                    , config  =  dict (locale   =  constants.languageLocal   ) 
                 )
         )
         
@@ -1179,7 +1171,7 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                             
                             
                             featurePlot, graphDistributions = getFeaturePlot(studentWiseData, featuresPractice[first], featuresPractice[second], 
-                                                                   '(Practice) Details of students ' + titleFirst,
+                                                                   'Students Practice ' + titleFirst,
                                                                    hoverDataPractice,
                                                                    hasDistribution = True,
                                                                    isThemeSizePlot = False )
@@ -1189,15 +1181,17 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                                             children = featurePlot
                                     )
                             )
+                            """
                             graphs.append(  html.Div( getPlotDistributionPlotChildrens(graphDistributions, quantileIndex) ,
                                 className = "c-container"
                             ))
+                            """
                             quantileIndex += 1
                             
                             
                             dfTheory2Plot = studentWiseDataTheory.groupby(['StudentId', 'Name', 'TaskType'], as_index=False).sum()
                             featurePlot, graphDistributions = getFeaturePlot(dfTheory2Plot, featuresPractice[first], featuresPractice[second], 
-                                                                   '(Theory) Details of students ' + titleFirst,
+                                                                   'Students Theory ' + titleFirst,
                                                                    hoverDataTheory, 
                                                                    isColored = True,
                                                                    hasDistribution = True,
@@ -1207,15 +1201,17 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                                             children = featurePlot
                                     )
                             )
+                            """
                             graphs.append(  html.Div( getPlotDistributionPlotChildrens(graphDistributions, quantileIndex) ,
                                 className = "c-container"
                             ))
+                            """
                             quantileIndex += 1
                          
 #    Graphs only for PRACTICE
                         if ([featuresPractice[first], featuresPractice[second]] not in  featurePairsToPlotTheory):    
                             featurePlot, graphDistributions = getFeaturePlot(studentWiseData, featuresPractice[first], featuresPractice[second], 
-                                                                   '(Practice) Details of students ' + titleFirst,
+                                                                   'Students Practise ' + titleFirst,
                                                                    hoverDataPractice,
                                                                    hasDistribution = True,
                                                                    isThemeSizePlot = False )
@@ -1224,9 +1220,11 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                                             children = featurePlot
                                     )
                             )
+                            """
                             graphs.append(  html.Div( getPlotDistributionPlotChildrens(graphDistributions, quantileIndex) ,
                                 className = "c-container"
                             ))
+                            """
                             quantileIndex += 1
     
 #    Graphs only for THEORY
@@ -1241,7 +1239,7 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                         
                     dfTheory2Plot = studentWiseDataTheory.groupby(['StudentId', 'Name', 'TaskType'], as_index=False).sum()
                     featurePlot, graphDistributions = getFeaturePlot(dfTheory2Plot, rowTheory[0], rowTheory[1] , 
-                                                                   '(Theory) Details of students ' + titleFirst,
+                                                                   'Students ' + titleFirst,
                                                                    hoverDataTheory, isColored = True,
                                                                    hasDistribution = True,
                                                                    isThemeSizePlot = False )
@@ -1251,9 +1249,11 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                                             children = featurePlot
                                     )
                     )
+                    """
                     graphs.append(  html.Div(getPlotDistributionPlotChildrens(graphDistributions, quantileIndex) ,
                         className = "c-container"
                     ))
+                    """
                     quantileIndex += 1
                     
                 except Exception as e: 
@@ -1267,18 +1267,7 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
         subprocess.Popen(['echo', str(e)])
         print(e)
 
-    graphsMain.append(
-        html.Div(html.Details(
-                    children = [
-                            html.Summary([  html.I(className="fas fa-info m-right-small"),
-                            "General Information "  ]),
-                            html.Div(
-                                graphs,
-                                className = " p-top_medium "
-                            ),
-                    ],
-                    className = "c-container "
-    )))     
+    graphsMain.append(html.Div(html.Div(graphs, className = " p-top_medium "), className = "c-container "))
     
     return graphsMain      
 
