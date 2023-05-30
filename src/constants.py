@@ -347,9 +347,9 @@ feature2UserNamesDict = {
         
         
         
-		, "PracticeSessionDuration" : "Session D. Practice(s)"
-		, "TheorySessionDuration" : "Session D. Theory(s)"
-        , featureSessionDuration : "Session Duration(s)"
+		, "PracticeSessionDuration" : "Time spend in Practice"
+		, "TheorySessionDuration" : "Time spend in Theory"
+        , featureSessionDuration : "Total Time spend"
         , COUNT_STUDENT_FEATURE : "Number of Students"
         
         

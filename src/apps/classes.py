@@ -142,9 +142,6 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
     graphs = []
     
     
-        
-        
-        
     try :
         groupOriginal = dfGroupedOriginal.get_group(school)
         groupOriginal['CreatedAt'] = pd.to_datetime(groupOriginal['CreatedAt'])
@@ -1358,6 +1355,25 @@ def getPlotDistributionPlotChildrens(graphDistributions, quantileIndex = 0):
     ]
 
 
+def turnSecondsIntoFancyTimestamp(totalSeconds):
+    hours = totalSeconds // 3600
+    minutes = (totalSeconds % 3600) // 60
+    seconds = (totalSeconds % 3600) % 60
+    
+    timeString = f"{hours}h {minutes}m {seconds}s"
+    return timeString
+
+
+def turnFancyTimestampIntoSeconds(timeString):
+    splitUpString = timeString.split()
+    hours = int(splitUpString[0].rstrip('h'))
+    minutes = int(splitUpString[1].rstrip('m'))
+    seconds = int(splitUpString[2].rstrip('s'))
+
+    totalSeconds = (hours * 3600) + (minutes * 60) + seconds
+    return totalSeconds
+
+
 #Student Interaction with Game - TIMELINE
 def plotStudentsList(schoolKey, filterByDate = '' ):
     
@@ -1401,20 +1417,32 @@ def plotStudentsList(schoolKey, filterByDate = '' ):
                                             , left_index=False, right_index=False
                                             , how='inner')
         
+        for index, row in studentDataDfSum.iterrows():
+            timestamp = turnSecondsIntoFancyTimestamp(row["PracticeSessionDuration"])
+            studentDataDfSum.at[index,"PracticeSessionDuration"] = timestamp
+            timestamp = turnSecondsIntoFancyTimestamp(row["TheorySessionDuration"])
+            studentDataDfSum.at[index,"TheorySessionDuration"] = timestamp
+            timestamp = turnSecondsIntoFancyTimestamp(row["SessionDuration"])
+            studentDataDfSum.at[index,"SessionDuration"] = timestamp
+
         fig1Table = dash_table.DataTable(
+            id = "students-list-table",
             columns=[
                 {"name": constants.feature2UserNamesDict.get(i) if i in constants.feature2UserNamesDict.keys() else i , "id": i, "selectable": True} for i in studentDataDfSum[features2Plot].columns
             ],
             data         = studentDataDfSum[features2Plot].to_dict('records'),
-            sort_action  = "native",
-            sort_mode    = "multi",
+            sort_action  = "custom",
+            sort_mode    = "single",
+            sort_by      = [],
             style_header = {
+                'border': '1px solid black',
                 'textAlign': 'center',
                 'backgroundColor': 'rgb(210, 210, 210)',
                 'color': 'black',
                 'fontWeight': 'bold'
             },
             style_data = {
+                'border': '1px solid black',
                 'textAlign': 'left',
                 'backgroundColor': 'white',
                 'color': 'black'
@@ -1763,3 +1791,56 @@ def update_download_link__details_group(*args):
             return csv_string, "m-left-right-medium"
 
     return "", "m-left-right-medium hidden"
+
+
+@app.callback(Output('students-list-table', 'data'),
+              Input('students-list-table', 'sort_by'),
+              State('students-list-table', 'data')
+)
+def custom_sort_students_table(sortBy, data):
+    
+    if sortBy:
+        df = pd.DataFrame(data)
+        if sortBy[0]['column_id'] == "Name":
+            df_sorted = df.sort_values(by = 'Name', ascending = (sortBy[0]['direction'] == 'asc'))
+            return df_sorted.to_dict('records')
+    
+        elif sortBy[0]['column_id'] == "SessionDuration":
+            for index, row in df.iterrows():
+                seconds = turnFancyTimestampIntoSeconds(row["SessionDuration"])
+                df.at[index,"SessionDuration"] = seconds
+            df_sorted = df.sort_values(by = 'SessionDuration', ascending = (sortBy[0]['direction'] == 'asc'))
+            for index, row in df_sorted.iterrows():
+                timestamp = turnSecondsIntoFancyTimestamp(row["SessionDuration"])
+                df_sorted.at[index,"SessionDuration"] = timestamp
+            return df_sorted.to_dict('records')
+    
+        elif sortBy[0]['column_id'] == "PracticeSessionDuration":
+            for index, row in df.iterrows():
+                seconds = turnFancyTimestampIntoSeconds(row["PracticeSessionDuration"])
+                df.at[index,"PracticeSessionDuration"] = seconds
+            df_sorted = df.sort_values(by = 'PracticeSessionDuration', ascending = (sortBy[0]['direction'] == 'asc'))
+            for index, row in df_sorted.iterrows():
+                timestamp = turnSecondsIntoFancyTimestamp(row["PracticeSessionDuration"])
+                df_sorted.at[index,"PracticeSessionDuration"] = timestamp
+            return df_sorted.to_dict('records')
+    
+        elif sortBy[0]['column_id'] == "TheorySessionDuration":
+            for index, row in df.iterrows():
+                seconds = turnFancyTimestampIntoSeconds(row["TheorySessionDuration"])
+                df.at[index,"TheorySessionDuration"] = seconds
+            df_sorted = df.sort_values(by = 'TheorySessionDuration', ascending = (sortBy[0]['direction'] == 'asc'))
+            for index, row in df_sorted.iterrows():
+                timestamp = turnSecondsIntoFancyTimestamp(row["TheorySessionDuration"])
+                df_sorted.at[index,"TheorySessionDuration"] = timestamp
+            return df_sorted.to_dict('records')
+    
+        elif sortBy[0]['column_id'] == "Attempts":
+            df_sorted = df.sort_values(by = 'Attempts', ascending = (sortBy[0]['direction'] == 'asc'))
+            return df_sorted.to_dict('records')
+    
+        elif sortBy[0]['column_id'] == "Points":
+            df_sorted = df.sort_values(by = 'Points', ascending = (sortBy[0]['direction'] == 'asc'))
+            return df_sorted.to_dict('records')
+    
+    return data
