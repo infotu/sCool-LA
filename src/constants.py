@@ -248,7 +248,49 @@ featureGroup                        = "LA"
 
 
 
+codeConceptNameDict = {
+    "hasLoop" : "Used Loop"
+	,"hasNestedLoop" : "Used Nested Loop"
+	,"hasCondition" : "Used Condition"
+	,"hasVariable" : "Used Variable"
+	,"hasAsyncOrAwait" : "Used Async"
+	,"hasFunctionClass" : "Used Function or Class"
+	,"hasStatements" : "Used Statements (e.g. Assignment, Assert, Delete)"
+	,"hasExpressionsArithematic" : "Used Arithematic Operators (e.g. Add, Div, Mult)"
+	,"hasExpressionsBool" : "Used Boolean (And, Or)"
+	,"hasExpressionsLogical" : "Used Logical Operators (e.g. Eq, Lt, Gt)"
+	,"hasExpressionsUnary" : "Used Unary Operators"
+	,"hasExpressionsBitwise" : "Used Bitwise Operators"
+	,"hasExpressionsDict" : "Used Dictionary Or Map (Dict)"
+	,"hasExpressionsDataStructure" : "Used Data Structure (e.g. Dict, List, Set)"
+    ,"hasExpressionsFunctionCall" : "Used function call (e.g. call('friend'))"
+	,"hasControlFlowConditional" : "Used Conditional Flows (e.g. If, continue, break)"
+	,"hasControlFlowTryException" : "Used Try Exception"
+	,"hasConstantsUseful" : "Used Constants (e.g. 3 or 'a' or None)"
+	,"hasExpressionsKeyword" : "Used Keyword (e.g. and, while, None)"
+}
 
+codeConceptDescriptionDict = {
+    "hasLoop" : "Loops allow the programmer to repeat a block of code multiple times. (e.g. for, while)"
+	,"hasNestedLoop" : "Nested Loops are simple loops that are defined inside of another loop. (e.g. for, while)"
+	,"hasCondition" : "Conditions are used to make decisions during runtime of the program. (e.g. if)"
+	,"hasVariable" : "Variables are named storage locations that are holding values."
+	,"hasAsyncOrAwait" : "Used to work with asynchronous operations. "
+	,"hasFunctionClass" : "Functions are reusable blocks of code. Classes are blueprints that define the structure of objects."
+	,"hasStatements" : "Statements are complete instructions or commands performing specific actions."
+	,"hasExpressionsArithematic" : "Arithmetic Operators are used to perform mathematical operations. (e.g. <, >, ==, !=)"
+	,"hasExpressionsBool" : "Boolean Operators are used to perform logical operations. (e.g. or, and)"
+	,"hasExpressionsLogical" : "Logical Operators are used to perform logical operations. (e.g. &&, ||, !)"
+	,"hasExpressionsUnary" : "Unary Operators perform a single action on a single operand or variable. (e.g. ++, --)"
+	,"hasExpressionsBitwise" : "Bitwise Operators are used to manipulate bits of binary values. (e.g. &, |, ^, ~)"
+	,"hasExpressionsDict" : "A dictionary or map is a data structure that stores key-value pairs."
+	,"hasExpressionsDataStructure" : "Dictionary, List or Set was used."
+    ,"hasExpressionsFunctionCall" : "Function Calls are expressions that execute a function."
+	,"hasControlFlowConditional" : "Control Flow Conditions allow you to control which parts of the code are executed. (if, switch, continue, break)"
+	,"hasControlFlowTryException" : "Try-Except blocks are used to handle errors that may occur during execution of code."
+	,"hasConstantsUseful" : "Constants are values remaining unchanged during the execution of a program. (e.g. 3 or 'a' or None)"
+	,"hasExpressionsKeyword" : "Keywords are reserved words with special meaning or purpose within a programming language. (e.g. and, while, None)"
+}
 
 
 #User understandable Column names
@@ -336,8 +378,8 @@ feature2UserNamesDict = {
 		,"hasExpressionsBitwise" : "Used Bitwise Operators"
 		,"hasExpressionsDict" : "Used Dictionary Or Map (Dict)"
 		,"hasExpressionsDataStructure" : "Used Data Structure (e.g. Dict, List, Set)"
-        ,"hasExpressionsFunctionCall" : "Used function call (e.g. call('friend') )"
-		,"hasControlFlowConditional" : "Used Conditional Flows (e.g. If, continue, Break)"
+        ,"hasExpressionsFunctionCall" : "Used function call (e.g. call('friend'))"
+		,"hasControlFlowConditional" : "Used Conditional Flows (e.g. if, continue, break)"
 		,"hasControlFlowTryException" : "Used Try exception"
 		,"hasVariablesNamed" : "Used Variables"
 		,"hasConstantsUseful" : "Used Constants (e.g. 3 or 'a' or None)"

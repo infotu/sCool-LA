@@ -320,7 +320,7 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                         
     
                 rows.append(  html.Tr(  tds ,
-#                                      className =  (   "type-practice"  if row[featureTaskType] == constants.TaskTypePractice else "type-theory"  )
+#                                      className = (   "type-practice"  if row[featureTaskType] == constants.TaskTypePractice else "type-theory"  )
                                       ) )
             
             table_body = [html.Tbody(  rows   )]
@@ -550,13 +550,18 @@ def getGroupTaskWiseDetails(groupId, isGrouped = True, taskId = 0 , filterByDate
         
         taskWiseConceptPracticeGrouped = currentGroupDataNoDup.groupby(['PracticeTaskId'])
         
-        featureToPlotTask = ['Name', 'Code', 'SessionDuration']
+        featureToPlotTask = ['Name', 'Code', 'SessionDuration', 'UsedConcepts']
         
         if not taskId is None and  taskId > 0 and taskId in taskWiseConceptPracticeGrouped.groups.keys():
             taskData = taskWiseConceptPracticeGrouped.get_group(taskId)
+
+            #subprocess.Popen(["echo", "STARTSTARTSTART 2"])
+            #with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+            #    subprocess.Popen(["echo", str(taskData.iloc[:2])])
+            #subprocess.Popen(["echo", "ENDENDEND 2"])
             
             table_header = [
-                html.Thead(html.Tr([html.Th('Student'), html.Th('Submitted Code'), html.Th('Time spent writing Code')]))
+                html.Thead(html.Tr([html.Th('Student'), html.Th('Submitted Code'), html.Th('Time spent writing Code'), html.Th("Used Code Concepts")]))
             ]
 
             for index, row in taskData.iterrows():
@@ -575,9 +580,23 @@ def getGroupTaskWiseDetails(groupId, isGrouped = True, taskId = 0 , filterByDate
                             codeLined.append(html.Pre(html.Span(codeLine),
                                                       className = "c-pre" 
                                             ))
-                        
                         tds.append(html.Td(codeLined))
-                    else :
+                    elif feature == "UsedConcepts":
+                        usedConcepts = []
+                        for conceptKey in constants.codeConceptNameDict.keys():
+                            if int(row[conceptKey]) > 0:
+                                usedConcepts.append(conceptKey)
+                        tds.append(html.Td(html.Div(children = [ 
+                                html.Details(
+                                            children = [
+                                                html.Summary(constants.codeConceptNameDict[concept]),
+                                                html.P(constants.codeConceptDescriptionDict[concept])
+                                            ],
+                                            className = " c-details practice"
+                                        ) for concept in usedConcepts]), 
+                                        className="c-table-w-content-main")
+                        )
+                    else:
                         tds.append(html.Td(str(row[feature])))
     
                 rows.append(html.Tr(tds))
