@@ -409,7 +409,6 @@ def createProgressChildren(studentId, classId):
             tasksCompleted = studentDataDfSuccess['Task'].unique()
             dfTasksCompleted = dfTaskDetails[dfTaskDetails['Task'].isin(tasksCompleted)] 
 
-            graphs.append(html.Hr(id = 'students-progress-tracker-hr', className = "hr_custom_style"))
             graphs.append(html.H3("Student Courses Progress Tracker", className = "p-bottom_medium"))       
 
             for courseIdAttempt in dfTasksCompleted['CourseId'].unique():
@@ -495,7 +494,7 @@ def getCourseProgressCard(courseId, dfTasksCompleted):
             ],
             className="c-card  c-card-small   row",
         ),
-        className = "col-sm-12" )
+        className = "col-sm-12 m-bottom_medium" )
     
     except Exception as e:
         subprocess.Popen(['echo', 'getCoursePProgressCard Exception'])
@@ -828,40 +827,41 @@ current_student = -1
 layout = [
     html.Div([
 
-        html.H1('Select a Class', id = 'students-select-a-class-heading', style = {'text-align': 'center', 'margin-top': '10px'}),
+        html.Div(html.H1('Select a Class', id = 'students-select-a-class-heading', className = "align-center"), className = "custom-heading-select-a-class"),
 
-        html.Div(createUserLAOptionsButtons(), className = 'choose-learning-activity-buttons', id = 'students-learning-activity-selection-div'),
+        html.Div(createUserLAOptionsButtons(), className = 'm-top_small m-left-right-small choose-learning-activity-buttons', id = 'students-learning-activity-selection-div'),
 
-        html.Div(html.Button('Select other Class', id = {"button-type": "students-select-classes-button", "class-id": -1}), className = 'choose-learning-activity-buttons hidden', id = "students-button-select-other-la-div"),
+        html.Div(html.Button('Select other Class', id = {"button-type": "students-select-classes-button", "class-id": -1}), className = 'm-top_small m-left-right-small choose-learning-activity-buttons hidden', id = "students-button-select-other-la-div"),
 
-        html.Div(children = [html.Hr(id = 'students-select-student-hr', className = "hr_custom_style"),
-                             html.H1('Select a Student', id = 'students-select-a-student-heading', style = {'text-align': 'center', 'margin-top': '10px'})],
-                             id = 'students-select-a-student-heading-div', className = 'hidden'
-        ),
+        html.Hr(id = 'students-select-student-hr', className = "hr_custom_style hidden"),
 
-        html.Div(children = [], className = 'choose-students-buttons hidden', id = 'students-selection-div'),
+        html.Div(html.H1('Select a Student', id = 'students-select-a-student-heading', className = "align-center"), id = 'students-select-a-student-heading-div', className = 'stick-on-top-of-page hidden'),
 
-        html.Div(html.Button('Select other Student', id = {"button-type": "students-select-student-button", "student-id": -1}), className = 'choose-students-buttons hidden', id = "students-button-select-other-student-div"),
+        html.Div(children = [], className = 'm-top_small m-left-right-small choose-students-buttons hidden', id = 'students-selection-div'),
 
-        html.Div(children = [html.Hr(id = 'students-overview-hr', className = "hr_custom_style"),
-                             html.H3('Student Overview', className = "p-bottom_medium")],
-                             id = 'students-overview', className = "c-container hidden"
-        ),
+        html.Div(html.Button('Select other Student', id = {"button-type": "students-select-student-button", "student-id": -1}), className = 'm-top_small m-left-right-small choose-students-buttons hidden', id = "students-button-select-other-student-div"),
 
-        html.Div(id = 'students-overview-container', className = "c-container hidden"),
+        html.Hr(id = 'students-overview-hr', className = "hr_custom_style hidden"),
 
-        html.Div(id = 'students-progress-tracker-container', className = "c-container hidden"),
+        html.Div(html.H3('Student Overview', className = "p-bottom_medium"), id = 'students-overview', className = "c-container m-left-right-medium hidden"),
+
+        html.Div(id = 'students-overview-container', className = "c-container m-left-right-medium m-bottom_medium hidden"),
+
+        html.Hr(id = 'students-progress-tracker-hr', className = "hr_custom_style hidden"),
+
+        html.Div(id = 'students-progress-tracker-container', className = "c-container m-left-right-medium m-bottom_medium hidden"),
              
-        html.Div(children = [html.Hr(id = 'students-feature-overview-hr', className = "hr_custom_style"),
-                             dcc.Dropdown(id = 'students-feature-overview-dropdown', placeholder = "Select Overview Features", options = [], multi = True)],           
-                             id = 'students-feature-overview-dropdown-div',
-                             className = "p-top_medium hidden"
+        html.Hr(id = 'students-feature-overview-hr', className = "hr_custom_style hidden"),
+    
+        html.Div(dcc.Dropdown(id = 'students-feature-overview-dropdown', placeholder = "Select Overview Features", options = [], multi = True),           
+                 id = 'students-feature-overview-dropdown-div',
+                 className = "p-top_medium hidden"
         ),
                 
-        dbc.Row([
-            dbc.Col(html.Div(id = 'students-features-overview-container', className = "c-container m_small hidden"))
-        ]),
+        html.Div(id = 'students-features-overview-container', className = "c-container m_small hidden"),
              
+        html.Hr(id = 'students-game-interactions-hr', className = "hr_custom_style hidden"),
+
         dbc.Row([
             dbc.Col(html.Div([dcc.Dropdown(id = 'students-date-dropdown', placeholder = "Select Date")], id = "students-date-dropdown-div", className = "c-container hidden"), width = 6),
 
@@ -876,20 +876,16 @@ layout = [
                 ], 
                 id = "students-sort-order-dropdown-div",
                 className = "c-container hidden", 
-                )
-                , width  =  6
+                ),
+                width =  6
             )
         ]),    
      
-        dbc.Row([
-            dbc.Col(html.Div(id = 'Students-Container', className = "c-container p-bottom_15 hidden"))
-        ]),
+        html.Div(id = 'Students-Container', className = "c-container p-bottom_15 hidden"),
 
-        dbc.Row([
-            dbc.Col(html.A(children=[html.I(className="fas fa-download font-size_medium p_small"),"download data : Student",],
+        html.Div(html.A(children=[html.I(className="fas fa-download font-size_medium p_small"),"download data : Student",],
                            id = "students_details_download_link", className = "hidden", href = "", target = "_blank", download = 'student.csv'), id = "students_details_download_link-A", className = "hidden")
-        ])
-    ], style = {'margin': '30px'})
+    ])
 ]
 
 
@@ -911,7 +907,11 @@ layout = [
                Output("students-date-dropdown", "className"),                   Output("students-sort-order-dropdown", "className"),
                Output("students-feature-overview-dropdown", "className"),
                Output('Students-Container', 'children'),                        Output('students-date-dropdown', 'options'),
-               Output('students_details_download_link', 'href'),                Output('students_details_download_link', 'className')],
+               Output('students_details_download_link', 'href'),                Output('students_details_download_link', 'className'),
+               
+               Output("students-select-student-hr", "className"),               Output("students-overview-hr", "className"),
+               Output("students-progress-tracker-hr", "className"),             Output("students-feature-overview-hr", "className"),
+               Output("students-game-interactions-hr", "className")],
 
                Input({"button-type": "students-select-classes-button", "class-id": ALL}, "n_clicks"),
                Input({"button-type": "students-select-student-button", "student-id": ALL}, "n_clicks"),
@@ -976,19 +976,22 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
             initialClassDirS.discard('disabled')
             initialClassFeaturesS.discard('disabled')
 
-            return ["choose-learning-activity-buttons hidden", dash.no_update,
-                    "choose-learning-activity-buttons", "",
-                    [], "choose-students-buttons hidden",
-                    getButtonLabel(current_student), "choose-students-buttons", 
-                    "c-container", getFeatureOptions(),
+            return ["m-top_small m-left-right-small choose-learning-activity-buttons hidden", dash.no_update,
+                    "m-top_small m-left-right-small choose-learning-activity-buttons", "stick-on-top-of-page",
+                    [], "m-top_small m-left-right-small choose-students-buttons hidden",
+                    getButtonLabel(current_student), "m-top_small m-left-right-small choose-students-buttons", 
+                    "c-container m-left-right-medium", getFeatureOptions(),
                     "p-top_medium", "c-container m_small",
                     "c-container", "c-container",
                     "", "c-container p-bottom_15",
-                    student_overview_graphs, "c-container",
-                    student_progress_tracker_graphs, "c-container",
+                    student_overview_graphs, "c-container m-left-right-medium m-bottom_medium",
+                    student_progress_tracker_graphs, "c-container m-left-right-medium m-bottom_medium",
                     ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS),
                     student_container_graphs, student_date_dropdown_options,
-                    csv_string, ""]
+                    csv_string, "",
+                    "hr_custom_style", "hr_custom_style",
+                    "hr_custom_style", "hr_custom_style",
+                    "hr_custom_style"]
         
         # extract dictionary string and convert it to real dictionary
         start_index = triggered_id.index('{')
@@ -1002,19 +1005,22 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
             class_id = triggered_id_dict["class-id"]
             current_class = class_id
 
-            return ["choose-learning-activity-buttons hidden", classes.getButtonLabel(class_id),
-                    "choose-learning-activity-buttons", "",
-                    createStudentButtonsFromClassId(class_id), "choose-students-buttons",
-                    "Select a Student", "choose-students-buttons hidden", 
-                    "c-container hidden", [],
+            return ["m-top_small m-left-right-small choose-learning-activity-buttons hidden", classes.getButtonLabel(class_id),
+                    "m-top_small m-left-right-small choose-learning-activity-buttons", "stick-on-top-of-page",
+                    createStudentButtonsFromClassId(class_id), "m-top_small m-left-right-small choose-students-buttons",
+                    "Select a Student", "m-top_small m-left-right-small choose-students-buttons hidden", 
+                    "c-container m-left-right-medium hidden", [],
                     "p-top_medium hidden", "c-container m_small hidden",
                     "c-container hidden", "c-container hidden",
                     "hidden", "c-container p-bottom_15 hidden",
-                    [], "c-container hidden",
-                    [], "c-container hidden",
+                    [], "c-container m-left-right-medium m-bottom_medium hidden",
+                    [], "c-container m-left-right-medium m-bottom_medium hidden",
                     ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS),
                     [], [],
-                    "", "disabled"]
+                    "", "disabled",
+                    "hr_custom_style", "hr_custom_style hidden",
+                    "hr_custom_style hidden", "hr_custom_style hidden",
+                    "hr_custom_style hidden"]
         
         elif triggered_id_dict["button-type"] == "students-select-student-button" and triggered_id_dict["student-id"] >= 0:
             subprocess.Popen(['echo', 'callback - ' + str(triggered_id_dict["button-type"])])
@@ -1049,55 +1055,64 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
             initialClassDirS.discard('disabled')
             initialClassFeaturesS.discard('disabled')
 
-            return ["choose-learning-activity-buttons hidden", dash.no_update,
-                    "choose-learning-activity-buttons", "",
-                    [], "choose-students-buttons hidden",
-                    getButtonLabel(student_id), "choose-students-buttons", 
-                    "c-container", getFeatureOptions(),
+            return ["m-top_small m-left-right-small choose-learning-activity-buttons hidden", dash.no_update,
+                    "m-top_small m-left-right-small choose-learning-activity-buttons", "stick-on-top-of-page",
+                    [], "m-top_small m-left-right-small choose-students-buttons hidden",
+                    getButtonLabel(student_id), "m-top_small m-left-right-small choose-students-buttons", 
+                    "c-container m-left-right-medium", getFeatureOptions(),
                     "p-top_medium", "c-container m_small",
                     "c-container", "c-container",
                     "", "c-container p-bottom_15",
-                    student_overview_graphs, "c-container",
-                    student_progress_tracker_graphs, "c-container",
+                    student_overview_graphs, "c-container m-left-right-medium m-bottom_medium",
+                    student_progress_tracker_graphs, "c-container m-left-right-medium m-bottom_medium",
                     ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS),
                     student_container_graphs, student_date_dropdown_options,
-                    csv_string, ""]
+                    csv_string, "",
+                    "hr_custom_style", "hr_custom_style",
+                    "hr_custom_style", "hr_custom_style",
+                    "hr_custom_style"]
         
         elif triggered_id_dict["button-type"] == "students-select-student-button" and triggered_id_dict["student-id"] == -1:
             subprocess.Popen(['echo', 'callback - ' + str(triggered_id_dict["button-type"])])
             subprocess.Popen(['echo', 'callback - return 3'])
             current_student = -1
 
-            return ["choose-learning-activity-buttons hidden", dash.no_update,
-                    "choose-learning-activity-buttons", "",
-                    createStudentButtonsFromClassId(current_class), "choose-students-buttons",
-                    "Select a Student", "choose-students-buttons hidden", 
-                    "c-container hidden", [],
+            return ["m-top_small m-left-right-small choose-learning-activity-buttons hidden", dash.no_update,
+                    "m-top_small m-left-right-small choose-learning-activity-buttons", "stick-on-top-of-page",
+                    createStudentButtonsFromClassId(current_class), "m-top_small m-left-right-small choose-students-buttons",
+                    "Select a Student", "m-top_small m-left-right-small choose-students-buttons hidden", 
+                    "c-container m-left-right-medium hidden", [],
                     "p-top_medium hidden", "c-container m_small hidden",
                     "c-container hidden", "c-container hidden",
                     "hidden", "c-container p-bottom_15 hidden",
-                    [], "c-container hidden",
-                    [], "c-container hidden",
+                    [], "c-container m-left-right-medium m-bottom_medium hidden",
+                    [], "c-container m-left-right-medium m-bottom_medium hidden",
                     ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS),
                     [], [],
-                    "", "disabled"]
+                    "", "disabled",
+                    "hr_custom_style", "hr_custom_style hidden",
+                    "hr_custom_style hidden", "hr_custom_style hidden",
+                    "hr_custom_style hidden"]
 
     current_class = -1
     current_student = -1
     subprocess.Popen(['echo', 'callback - return 4'])
-    return ["choose-learning-activity-buttons", "Select a Class",
-            "choose-learning-activity-buttons hidden", "hidden",
-            [], "choose-students-buttons hidden",
-            "Select a Student", "choose-students-buttons hidden", 
-            "c-container hidden", [],
+    return ["m-top_small m-left-right-small choose-learning-activity-buttons", "Select a Class",
+            "m-top_small m-left-right-small choose-learning-activity-buttons hidden", "stick-on-top-of-page hidden",
+            [], "m-top_small m-left-right-small choose-students-buttons hidden",
+            "Select a Student", "m-top_small m-left-right-small choose-students-buttons hidden", 
+            "c-container m-left-right-medium hidden", [],
             "p-top_medium hidden", "c-container m_small hidden",
             "c-container hidden", "c-container hidden",
             "hidden", "c-container p-bottom_15 hidden",
-            [], "c-container hidden",
-            [], "c-container hidden",
+            [], "c-container m-left-right-medium m-bottom_medium hidden",
+            [], "c-container m-left-right-medium m-bottom_medium hidden",
             ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS),
             [], [],
-            "", "disabled"]
+            "", "disabled",
+            "hr_custom_style hidden", "hr_custom_style hidden",
+            "hr_custom_style hidden", "hr_custom_style hidden",
+            "hr_custom_style hidden"]
 
 
 # Update bar plot

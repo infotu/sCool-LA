@@ -14,6 +14,14 @@ html {
 	font-family: sans-serif;
 }
 
+.custom-heading-select-a-class {
+	top: 5rem;
+	color: white;
+    background-color: var(--theme-background-color);
+	padding-top: 1rem;
+	padding-bottom: 0.5rem;
+}
+
 .stick-on-top-of-page {
     position: sticky;
 	top: 5rem;
@@ -523,6 +531,7 @@ html {
 
 .theme-app .c-progress {
 	height: 1.2rem;
+	background-color: white;
 }
 
 .theme-app .c-details {
