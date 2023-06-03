@@ -63,18 +63,18 @@ menuLink = {
 
     "menu-link-3" : { keyLabel : 'Classes', keyHref : '/Classes' ,
                   keySubmenu : [
-                          "menu-sub-link-5", "menu-sub-link-6", "menu-sub-link-7", "menu-sub-link-8"
+                          "menu-sub-link-4", "menu-sub-link-5", "menu-sub-link-6", "menu-sub-link-7"
                           ],  keyClassName : 'fas ' + iconNameClasses + ' m-right-small',
                           keyOnlyForAdmin : False    },
 
     "menu-link-4" : { keyLabel : 'Students', keyHref : '/Students' ,
-                  keySubmenu : [ "menu-sub-link-3"  
+                  keySubmenu : [ "menu-sub-link-8", "menu-sub-link-9", "menu-sub-link-10"
                           ],  keyClassName : 'fas ' + iconNameStudents + ' m-right-small',
                           keyOnlyForAdmin : False    },  
 
     "menu-link-5" : { keyLabel : 'Custom', keyHref : '/Custom' ,
                   keySubmenu : [
-                          "menu-sub-link-4"
+                          "menu-sub-link-3"
                           ],  keyClassName : 'fas ' + iconNameCustom + ' m-right-small',
                           keyOnlyForAdmin : False    }
 }
@@ -84,12 +84,14 @@ menuSubLink2Scroll = {
     "menu-sub-link-0"  :  {keyLabel : "Overview", keyScrollTo: ''}
     ,"menu-sub-link-1" :  {keyLabel : "Compare Groups", keyScrollTo: 'row-control-main-overview'}
     ,"menu-sub-link-2" :  {keyLabel : "Distribution", keyScrollTo: "Group-Distribution-Information"}
-    ,"menu-sub-link-3" :  {keyLabel : "Student Info", keyScrollTo: 'students-information'}
-    ,"menu-sub-link-4" :  {keyLabel : "Custom", keyScrollTo: ''}
-    ,"menu-sub-link-5" :  {keyLabel : "Class Overview", keyScrollTo: 'classes-overview-hr'}
-    ,"menu-sub-link-6" :  {keyLabel : "Task Information", keyScrollTo: 'classes-task-information-hr'}
-    ,"menu-sub-link-7" :  {keyLabel : "Concept Information", keyScrollTo: 'classes-concept-hr'}
-    ,"menu-sub-link-8" :  {keyLabel : "Class Statistics", keyScrollTo: 'classes-stats-hr'}
+    ,"menu-sub-link-3" :  {keyLabel : "Custom", keyScrollTo: ''}
+    ,"menu-sub-link-4" :  {keyLabel : "Class Overview", keyScrollTo: 'classes-overview-hr'}
+    ,"menu-sub-link-5" :  {keyLabel : "Task Information", keyScrollTo: 'classes-task-information-hr'}
+    ,"menu-sub-link-6" :  {keyLabel : "Concept Information", keyScrollTo: 'classes-concept-hr'}
+    ,"menu-sub-link-7" :  {keyLabel : "Class Statistics", keyScrollTo: 'classes-stats-hr'}
+    ,"menu-sub-link-8" :  {keyLabel : "Student Overview", keyScrollTo: 'students-overview-hr'}
+    ,"menu-sub-link-9" :  {keyLabel : "Progress Tracker", keyScrollTo: 'students-progress-tracker-hr'}
+    ,"menu-sub-link-10" :  {keyLabel : "Game Interactions/Timeline", keyScrollTo: 'students-game-interactions-hr'}
 }
 
 
