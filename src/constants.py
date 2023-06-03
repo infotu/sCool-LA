@@ -655,6 +655,7 @@ markerfacecolors = ['navy', 'seagreen', 'red', 'cyan', 'magenta', 'maroon'
 
 codeSubmissionParagraph = "Select a task in the dropdown menu below to see the code submissions your students submitted and how long it took them to write the code. There will also be more information about how many students used certain coding concepts in the chosen task."
 
+studentsGameInteractionParagraph = "This section shows you how much time a student spends on certain tasks. It contains a details table, where you can see every game interaction your student ever had and it contains the student timeline, there you can more easily verify if your student was active in your teaching lessons. You can filter the data per day and choose between ascending or descending sort of the data (per default all of the data is visible)."
 
 
 #------------------------------------

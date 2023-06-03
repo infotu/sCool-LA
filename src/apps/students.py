@@ -487,10 +487,10 @@ def getCourseProgressCard(courseId, dfTasksCompleted):
                                         children = [ 'Course' ],
                                         className="card_value_label"
                                     ),  ],
-                    className="card_value_title col-12"
+                    className="card_value_title col-12 m-top_small"
                 ),
-                html.Div(children = skillsDiv,
-                        className = "  col-12  "),
+                html.Div(html.Hr(className = "hr_course-progress"), className = "col-12"),
+                html.Div(children = skillsDiv, className = "col-12"),
             ],
             className="c-card  c-card-small   row",
         ),
@@ -605,6 +605,10 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
             )
             return graphs
         
+        with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
+            subprocess.Popen(["echo", f"AMOUNT OF ROWS: {len(studentData.index)}"])
+            subprocess.Popen(["echo", str(studentData.iloc[:20])])
+        
     #    studentData                     = studentData.sort_values(by='Start')
             
         isAscending = True
@@ -658,7 +662,7 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
                         )
         fig.update_layout(
                                             height          =   graphHeightRows , 
-                                            title_text      = 'Details of student\'s game interactions'
+                                            title_text      = 'Details of Student\'s Game Interactions'
                                                 , yaxis = dict(
                                                     title = 'Time',
                                                     titlefont_size = 16,
@@ -862,29 +866,36 @@ layout = [
              
         html.Hr(id = 'students-game-interactions-hr', className = "hr_custom_style hidden"),
 
-        dbc.Row([
-            dbc.Col(html.Div([dcc.Dropdown(id = 'students-date-dropdown', placeholder = "Select Date")], id = "students-date-dropdown-div", className = "c-container hidden"), width = 6),
+        html.Div(children = [
+            html.H3("Student Game Interactions and Timeline", className = "p-bottom_small"),
+            html.P(constants.studentsGameInteractionParagraph, className = "normal-paragraph m-bottom_small")
+        ], id = "students-game-interactions-header-div", className = "c-container m-left-right-medium hidden"),
 
-            dbc.Col(
-                html.Div([
-                    dcc.Dropdown(
-                            id = 'students-sort-order-dropdown',
-                            options = [{'label': sortOrderAscending, 'value': sortOrderAscending}, {'label': sortOrderDescending, 'value': sortOrderDescending}],
-                            value = sortOrderAscending , 
-                            placeholder = "Order",
-                    )
-                ], 
-                id = "students-sort-order-dropdown-div",
-                className = "c-container hidden", 
-                ),
-                width =  6
-            )
-        ]),    
+        html.Div(
+            dbc.Row([
+                dbc.Col(html.Div([dcc.Dropdown(id = 'students-date-dropdown', placeholder = "Select Date")], id = "students-date-dropdown-div", className = "c-container hidden"), width = 6),
+
+                dbc.Col(
+                    html.Div([
+                        dcc.Dropdown(
+                                id = 'students-sort-order-dropdown',
+                                options = [{'label': sortOrderAscending, 'value': sortOrderAscending}, {'label': sortOrderDescending, 'value': sortOrderDescending}],
+                                value = sortOrderAscending , 
+                                placeholder = "Order",
+                        )
+                    ], 
+                    id = "students-sort-order-dropdown-div",
+                    className = "c-container hidden", 
+                    ),
+                    width =  6
+                )
+            ]), className = "m-left-right-medium m-top_large"
+        ),
      
-        html.Div(id = 'Students-Container', className = "c-container p-bottom_15 hidden"),
+        html.Div(id = 'Students-Container', className = "c-container p-bottom_15 m-left-right-medium hidden"),
 
         html.Div(html.A(children=[html.I(className="fas fa-download font-size_medium p_small"),"download data : Student",],
-                           id = "students_details_download_link", className = "hidden", href = "", target = "_blank", download = 'student.csv'), id = "students_details_download_link-A", className = "hidden")
+                           id = "students_details_download_link", className = "hidden", href = "", target = "_blank", download = 'student.csv'), id = "students_details_download_link-A", className = "m-left-right-medium hidden")
     ])
 ]
 
@@ -908,6 +919,7 @@ layout = [
                Output("students-feature-overview-dropdown", "className"),
                Output('Students-Container', 'children'),                        Output('students-date-dropdown', 'options'),
                Output('students_details_download_link', 'href'),                Output('students_details_download_link', 'className'),
+               Output("students-game-interactions-header-div", "className"),
                
                Output("students-select-student-hr", "className"),               Output("students-overview-hr", "className"),
                Output("students-progress-tracker-hr", "className"),             Output("students-feature-overview-hr", "className"),
@@ -983,12 +995,13 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
                     "c-container m-left-right-medium", getFeatureOptions(),
                     "p-top_medium", "c-container m_small",
                     "c-container", "c-container",
-                    "", "c-container p-bottom_15",
+                    "m-left-right-medium", "c-container p-bottom_15 m-left-right-medium",
                     student_overview_graphs, "c-container m-left-right-medium m-bottom_medium",
                     student_progress_tracker_graphs, "c-container m-left-right-medium m-bottom_medium",
                     ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS),
                     student_container_graphs, student_date_dropdown_options,
                     csv_string, "",
+                    "c-container m-left-right-medium",
                     "hr_custom_style", "hr_custom_style",
                     "hr_custom_style", "hr_custom_style",
                     "hr_custom_style"]
@@ -1012,12 +1025,13 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
                     "c-container m-left-right-medium hidden", [],
                     "p-top_medium hidden", "c-container m_small hidden",
                     "c-container hidden", "c-container hidden",
-                    "hidden", "c-container p-bottom_15 hidden",
+                    "m-left-right-medium hidden", "c-container p-bottom_15 m-left-right-medium hidden",
                     [], "c-container m-left-right-medium m-bottom_medium hidden",
                     [], "c-container m-left-right-medium m-bottom_medium hidden",
                     ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS),
                     [], [],
                     "", "disabled",
+                    "c-container m-left-right-medium hidden",
                     "hr_custom_style", "hr_custom_style hidden",
                     "hr_custom_style hidden", "hr_custom_style hidden",
                     "hr_custom_style hidden"]
@@ -1062,12 +1076,13 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
                     "c-container m-left-right-medium", getFeatureOptions(),
                     "p-top_medium", "c-container m_small",
                     "c-container", "c-container",
-                    "", "c-container p-bottom_15",
+                    "m-left-right-medium", "c-container p-bottom_15 m-left-right-medium",
                     student_overview_graphs, "c-container m-left-right-medium m-bottom_medium",
                     student_progress_tracker_graphs, "c-container m-left-right-medium m-bottom_medium",
                     ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS),
                     student_container_graphs, student_date_dropdown_options,
                     csv_string, "",
+                    "c-container m-left-right-medium",
                     "hr_custom_style", "hr_custom_style",
                     "hr_custom_style", "hr_custom_style",
                     "hr_custom_style"]
@@ -1084,12 +1099,13 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
                     "c-container m-left-right-medium hidden", [],
                     "p-top_medium hidden", "c-container m_small hidden",
                     "c-container hidden", "c-container hidden",
-                    "hidden", "c-container p-bottom_15 hidden",
+                    "m-left-right-medium hidden", "c-container p-bottom_15 m-left-right-medium hidden",
                     [], "c-container m-left-right-medium m-bottom_medium hidden",
                     [], "c-container m-left-right-medium m-bottom_medium hidden",
                     ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS),
                     [], [],
                     "", "disabled",
+                    "c-container m-left-right-medium hidden",
                     "hr_custom_style", "hr_custom_style hidden",
                     "hr_custom_style hidden", "hr_custom_style hidden",
                     "hr_custom_style hidden"]
@@ -1104,12 +1120,13 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
             "c-container m-left-right-medium hidden", [],
             "p-top_medium hidden", "c-container m_small hidden",
             "c-container hidden", "c-container hidden",
-            "hidden", "c-container p-bottom_15 hidden",
+            "m-left-right-medium hidden", "c-container p-bottom_15 m-left-right-medium hidden",
             [], "c-container m-left-right-medium m-bottom_medium hidden",
             [], "c-container m-left-right-medium m-bottom_medium hidden",
             ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS),
             [], [],
             "", "disabled",
+            "c-container m-left-right-medium hidden",
             "hr_custom_style hidden", "hr_custom_style hidden",
             "hr_custom_style hidden", "hr_custom_style hidden",
             "hr_custom_style hidden"]
