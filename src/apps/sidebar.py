@@ -1,17 +1,21 @@
 # -*- coding: utf-8 -*-
+
 """
 Created on   Jun 14 15:45:09 2020
 Reworked on  Mar 14 10:25:00 2023
 
 @authors: tilan, zangl
 """
+
+
+#----------------------------------------------------------------------------------------------------------------------
+# imports
 import numpy as np
 import dash
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State, ClientsideFunction
-
 
 from flask_login import current_user
 
@@ -22,11 +26,8 @@ from data import studentGrouped
 from apps import settings
 
 
-# the style arguments for the sidebar. We use position:fixed and a fixed width
-
-
-#-------------------------------------------------------------------------
-
+#----------------------------------------------------------------------------------------------------------------------
+# global constants
 keyLabel            = constants.keyLabel
 keyHref             = constants.keyHref
 keySubmenu          = constants.keySubmenu
@@ -43,8 +44,8 @@ iconNameCustom      = constants.iconNameCustom
 iconNameTutorial    = constants.iconNameTutorial
 
 
-
-# Used to generate Menu Links
+#----------------------------------------------------------------------------------------------------------------------
+# Used to generate left side navbar buttons
 # provide href, where navigate to on click on the Menu Section
 menuLink = {
     "menu-link-0" : { keyLabel : 'Game Data', keyHref : '/Home',
@@ -63,12 +64,12 @@ menuLink = {
 
     "menu-link-3" : { keyLabel : 'Classes', keyHref : '/Classes' ,
                   keySubmenu : [
-                          "menu-sub-link-4", "menu-sub-link-5", "menu-sub-link-6", "menu-sub-link-7"
+                          "menu-sub-link-4", "menu-sub-link-5", "menu-sub-link-6", "menu-sub-link-7", "menu-sub-link-8"
                           ],  keyClassName : 'fas ' + iconNameClasses + ' m-right-small',
                           keyOnlyForAdmin : False    },
 
     "menu-link-4" : { keyLabel : 'Students', keyHref : '/Students' ,
-                  keySubmenu : [ "menu-sub-link-8", "menu-sub-link-9", "menu-sub-link-10"
+                  keySubmenu : [ "menu-sub-link-9", "menu-sub-link-10", "menu-sub-link-11"
                           ],  keyClassName : 'fas ' + iconNameStudents + ' m-right-small',
                           keyOnlyForAdmin : False    },  
 
@@ -78,7 +79,10 @@ menuLink = {
                           ],  keyClassName : 'fas ' + iconNameCustom + ' m-right-small',
                           keyOnlyForAdmin : False    }
 }
-# Used to generate Menu Sub Links
+
+
+#----------------------------------------------------------------------------------------------------------------------
+# Used to generate left side navbar sub-buttons
 # provide Scroll to domElementId -> scroll to this domElement on click
 menuSubLink2Scroll = {
     "menu-sub-link-0"  :  {keyLabel : "Overview", keyScrollTo: ''}
@@ -87,30 +91,22 @@ menuSubLink2Scroll = {
     ,"menu-sub-link-3" :  {keyLabel : "Custom", keyScrollTo: ''}
     ,"menu-sub-link-4" :  {keyLabel : "Class Overview", keyScrollTo: 'classes-overview-hr'}
     ,"menu-sub-link-5" :  {keyLabel : "Task Information", keyScrollTo: 'classes-task-information-hr'}
-    ,"menu-sub-link-6" :  {keyLabel : "Concept Information", keyScrollTo: 'classes-concept-hr'}
-    ,"menu-sub-link-7" :  {keyLabel : "Class Statistics", keyScrollTo: 'classes-stats-hr'}
-    ,"menu-sub-link-8" :  {keyLabel : "Student Overview", keyScrollTo: 'students-overview-hr'}
-    ,"menu-sub-link-9" :  {keyLabel : "Progress Tracker", keyScrollTo: 'students-progress-tracker-hr'}
-    ,"menu-sub-link-10" :  {keyLabel : "Game Interactions/Timeline", keyScrollTo: 'students-game-interactions-hr'}
+    ,"menu-sub-link-6" :  {keyLabel : "Task Code Submissions", keyScrollTo: 'classes-code-submission-hr'}
+    ,"menu-sub-link-7" :  {keyLabel : "Concept Information", keyScrollTo: 'classes-concept-hr'}
+    ,"menu-sub-link-8" :  {keyLabel : "Class Statistics", keyScrollTo: 'classes-stats-hr'}
+    ,"menu-sub-link-9" :  {keyLabel : "Student Overview", keyScrollTo: 'students-overview-hr'}
+    ,"menu-sub-link-10" :  {keyLabel : "Progress Tracker", keyScrollTo: 'students-progress-tracker-hr'}
+    ,"menu-sub-link-11" :  {keyLabel : "Game Interactions/Timeline", keyScrollTo: 'students-game-interactions-hr'}
 }
 
 
 spacer = [html.Div(className = "  m-bottom_x-small ")]
 
-def getSubmenuButtons(menuKey):
-    currentMenu = menuLink.get(menuKey)
-    result = []
-    countMenuSubLink = 0
-    
-    for submenuKey in currentMenu.get(keySubmenu):
-        result.append(
-                dbc.Button(menuSubLink2Scroll.get(submenuKey).get('label'), 
-                                   id="menu-sub-link-" + str(countMenuSubLink), 
-                                   outline=True, color="primary", 
-                                   className="", 
-                                   block=True),
-        )
 
+#----------------------------------------------------------------------------------------------------------------------
+# Function that generates the sidebar menu buttons (Game Data, Groups, Tutorial, Classes, Students, Custom) and their sub-buttons
+# params:   none
+# returns:  list containing sidebar menu buttons
 def getMenu():
     menus = []
     
@@ -127,11 +123,9 @@ def getMenu():
             if userDB['IsAdmin']:
                 isUserAdmin = True
 
-    
     for menuKey in menuLink.keys():
         currentMenu = menuLink.get(menuKey)
         
-#        menuOpener = [html.I(className="fas fa-chevron-right mr-3 c-button-nav-icon-right float-r")] 
         contentClass = ""
         if len(currentMenu.get(keySubmenu)) > 0  :
             contentClass = " c-button-nav-content-hover-items "
@@ -158,7 +152,7 @@ def getMenu():
                 id = menuKey + '-li-container' 
             )
         )
-        # we use the Collapse component to hide and reveal the navigation links
+        # we use the Collapse component to hide and reveal the menu links
         subMenuButtons = []
         
         for submenuKey in currentMenu.get(keySubmenu):
@@ -186,10 +180,16 @@ def getMenu():
     return menus
 
 
-
+#----------------------------------------------------------------------------------------------------------------------
+# Function to get the help center layout from settings.py
+# params:   none
+# returns:  layout of the settings tab
 def getModalHelpBody():
     return settings.settingsLayout
 
+
+#----------------------------------------------------------------------------------------------------------------------
+# sidebar manu layout - used in main layout (located in index.py)
 sidebar = html.Div(
     [
 
@@ -255,13 +255,17 @@ sidebar = html.Div(
 )
 
 
-menuLinksCount      =   len(menuLink.keys())  
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function to show/hide a red highlight border on certain components based on user interaction. (clicking on headlines)
+# params:   args         (tuple) - id of main sidebar menu buttons / current url / state of buttons (if they are currently selected or not)
+# returns:  new state of buttons (if they are currently selected or not)
 @app.callback(
     [Output(f"{i}-collapse", "is_open") for i in menuLink],
     ([Input(f"{i}", "n_clicks") for i in menuLink ] + [ Input("url", "pathname")]),
     [State(f"{i}-collapse", "is_open") for i in menuLink],
 )
 def toggle_accordion(*args):
+    menuLinksCount      =   len(menuLink.keys())
     ctx = dash.callback_context
     
     newToggle = [False] * (menuLinksCount)
@@ -297,21 +301,22 @@ def toggle_accordion(*args):
     if clickedButton_index >= 0  and  args[clickedButton_index] :
         newToggle[clickedButton_index] = not args[menuLinksCount + 1 + clickedButton_index ]   # add 1 for URL pathname param
         
-    
     return newToggle
 
 
-
-
-
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function to manipulate the className property of the menu buttons list container based on wether the current user is a admin or not.
+# params:   pathname         (string) - string containing the pathname (used only as trigger)
+# returns:  list containing classNames (CSS styling) of the sidebar menu buttons list container
 @app.callback(  [  Output(f"{i}-li-container", "className") for i in menuLink   ], 
                 [  Input("url", "pathname")   ],
 )
 def setMenuClassOnLogin(pathname):   
+
+    menuLinksCount = len(menuLink.keys())
+    newClasses = ['m-top_x-small'] * menuLinksCount
     
-    newClasses =  ['m-top_x-small'] * menuLinksCount
-    
-    if   current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated  :
+    if current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated  :
 
         isUserAdmin = False    
         
@@ -321,26 +326,27 @@ def setMenuClassOnLogin(pathname):
             if userDB['IsAdmin']:
                 isUserAdmin = True
         
-        
         for index, menuKey in enumerate(menuLink):
             currentMenu = menuLink.get(menuKey)
             newClasses[index] = "hidden-v "  if    not isUserAdmin   and   currentMenu.get(keyOnlyForAdmin)   else   "m-top_x-small"
             
-    
-    return  newClasses
+    return newClasses
 
 
-
-
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function to manipulate the className property of the menu buttons. (highlight setter)
+# params:   args         (tuple) - states of main sidebar menu button collapses (indicating if they are currently open or not)
+# returns:  new className of buttons (if they are currently selected or not)
 @app.callback(  [ Output(f"{i}", "className") for i in menuLink ], 
                  [Input(f"{i}-collapse", "is_open") for i in menuLink] )
 def setMenuClassOnChangeOpen(*args):   
     return  np.where(args,"open highlight",'').tolist()
 
      
-
-
-
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function to set the value of the Imput field with the id menu-sub-link-input.
+# params:   args         (tuple) - click information of all sub-menu buttons
+# returns:  new value of button with id menu-sub-link-input (indicating wehter button is pressed)
 @app.callback ( Output("menu-sub-link-input", "value") , 
               [Input(f"{j}", "n_clicks")   for j in menuSubLink2Scroll ])
 def changeMenuSetInput(*args):
@@ -361,6 +367,12 @@ def changeMenuSetInput(*args):
     return newValue    
     
 
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function to update the property "is_open" of the menu-modal-setting component.
+# params:   n1              (int)  - number of clicks on component menu-modal-setting-open
+#           n2              (int)  - number of clicks on component menu-modal-setting-close
+#           is_open         (bool) - indicating wether the menu-modal-setting component is currently open or not
+# returns:  new state of property "is_open" of the menu-modal-setting component
 @app.callback(
     Output("menu-modal-setting", "is_open"),
     [Input("menu-modal-setting-open", "n_clicks"), Input("menu-modal-setting-close", "n_clicks")],
@@ -370,7 +382,6 @@ def toggle_modal(n1, n2, is_open):
     if n1 or n2:
         return not is_open
     return is_open
-
 
 
 app.clientside_callback(

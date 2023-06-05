@@ -42,7 +42,7 @@ html {
 }
 .page-sidebar {
 	position: fixed;
-    margin-top: 5rem;
+	margin-top: 2.4rem;
     top: 0;
 	left: 0;
     bottom: 0;
@@ -671,7 +671,7 @@ html {
 		overflow-y: scroll;
 		width: 14rem;
 		padding: 0.5rem 1rem;
-		margin-top: 5rem;
+		margin-top: 2.4rem;
 	}
 	.page-main  {
 		margin-left: 14rem;
@@ -743,7 +743,7 @@ html {
 	.page-sidebar {
 		width: 100%;
 		position: initial;
-		margin-top: 5rem;
+		margin-top: 2.4rem;
 		z-index: 1;
 	}
 	.page-main {

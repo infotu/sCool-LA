@@ -1512,7 +1512,7 @@ layout = html.Div(
     html.Div(children=[
             html.Div('Task code submissions',
                      id = 'classes-taskId-selector-heading',
-                     className= "heading-sub practice  p-bottom_small"
+                     className= "heading-sub practice  p-bottom_small m-top_small"
             ),
             html.Div(constants.codeSubmissionParagraph,
                      className = "normal-paragraph m-bottom_small"),

@@ -6,7 +6,8 @@ Created on   May 18 14:30:00 2023
 @authors: zangl
 """
 
-
+#----------------------------------------------------------------------------------------------------------------------
+# imports
 import dash
 import dash_html_components as html
 from dash.dependencies import Input, Output
@@ -14,6 +15,8 @@ from app import app
 import constants
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# welcome tab layout - used in main layout (located in index.py)
 layout = html.Div([
 
     html.H1(constants.welcomeHeading, className = "welcome-heading"),
