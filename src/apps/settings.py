@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
+
 """
 Created on Thu Aug  6 21:24:40 2020
+Reworked on  Mar 22 17:50:30 2023
 
-@author: tilan
+@authors: tilan, zangl
 """
+
+
+#----------------------------------------------------------------------------------------------------------------------
+# imports
 import dash
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
@@ -17,6 +23,8 @@ from data import studentGrouped
 import constants
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# global constants
 THEME_COLOR_MAP     = constants.THEME_COLOR_MAP
 
 keyLabel            = constants.keyLabel
@@ -36,30 +44,25 @@ iconNameStudents    = constants.iconNameStudents
 iconNameCustom      = constants.iconNameCustom
 iconNameTutorial    = constants.iconNameTutorial
 
+themeOptionsButtonPre = "setting-customize-"
 
 
-
-
-dfUser                                                  =  studentGrouped.dfUser
-
+#----------------------------------------------------------------------------------------------------------------------
+# global dataframes
+dfUser                                                  = studentGrouped.dfUser
 dfLearningActivityDetails                               = studentGrouped.dfLearningActivityDetails
-
 dfEnrolledDetails                                       = studentGrouped.dfEnrolledDetails
-
 dfStudentDetails                                        = studentGrouped.dfStudentDetails
-
 dfCourseDetails                                         = studentGrouped.dfCourseDetails
 dfSkillDetails                                          = studentGrouped.dfSkillDetails
 dfPracticeTaskDetails                                   = studentGrouped.dfPracticeTaskDetails
 dfTheoryTaskDetails                                     = studentGrouped.dfTheoryTaskDetails
 dfTaskDetails                                           = studentGrouped.dfTaskDetails
 
-
 dfPracticeTasks = dfPracticeTaskDetails.merge(
         dfSkillDetails[['SkillId', 'Title', 'Description']]
         , how='inner', on=['SkillId'], left_index=False, right_index=False,
         suffixes = ('', ' Skill')  )
-
 
 dfPracticeTasks = dfPracticeTaskDetails.merge(
         dfCourseDetails[['CourseId', 'Title', 'Description']]
@@ -67,12 +70,10 @@ dfPracticeTasks = dfPracticeTaskDetails.merge(
         suffixes = ('', ' Course')  )
 
 
-
 dfTheoryTasks = dfTheoryTaskDetails.merge(
         dfSkillDetails[['SkillId', 'Title', 'Description']]
         , how='inner', on=['SkillId'], left_index=False, right_index=False,
         suffixes = ('', ' Skill')  )
-
 
 dfTheoryTasks = dfTheoryTaskDetails.merge(
         dfCourseDetails[['CourseId', 'Title', 'Description']]
@@ -80,8 +81,77 @@ dfTheoryTasks = dfTheoryTaskDetails.merge(
         suffixes = ('', ' Course')  )
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Function that sets the Theme of the app bases on parameter.
+# params:   newTheme         (string) - new theme for app
+# returns:  nothing
+def setAppTheme(newTheme):
+    
+    constants.THEME = newTheme
+    constants.THEME_COLOR, constants.THEME_BACKGROUND_COLOR, constants.THEME_COLOR_LIGHT, constants.THEME_EXPRESS_LAYOUT = constants.refreshThemeColor()
 
-themeOptionsButtonPre = "setting-customize-"
+
+#----------------------------------------------------------------------------------------------------------------------
+# Function that 
+# params:   none
+# returns:  
+def getCourseTask():
+    
+    layoutModalBodyCourseTask = []
+    
+    if current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated:
+        currentUserId = current_user.id        
+        userDB = studentGrouped.getUserFromUserId(currentUserId)        
+        
+        if  userDB is not None:        
+            if userDB['IsAdmin']:
+                layoutModalBodyCourseTask.append(                        
+                        html.Div( 
+                                children = [
+                                    html.H5("Practice Tasks"),                  
+                                    dbc.Table.from_dataframe(dfPracticeTaskDetails[[
+                                            'PracticeTaskId','Title','Description','Difficulty','TitleSkill','TitleCourse']], 
+                                                             striped=True, bordered=True, hover=True)
+                                ]
+                            )
+                )
+            
+                layoutModalBodyCourseTask.append(                        
+                        html.Div(      
+                                children = [   
+                                    html.H5("Theory Tasks"),                       
+                                    dbc.Table.from_dataframe(dfTheoryTaskDetails[[
+                                            'TheoryTaskId','Title','Description','Difficulty','TitleSkill','TitleCourse']], 
+                                                             striped=True, bordered=True, hover=True)
+                                ]
+                            )
+                )
+            else:
+                layoutModalBodyCourseTask.append(
+                        html.Div(
+                             children = [  
+                                html.H5("Practice Tasks"),   
+                                dbc.Table.from_dataframe(dfPracticeTaskDetails[  dfPracticeTaskDetails['User_Id'] ==  currentUserId][[
+                                        'PracticeTaskId','Title','Description','Difficulty','TitleSkill','SkillId','TitleCourse','CourseId']], 
+                                                         striped=True, bordered=True, hover=True)
+                            ]
+                        )
+                )
+                
+                layoutModalBodyCourseTask.append(
+                        html.Div(
+                             children = [  
+                                html.H5("Theory Tasks"),      
+                                dbc.Table.from_dataframe(dfTheoryTaskDetails[  dfTheoryTaskDetails['User_Id'] ==  currentUserId][[
+                                        'TheoryTaskId','Title','Description','Difficulty','TitleSkill','SkillId','TitleCourse','CourseId']], 
+                                                         striped=True, bordered=True, hover=True)
+                            ]
+                        )
+                )
+
+    return layoutModalBodyCourseTask
+
+
 
 layoutModalBodyCustomize =[
     html.H5( children = [ html.I(className="fas fas fa-palette p-right_xx-small"),   "Customize theme"  ] ),
@@ -212,69 +282,6 @@ layoutModalBodyHelp = [
 ]
 
 
-def getCourseTask():
-    
-    layoutModalBodyCourseTask = []
-    
-    if current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated:
-        currentUserId = current_user.id        
-        userDB = studentGrouped.getUserFromUserId(currentUserId)        
-        
-        if  userDB is not None:        
-            if userDB['IsAdmin']:
-                
-                layoutModalBodyCourseTask.append(                        
-                        html.Div( 
-                                children = [
-                                    html.H5("Practice Tasks"),                  
-                                    dbc.Table.from_dataframe(dfPracticeTaskDetails[[
-                                            'PracticeTaskId','Title','Description','Difficulty','TitleSkill','TitleCourse']], 
-                                                             striped=True, bordered=True, hover=True)
-                                ]
-                            )
-                )
-                
-                layoutModalBodyCourseTask.append(                        
-                        html.Div(      
-                                children = [   
-                                    html.H5("Theory Tasks"),                       
-                                    dbc.Table.from_dataframe(dfTheoryTaskDetails[[
-                                            'TheoryTaskId','Title','Description','Difficulty','TitleSkill','TitleCourse']], 
-                                                             striped=True, bordered=True, hover=True)
-                                ]
-                            )
-                )
-            else:
-                layoutModalBodyCourseTask.append(
-                        
-                        html.Div(
-                             children = [  
-                                html.H5("Practice Tasks"),   
-                                dbc.Table.from_dataframe(dfPracticeTaskDetails[  dfPracticeTaskDetails['User_Id'] ==  currentUserId][[
-                                        'PracticeTaskId','Title','Description','Difficulty','TitleSkill','SkillId','TitleCourse','CourseId']], 
-                                                         striped=True, bordered=True, hover=True)
-                            ]
-                        )
-                )
-                
-                layoutModalBodyCourseTask.append(
-                        
-                        html.Div(
-                             children = [  
-                                html.H5("Theory Tasks"),      
-                                dbc.Table.from_dataframe(dfTheoryTaskDetails[  dfTheoryTaskDetails['User_Id'] ==  currentUserId][[
-                                        'TheoryTaskId','Title','Description','Difficulty','TitleSkill','SkillId','TitleCourse','CourseId']], 
-                                                         striped=True, bordered=True, hover=True)
-                            ]
-                        )
-                )
-
-
-    return layoutModalBodyCourseTask
-
-
-
-
 
 settingsLayout = [
         
@@ -293,11 +300,6 @@ settingsLayout = [
 
 
 #------------------------------Customize Application ------------------------------
-
-def setAppTheme(newTheme):
-    
-    constants.THEME = newTheme
-    constants.THEME_COLOR, constants.THEME_BACKGROUND_COLOR, constants.THEME_COLOR_LIGHT, constants.THEME_EXPRESS_LAYOUT = constants.refreshThemeColor()
 
 
 @app.callback ( [ Output("setting-customize-theme-background-color-input", "value") ,

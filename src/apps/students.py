@@ -401,18 +401,18 @@ def createProgressChildren(studentId, classId):
 
         studentDataDf.fillna(0, inplace=True)
         studentDataDfSuccess = studentDataDf[studentDataDf['Result'].astype('Int64') > 0 ]
-    
+
         if studentDataDfSuccess is not None and studentDataDfSuccess.empty is False  and 'Task' in studentDataDfSuccess.columns:        
             
             print('skill studentdatadf')
 
             tasksCompleted = studentDataDfSuccess['Task'].unique()
-            dfTasksCompleted = dfTaskDetails[dfTaskDetails['Task'].isin(tasksCompleted)] 
+            dfTasksCompleted = dfTaskDetails[dfTaskDetails['Task'].isin(tasksCompleted)]
 
             graphs.append(html.H3("Student Courses Progress Tracker", className = "p-bottom_medium p-top_large"))       
 
             for courseIdAttempt in dfTasksCompleted['CourseId'].unique():
-                graphs.append( getCourseProgressCard(courseIdAttempt, dfTasksCompleted ))
+                graphs.append( getCourseProgressCard(courseIdAttempt, dfTasksCompleted))
 
     except Exception as e:
         subprocess.Popen(['echo', 'createProgressChildren Exception'])
@@ -425,41 +425,54 @@ def createProgressChildren(studentId, classId):
 def getCourseProgressCard(courseId, dfTasksCompleted):
     try:
 
-        #with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
-        #    subprocess.Popen(["echo", f"AMOUNT OF ROWS: {len(dfTaskDetails.index)}"])
-        #    subprocess.Popen(["echo", str(dfTaskDetails.iloc[:10])])
-
-        completeCourseTasks = dfTaskDetails.loc[dfTaskDetails["CourseId"] == courseId]
-
-        with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
-            subprocess.Popen(["echo", f"AMOUNT OF ROWS: {len(completeCourseTasks.index)}"])
-            subprocess.Popen(["echo", str(completeCourseTasks.loc[completeCourseTasks["CourseId"] == courseId])])
-
+        completeCourseTasks = dfTaskDetails[dfTaskDetails["CourseId"] == courseId]
         courseSkillIdAttempt = completeCourseTasks[completeCourseTasks['CourseId'] == courseId]['SkillId'].unique()
                 
         skillsDiv = []
         for skillIdAttempt in courseSkillIdAttempt:
 
-            subprocess.Popen(["echo", f"Here in course with ID: {courseId} we have a skill with id: {skillIdAttempt} and this id has the title: {dfTaskDetails[dfTaskDetails['SkillId'] == skillIdAttempt]['TitleSkill'].unique()}"])
+            totalTasksOfSkillUniqueList = dfTaskDetails[dfTaskDetails['SkillId'] == skillIdAttempt]['Task'].unique()
+            totalCompletedTasksOfSkillUniqueList = dfTasksCompleted[dfTasksCompleted['SkillId'] == skillIdAttempt]['Task'].unique()
+            totalNotCompletedTasksOfSkillUniqueList = [x for x in totalTasksOfSkillUniqueList if x not in totalCompletedTasksOfSkillUniqueList]
 
             skillTitle = dfTaskDetails[dfTaskDetails['SkillId'] == skillIdAttempt]['TitleSkill'].unique()
-            
-            dfSkillTaskCompleted = dfTasksCompleted[dfTasksCompleted['SkillId'] == skillIdAttempt]
-            skillTaskCount = len(dfTaskDetails[dfTaskDetails['SkillId'] == skillIdAttempt][constants.featureTask].unique())
-            progressSkill = math.ceil(  len(dfSkillTaskCompleted[constants.featureTask].unique()) * 100 / skillTaskCount  )
-            
-            
+            progressSkill = math.ceil(len(totalCompletedTasksOfSkillUniqueList) * 100 / len(totalTasksOfSkillUniqueList))
             tasksCompletedDetails =  []
-            
-            for taskId in dfSkillTaskCompleted[constants.featureTask].unique() :
+            tasksNotCompletedDetails = []
+
+            for taskId in totalCompletedTasksOfSkillUniqueList:
                 currentTask = dfTaskDetails[dfTaskDetails[constants.featureTask] == taskId]
+                classNameAddOn = ""
+                if(currentTask["TaskType"].iloc[0] == "Practice"):
+                    classNameAddOn = "rgb(76, 114, 176)"
+                elif(currentTask["TaskType"].iloc[0] == "Theory"):
+                    classNameAddOn = "rgb(214, 12, 140)"
+
                 tasksCompletedDetails.append(html.Details(
                             children = [
                                     html.Summary(currentTask['Title']),
                                     html.P('Task: ' + str(taskId) + 
                                         ';   Description: '  + currentTask['Description'] + ' \n'),
                                 ],
-                                className = " c-details " + (   "type-practice"  if currentTask[constants.featureTaskType].iloc[0] == constants.TaskTypePractice else "type-theory"  )
+                                className = "c-details",
+                                style = {"color": classNameAddOn}
+                        ))
+                
+            for taskId in totalNotCompletedTasksOfSkillUniqueList:
+                currentTask = dfTaskDetails[dfTaskDetails[constants.featureTask] == taskId]
+                classNameAddOn = ""
+                if(currentTask["TaskType"].iloc[0] == "Practice"):
+                    classNameAddOn = "rgb(76, 114, 176)"
+                elif(currentTask["TaskType"].iloc[0] == "Theory"):
+                    classNameAddOn = "rgb(214, 12, 140)"
+                tasksNotCompletedDetails.append(html.Details(
+                            children = [
+                                    html.Summary(currentTask['Title']),
+                                    html.P('Task: ' + str(taskId) + 
+                                        ';   Description: '  + currentTask['Description'] + ' \n'),
+                                ],
+                                className = " c-details ",
+                                style = {"color": classNameAddOn}
                         ))
             
             skillsDiv.append(html.Div(children= [
@@ -478,8 +491,7 @@ def getCourseProgressCard(courseId, dfTasksCompleted):
                         children =[ html.Div(
                                             children = [ 'Completed Tasks: ' ],
                                             className="card_value_label"
-                                        ), 
-    #                    ', '.join(dfSkillTaskCompleted['Task'].unique()),
+                                        ),
                                     ] + tasksCompletedDetails,
                         className=" card_value_details  col-10  align-left "
                     ),
@@ -491,17 +503,19 @@ def getCourseProgressCard(courseId, dfTasksCompleted):
                         children =[ html.Div(
                                             children = [ 'Not Completed Tasks: ' ],
                                             className="card_value_label"
-                                        ), 
-    #                    ', '.join(dfSkillTaskCompleted['Task'].unique()),
-                                    ] + tasksCompletedDetails,
+                                        ),
+                                    ] + tasksNotCompletedDetails,
                         className=" card_value_details  col-10  align-left "
                     ),
             ], className = "row m-bottom_small p_small", style = {"border": "2px groove grey"}))
         
+
+        totalTasksOfCourseUniqueList = dfTaskDetails[dfTaskDetails['CourseId'] == courseId]['Task'].unique()
+        totalCompletedTasksOfCourseUniqueList = dfTasksCompleted[dfTasksCompleted['CourseId'] == courseId]['Task'].unique()
+        totalNotCompletedTasksOfCourseUniqueList = [x for x in totalTasksOfCourseUniqueList if x not in totalCompletedTasksOfCourseUniqueList]
+
         courseTitle = dfTaskDetails[dfTaskDetails['CourseId'] == courseId]['TitleCourse'].unique()
-        courseTasksCount = len(dfTaskDetails[dfTaskDetails['CourseId'] == courseId]['Task'].unique())
-        courseTasksCompletedCount = len(dfTasksCompleted[dfTasksCompleted['CourseId'] == courseId]['Task'].unique())
-        progressCourse = math.ceil(  courseTasksCompletedCount * 100 / courseTasksCount  ) 
+        progressCourse = math.ceil(len(totalCompletedTasksOfCourseUniqueList) * 100 / len(totalTasksOfCourseUniqueList)) 
 
         return html.Div( html.Div(
             [
@@ -511,12 +525,11 @@ def getCourseProgressCard(courseId, dfTasksCompleted):
                                 dbc.Progress(str(progressCourse) + "%", value = progressCourse, className= " c-progress ",
                                                 color = "success" if progressCourse == 100 else "primary", ), 
                                 html.Div(
-                                        getCurrentSelectedStudentName() + ' completed ' + str(courseTasksCompletedCount) + ' of ' + str(courseTasksCount) + ' tasks in this course.',
+                                        getCurrentSelectedStudentName() + ' completed ' + str(len(totalCompletedTasksOfCourseUniqueList)) + ' of ' + str(len(totalTasksOfCourseUniqueList)) + ' tasks in this course.',
                                         className="card_value_label m-top_x-small"
                                     ),  ],
                     className="card_value_title col-12 m-top_small"
                 ),
-                html.Div(html.Hr(className = "hr_course-progress"), className = "col-12"),
                 html.Div(children = skillsDiv, className = "col-12"),
             ],
             className="c-card  c-card-small   row",
@@ -546,10 +559,6 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
                     util.getNoDataMsg()
             )
             return graphs
-        
-        #with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
-        #    subprocess.Popen(["echo", f"AMOUNT OF ROWS: {len(studentData.index)}"])
-        #    subprocess.Popen(["echo", str(studentData.iloc[:20])])
         
     #    studentData                     = studentData.sort_values(by='Start')
             
