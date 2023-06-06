@@ -384,6 +384,10 @@ def toggle_modal(n1, n2, is_open):
     return is_open
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Clientside callback function to update the children of menu-sub-link-output-hidden (with javascript code in /src/assets/app.js)
+# params:   elmntId         (string)  - menu-sub-link-input value
+# returns:  nothing
 app.clientside_callback(
         # specifiy the callback with ClientsideFunction(<namespace>, <function name>)
         ClientsideFunction('ui', 'jsFunction'),
