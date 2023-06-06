@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 """
 Created on   Aug  1 10:55:10 2020
 Reworked on  Mar 14 10:25:00 2023
@@ -6,7 +7,9 @@ Reworked on  Mar 14 10:25:00 2023
 @authors: tilan, zangl
 """
 
-# -*- coding: utf-8 -*-
+
+#----------------------------------------------------------------------------------------------------------------------
+# imports
 import math
 import json
 from datetime import date
@@ -31,7 +34,6 @@ import os
 from app import app
 from apps import classes
 
-
 from data import studentGrouped
 import constants
 import util
@@ -40,12 +42,8 @@ import traceback
 import datetime
 
 
-
-#fig = studentGroupedPerformance.figBar
-
-#--------------------------------- Const values START ----------------------------
-
-
+#----------------------------------------------------------------------------------------------------------------------
+# global constants
 feature2UserNamesDict               = constants.feature2UserNamesDict
 countStudentCompletingTaskFeature   = constants.countStudentCompletingTaskFeature
 countTaskCompletedByStudentFeature  = constants.countTaskCompletedByStudentFeature
@@ -59,18 +57,31 @@ featureSessionDuration              = constants.featureSessionDuration
 TaskTypePractice                    = constants.TaskTypePractice
 TaskTypeTheory                      = constants.TaskTypeTheory
 
-
-
 sortOrderDescending                 = constants.sortOrderDescending
 sortOrderAscending                  = constants.sortOrderAscending
 
 hasFeatures                         =  studentGrouped.hasFeatures
 
-#--------------------------------- Const values END ----------------------------
+studentOverviewFeaturesDefault =   {
+        constants.featureCollectedCoins : {
+                constants.keyClassName : 'fas fa-coins ',
+                constants.keyHasMeanStd : False,                
+        }
+        , constants.featureItemsCollectedCount : {
+                constants.keyClassName : 'fas fa-memory ',
+                constants.keyHasMeanStd : False,                
+        }
+        , constants.featureLineOfCodeCount : {
+                constants.keyClassName : 'fas list-ol ',
+                constants.keyHasMeanStd : False,                
+        }
+}
 
+currentClassGlobal = -1
+currentStudentGlobal = -1
 
-#--------------------------------- DataBase get data START ---------------------------
-
+#----------------------------------------------------------------------------------------------------------------------
+# global database constants
 dfStudentDetails                        = studentGrouped.dfStudentDetails
 
 dfCourseDetails                         = studentGrouped.dfCourseDetails
@@ -79,21 +90,18 @@ dfPracticeTaskDetails                   = studentGrouped.dfPracticeTaskDetails
 dfTheoryTaskDetails                     = studentGrouped.dfTheoryTaskDetails
 dfTaskDetails                           = studentGrouped.dfTaskDetails
 
-#dfGroupedPractice                       = studentGrouped.dfGroupedPractice
 dfGroupedOriginal                       = studentGrouped.dfGroupedOriginal
 dfPlayerStrategyPractice                = studentGrouped.dfPlayerStrategyPractice  
 dfGroupedPracticeTaskWise               = studentGrouped.dfGroupedPracticeTaskWise
 dfGroupedPracticeDB                     = studentGrouped.dfGroupedPracticeDB
 dfRuns                                  = studentGrouped.dfRuns
 
-
 dfPlayerStrategyTheory                  = studentGrouped.dfPlayerStrategyTheory
 dfGroupedPlayerStrategyTheory           = studentGrouped.dfGroupedPlayerStrategyTheory
 
-#--------------------------------- DataBase get data END ---------------------------
 
-
-#--------------------------- helper functions -----------------------    
+#----------------------------------------------------------------------------------------------------------------------
+# helper functions
 getTaskWiseSuccessFail                  =  studentGrouped.getTaskWiseSuccessFail
 getStudentsOfLearningActivity           =  studentGrouped.getStudentsOfLearningActivity
 
@@ -102,18 +110,13 @@ getPracticeDescription                  =  studentGrouped.getPracticeDescription
 getTheoryDescription                    =  studentGrouped.getTheoryDescription
 
 
-
-def convert_list_column_tostr_NL(val) :
-    separator = ',<br>'
-    return separator.join(val)
-
-
-
-#--------------------------- helper functions  END -----------------------
-
-
-#------------------------------------
-def getStudentData(StudentId, schoolKey, selectedDate = '' ):
+#----------------------------------------------------------------------------------------------------------------------
+# Function to get data of student by serving student id, class id (and optional filter date)
+# params:   studentId       (int) - integer containing student ID
+#           schoolKey       (int) - integer containing class ID
+#           selectedDate    (string) - string containing date of which the data is filtered by
+# returns:  Dataframe with all important data of a student from a certain class
+def getStudentData(studentId, schoolKey, selectedDate = '' ):
     
     print('getStudentData')
     
@@ -121,7 +124,7 @@ def getStudentData(StudentId, schoolKey, selectedDate = '' ):
     
     try :
         school                            = dfGroupedOriginal.get_group(schoolKey)
-        studentData                       = school[school['StudentId'] == StudentId]
+        studentData                       = school[school['StudentId'] == studentId]
         studentData['Finish']             = studentData['CreatedAt'] 
         studentData['Start']              = studentData['Finish'] - pd.to_timedelta(studentData[featureSessionDuration], unit='s')
         
@@ -150,37 +153,33 @@ def getStudentData(StudentId, schoolKey, selectedDate = '' ):
 
     try :
         schoolTheory = dfGroupedPlayerStrategyTheory.get_group(schoolKey)
-        schoolTheoryStudent = schoolTheory[schoolTheory['StudentId'] == StudentId]
-        
+        schoolTheoryStudent = schoolTheory[schoolTheory['StudentId'] == studentId]
         
         schoolTheoryStudent['Finish']       =   schoolTheoryStudent['CreatedAt']
         schoolTheoryStudent['Start']        =   schoolTheoryStudent['Finish'] - pd.to_timedelta(schoolTheoryStudent[featureSessionDuration], unit='s')
         schoolTheoryStudent                 =   schoolTheoryStudent.sort_values(by='Start')
         
+        schoolTheoryStudent['Difference']   =   (schoolTheoryStudent['Finish'] - schoolTheoryStudent['Start']).astype('timedelta64[s]')
         
-        schoolTheoryStudent['Difference']   = (schoolTheoryStudent['Finish'] - schoolTheoryStudent['Start']).astype('timedelta64[s]')
+        schoolTheoryStudent.loc[schoolTheoryStudent['Difference'] > schoolTheoryStudent[featureSessionDuration], 'Difference'] = schoolTheoryStudent[
+                schoolTheoryStudent['Difference'] > schoolTheoryStudent[featureSessionDuration]][featureSessionDuration]        
         
-        schoolTheoryStudent.loc[schoolTheoryStudent['Difference'] > schoolTheoryStudent[featureSessionDuration], 'Difference'] =  schoolTheoryStudent[
-                schoolTheoryStudent['Difference'] > schoolTheoryStudent[featureSessionDuration] ][featureSessionDuration]        
-        
-        
-        schoolTheoryStudent                 = schoolTheoryStudent.merge(right= dfTheoryTaskDetails[ ['TheoryTaskId', 'Title', 'Description' ] ]
+        schoolTheoryStudent                 = schoolTheoryStudent.merge(right= dfTheoryTaskDetails[['TheoryTaskId', 'Title', 'Description']]
                                                   , left_on='TheoryTaskId', right_on='TheoryTaskId'
                                                   , left_index=False, right_index=False
                                                   , how='inner')
         schoolTheoryStudent.rename(columns={'Description': 'TheoryTaskDescription'}, inplace=True)
         
         schoolTheoryStudent[featureDescription] = getTheoryDescription(schoolTheoryStudent, False)  
-        schoolTheoryStudent[featureDescription] = '<b>Title</b>:' + schoolTheoryStudent['Title'].astype(str)  + '<br>'+ schoolTheoryStudent[featureDescription].astype(str) 
+        schoolTheoryStudent[featureDescription] = '<b>Title</b>:' + schoolTheoryStudent['Title'].astype(str) + '<br>'+ schoolTheoryStudent[featureDescription].astype(str) 
     
-        schoolTheoryStudent['GroupBy']      = constants.TaskTypeTheory + '-' + schoolTheoryStudent['TheoryTaskId'].astype(str) 
-        schoolTheoryStudent['Task']         = constants.TaskTypeTheory + '-' +  schoolTheoryStudent['TheoryTaskId'].astype(str)  
-        schoolTheoryStudent['IndexCol']     = schoolTheoryStudent['Task'] + '-' +  schoolTheoryStudent['Result'].astype(str) 
+        schoolTheoryStudent['GroupBy']    = constants.TaskTypeTheory    + '-' +  schoolTheoryStudent['TheoryTaskId'].astype(str) 
+        schoolTheoryStudent['Task']       = constants.TaskTypeTheory    + '-' +  schoolTheoryStudent['TheoryTaskId'].astype(str)  
+        schoolTheoryStudent['IndexCol']   = schoolTheoryStudent['Task'] + '-' +  schoolTheoryStudent['Result'].astype(str) 
         
         schoolTheoryStudent[constants.featureTaskType] = constants.TaskTypeTheory
         
-        
-        if schoolTheoryStudent is not None and schoolTheoryStudent.empty == False :
+        if schoolTheoryStudent is not None and schoolTheoryStudent.empty == False:
             studentData = pd.concat([studentData, schoolTheoryStudent], ignore_index=True)
     except Exception as e:
         subprocess.Popen(['echo', 'getStudentData second Exception'])
@@ -192,85 +191,67 @@ def getStudentData(StudentId, schoolKey, selectedDate = '' ):
     
     if     None is not selectedDate         and         not selectedDate == ''     and   util.is_valid_date(selectedDate) :
         selectedDate = datetime.datetime.strptime(selectedDate, '%Y-%m-%d').date()
-        studentDataGroupedDate      = studentData.groupby([studentData['Start'].dt.date])
-        studentData                 = studentDataGroupedDate.get_group(selectedDate)
+        studentDataGroupedDate     =   studentData.groupby([studentData['Start'].dt.date])
+        studentData                =   studentDataGroupedDate.get_group(selectedDate)
     
-    studentData['StartStr']         = '@' + studentData['Start'].dt.strftime('%Y-%m-%d %H:%M:%S') + '-' + studentData['IndexCol'].astype(str)
+    studentData['StartStr'] = '@' + studentData['Start'].dt.strftime('%Y-%m-%d %H:%M:%S') + '-' + studentData['IndexCol'].astype(str)
 
     return studentData
 
 
-#Check if Student is in a Group
-def isStudentInGroup(StudentId, groupId) :
+#----------------------------------------------------------------------------------------------------------------------
+# Function to check wether student is in a class
+# params:   StudentId       (int) - integer containing student ID
+#           schoolKey       (int) - integer containing class ID
+# returns:  Boolean stating if student is in class or not
+def isStudentInClass(studentId, classId) :
     try:
-        groupStudents = getStudentsOfLearningActivity(groupId)
-        
-        if  not StudentId in groupStudents:
+        groupStudents = getStudentsOfLearningActivity(classId)
+        if not studentId in groupStudents:
             return False
-        
         return True
 
     except Exception as e:
-        subprocess.Popen(['echo', 'isStudentInGroup Exception'])
+        subprocess.Popen(['echo', 'isStudentInClass Exception'])
         subprocess.Popen(['echo', str(e)]) 
         print(e)
 
 
-studentOverviewFeaturesDefault =   {
-        constants.featureCollectedCoins : {
-                constants.keyClassName : 'fas fa-coins ',
-                constants.keyHasMeanStd : False,                
-        }
-        , constants.featureItemsCollectedCount : {
-                constants.keyClassName : 'fas fa-memory ',
-                constants.keyHasMeanStd : False,                
-        }
-        , constants.featureLineOfCodeCount : {
-                constants.keyClassName : 'fas list-ol ',
-                constants.keyHasMeanStd : False,                
-        }
-}
-
-
-def plotStudentOverview(StudentId, groupId):
+#----------------------------------------------------------------------------------------------------------------------
+# Function to plot the Student Overview subsection
+# params:   studentId       (int) - integer containing student ID
+#           classId         (int) - integer containing class ID
+# returns:  List containing html and dbc components with relevant graphs
+def plotStudentOverview(studentId, classId):
     
     graphs = []
     
     try:
-
     #    the student is not in the group
-        if not isStudentInGroup(StudentId, groupId) :
+        if not isStudentInClass(studentId, classId) :
             return graphs
         
-        
-
-        studentDataDf                     = getStudentData(StudentId, groupId)
+        studentDataDf                     = getStudentData(studentId, classId)
         
         if studentDataDf is None or studentDataDf.empty == True :
             graphs.append(
                     util.getNoDataMsg()
             )
             return graphs
-
         
         studentDataDf.fillna(0, inplace=True)
         graphs = util.plotStudentOverview(studentDataDf , classes = "c-card-small" )
         
-        
         plotRow = []
     
-        
-        groupOriginal                           = dfGroupedOriginal.get_group(groupId)
+        groupOriginal                           = dfGroupedOriginal.get_group(classId)
         
         groupOriginal['ConceptsUsed']           = groupOriginal['Code'].apply( studentGrouped.getAllNodeTypesUsefull )
         groupOriginal["ConceptsUsedDetails"]    = groupOriginal['ConceptsUsed'].replace(
                                                         constants.ProgramConceptsUsefull2UserNames, regex=True )
         
-        
         studentWiseData                         = groupOriginal.groupby(['StudentId'], as_index=False).sum()
-        studentDataDfPractice                   = studentWiseData[studentWiseData['StudentId'] == StudentId]
-        
-        
+        studentDataDfPractice                   = studentWiseData[studentWiseData['StudentId'] == studentId]
         
         studentDataDfSuccess                    =     studentDataDf[studentDataDf['Result'].astype('Int64') > 0 ]
         
@@ -287,21 +268,12 @@ def plotStudentOverview(StudentId, groupId):
                                             )
                                     ],
                                     className="col-sm-4",
-                            ))   
-    #        plotRow.append( html.Div([  
-    #                                    util.generateCardBase([html.I(className="fas fa-cubes m-right-small"),   'Tasks completed'], 
-    #                                                           
-    #                                                           ', '.join(studentDataDfSuccess['Task'].unique()), 
-    #                                                           
-    #                                                           classes = "c-card-small"),
-    #                                ],
-    #                                className="col-sm-8",
-    #                        ))
+                            ))
             
         for feature2OKey in studentOverviewFeaturesDefault.keys():
             currentFeatureO = studentOverviewFeaturesDefault.get(feature2OKey)
             
-            if constants.keyHasMeanStd in currentFeatureO.keys() and   currentFeatureO.get(constants.keyHasMeanStd):
+            if constants.keyHasMeanStd in currentFeatureO.keys() and currentFeatureO.get(constants.keyHasMeanStd):
                 plotRow.append( html.Div([
                                         util.generateCardDetail(
                                                     [html.I(className =  html.I(className=  currentFeatureO.get(constants.keyClassName)) +  " m-right-small"), 
@@ -316,11 +288,8 @@ def plotStudentOverview(StudentId, groupId):
                                         ],
                                         className="col-sm-4",
                                 ))
-
-
-                
-            else :
-                if feature2OKey in studentDataDfPractice.columns :
+            else:
+                if feature2OKey in studentDataDfPractice.columns:
                     plotRow.append( html.Div([
                                                 util.generateCardBase(
                                                         [   html.I(className=  currentFeatureO.get(constants.keyClassName) +  " m-right-small"), 
@@ -330,7 +299,7 @@ def plotStudentOverview(StudentId, groupId):
                                             ],
                                             className="col-sm-4",
                                     ))
-                elif feature2OKey in studentDataDf.columns :
+                elif feature2OKey in studentDataDf.columns:
                     plotRow.append( html.Div([
                                                 util.generateCardBase(
                                                         [   html.I(className=  currentFeatureO.get(constants.keyClassName) +  " m-right-small"), 
@@ -341,29 +310,27 @@ def plotStudentOverview(StudentId, groupId):
                                             className="col-sm-4",
                                     ))
         
-            
-        if groupOriginal[groupOriginal['StudentId'] == StudentId] is not None  and groupOriginal[groupOriginal['StudentId'] == StudentId]['ConceptsUsedDetails'].shape[0] > 0 :        
+        if groupOriginal[groupOriginal['StudentId'] == studentId] is not None and groupOriginal[groupOriginal['StudentId'] == studentId]['ConceptsUsedDetails'].shape[0] > 0 :        
             try :
-                ConceptsUsedUnique                      = util.get_unique_list_feature_items(groupOriginal[groupOriginal['StudentId'] == StudentId], 'ConceptsUsedDetails')
+                ConceptsUsedUnique = util.get_unique_list_feature_items(groupOriginal[groupOriginal['StudentId'] == studentId], 'ConceptsUsedDetails')
                 
                 if     ConceptsUsedUnique is not None  :        
                     
                     ConceptsUsedUniqueUserReadable = set()
                     for conceptUsed in ConceptsUsedUnique:
-                        ConceptsUsedUniqueUserReadable.add(  constants.ProgramConceptsUsefull2UserNames.get(conceptUsed) if 
+                        ConceptsUsedUniqueUserReadable.add( constants.ProgramConceptsUsefull2UserNames.get(conceptUsed) if 
                                                             conceptUsed in constants.ProgramConceptsUsefull2UserNames 
                                                             else 
-                                                            conceptUsed  )
+                                                            conceptUsed)
                     
                     plotRow.append( html.Div([
                                                 util.generateCardBase(
-                                                        [html.I(className="fas fa-code m-right-small"),   'Concepts Used', ], 
+                                                        [html.I(className="fas fa-code m-right-small"), 'Concepts Used'], 
                                                         ', '.join(ConceptsUsedUniqueUserReadable) ,
                                                         classes = "c-card-small" )
                                             ],
                                             className="col-sm-6",
                                     ))
-
             except Exception as e:
                 subprocess.Popen(['echo', 'student overview Concepts Used Error'])
                 subprocess.Popen(['echo', str(e)]) 
@@ -380,27 +347,30 @@ def plotStudentOverview(StudentId, groupId):
         subprocess.Popen(['echo', str(e)]) 
         print(e)
 
-
-
     return graphs
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Function to plot the Student Courses Progress Tracker
+# params:   studentId       (int) - integer containing student ID
+#           classId         (int) - integer containing class ID
+# returns:  List containing html and dbc components with relevant graphs
 def createProgressChildren(studentId, classId):
     
     graphs = []
 
     try:
-        if not isStudentInGroup(studentId, classId) :
+        if not isStudentInClass(studentId, classId):
             return graphs
 
         studentDataDf = getStudentData(studentId, classId)
         
-        if studentDataDf is None or studentDataDf.empty == True :
+        if studentDataDf is None or studentDataDf.empty == True:
             graphs.append(util.getNoDataMsg())
             return graphs
 
         studentDataDf.fillna(0, inplace=True)
-        studentDataDfSuccess = studentDataDf[studentDataDf['Result'].astype('Int64') > 0 ]
+        studentDataDfSuccess = studentDataDf[studentDataDf['Result'].astype('Int64') > 0]
 
         if studentDataDfSuccess is not None and studentDataDfSuccess.empty is False  and 'Task' in studentDataDfSuccess.columns:        
             
@@ -422,6 +392,11 @@ def createProgressChildren(studentId, classId):
     return graphs
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Function to generate the Student Courses Progress Tracker Cards (each course gets one card)
+# params:   courseId            (int)       - integer containing course ID
+#           dfTasksCompleted    (Dataframe) - pandas Dataframe containing completed Tasks
+# returns:  html Div component with course and skill progress data
 def getCourseProgressCard(courseId, dfTasksCompleted):
     try:
 
@@ -542,17 +517,23 @@ def getCourseProgressCard(courseId, dfTasksCompleted):
         print(e)
         
 
-#Student Interaction with Game - TIMELINE
-def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDirection = sortOrderDescending ):
+#----------------------------------------------------------------------------------------------------------------------
+# Function to generate the graphs of Student interactions with the tasks and the timeline
+# params:   studentId               (int)    - integer containing student ID
+#           schoolKey               (int)    - integer containing class ID
+#           studentSelectedDate     (string) - string containing date of which the data is filtered by 
+#           studentGraphDirection   (string) - string containing info about data is sorted desc or asc
+# returns:  list containing relevant graphs (student interactions and timeline)
+def plotStudent(studentId, schoolKey, studentSelectedDate = '', studentGraphDirection = sortOrderDescending):
     
     graphs = []
     
     try:    
     #    the student is not in the group
-        if not isStudentInGroup(StudentId, schoolKey):
+        if not isStudentInClass(studentId, schoolKey):
             return graphs
         
-        studentData = getStudentData(StudentId, schoolKey, studentSelectedDate)
+        studentData = getStudentData(studentId, schoolKey, studentSelectedDate)
 
         if studentData is None or studentData.empty == True :
             graphs.append(
@@ -568,31 +549,29 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
             
         studentData.sort_values(by = 'Start', inplace=True, ascending = isAscending )
         
-        studentData.loc[studentData[constants.featureTaskType]  == constants.TaskTypePractice, 'color']      =   constants.colorPractice
-        studentData.loc[studentData[constants.featureTaskType]  == constants.TaskTypeTheory, 'color']        =   constants.colorTheory
-        studentData.loc[(studentData[constants.featureTaskType]  == constants.TaskTypePractice ) & 
+        studentData.loc[studentData[constants.featureTaskType]   == constants.TaskTypePractice, 'color']     =   constants.colorPractice
+        studentData.loc[studentData[constants.featureTaskType]   == constants.TaskTypeTheory, 'color']       =   constants.colorTheory
+        studentData.loc[(studentData[constants.featureTaskType]  == constants.TaskTypePractice) & 
                         (studentData['Result']  == 0), 'color']                                              =   constants.colorPracticeError
-        studentData.loc[(studentData[constants.featureTaskType]  == constants.TaskTypeTheory ) & 
+        studentData.loc[(studentData[constants.featureTaskType]  == constants.TaskTypeTheory) & 
                         (studentData['Result']  == 0), 'color']                                              =   constants.colorTheoryError
 
         studentData['Task'] = studentData['IndexCol']
         studentData['Text'] = studentData['Difference'].astype(str) + 's for ' + studentData[constants.featureTaskType].astype(str) + ' Task : ' +  studentData['Title' ]  + ' Result : ' +  studentData['Result'].astype(str)
 
-        colors  = {
-                constants.TaskTypePractice  : constants.colorPractice,
-                constants.TaskTypeTheory : constants.colorTheory,
-                constants.TaskTypePractice + '-1' : constants.colorPractice,
-                constants.TaskTypeTheory + '-1' : constants.colorTheory,
-                constants.TaskTypePractice + '-0' : constants.colorPracticeError,
-                constants.TaskTypeTheory + '-0' : constants.colorTheoryError,
+        colors = {
+            constants.TaskTypePractice            : constants.colorPractice,
+            constants.TaskTypeTheory              : constants.colorTheory,
+            constants.TaskTypePractice   + '-1'   : constants.colorPractice,
+            constants.TaskTypeTheory     + '-1'   : constants.colorTheory,
+            constants.TaskTypePractice   + '-0'   : constants.colorPracticeError,
+            constants.TaskTypeTheory     + '-0'   : constants.colorTheoryError
         }
         
         studentData['IndexSuccFail'] = studentData[constants.featureTaskType] + '-' +  studentData['Result'].astype(str)
         
-        
-        graphHeightRows =  ( studentData.shape[0] * 40 )
-        graphHeightRows = graphHeightRows if (graphHeightRows > (constants.graphHeightMin + 100) ) else (constants.graphHeightMin + 100)
-        
+        graphHeightRows = (studentData.shape[0] * 40)
+        graphHeightRows = graphHeightRows if (graphHeightRows > (constants.graphHeightMin + 100)) else (constants.graphHeightMin + 100)
         
         #type 2 
         fig = go.Figure()
@@ -609,23 +588,21 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
                         hovertemplate   = "<br>" +
                                     "%{customdata[1]}<br>"     
                                     
-                                    )
                         )
+        )
         fig.update_layout(
-                                            height          =   graphHeightRows , 
-                                            title_text      = 'Details of Student\'s Game Interactions'
-                                                , yaxis = dict(
-                                                    title = 'Time',
-                                                    titlefont_size = 16,
-                                                    tickfont_size = 14,
-                                                ), xaxis = dict(
-                                                    title = 'Duration (s)',
-                                                    titlefont_size = 16,
-                                                    tickfont_size = 14,
-                                )                   
-                                    )
+                                    height        =  graphHeightRows, 
+                                    title_text    = 'Details of Student\'s Game Interactions',
+                                    yaxis = dict(
+                                        title = 'Time',
+                                        titlefont_size = 16,
+                                        tickfont_size = 14,),
+                                    xaxis = dict(
+                                        title = 'Duration (s)',
+                                        titlefont_size = 16,
+                                        tickfont_size = 14)                   
+        )
         graphs.append(
-                
                     dcc.Graph(
                         figure= fig
                     )
@@ -633,19 +610,17 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
                 if  constants.languageLocal  != 'en' else
                 
                     dcc.Graph(
-                        figure= fig
-                        
-                        , config  =  dict (locale   =  constants.languageLocal   ) 
+                        figure= fig,
+                        config = dict (locale = constants.languageLocal) 
                     )
             )
-        
         
     #    gantt chart for timeline 
     #    if studentData is not None and studentData.empty == False :    
         studentData['Task'] = studentData['GroupBy']
         
-        graphHeightRows =  ( len(studentData['Task'].unique()) * 40 )
-        graphHeightRows = graphHeightRows if (graphHeightRows > (constants.graphHeightMin + 100) ) else (constants.graphHeightMin + 100)
+        graphHeightRows = (len(studentData['Task'].unique()) * 40)
+        graphHeightRows = graphHeightRows if (graphHeightRows > (constants.graphHeightMin + 100)) else (constants.graphHeightMin + 100)
 
         fig = ff.create_gantt(studentData, 
                             title             =   constants.labelStudentTimeline , 
@@ -661,34 +636,17 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
                             )
         
         graphs.append(
-                
                     dcc.Graph(
                         figure= fig
                     )
-                
+
                 if  constants.languageLocal  != 'en' else
-                
+
                     dcc.Graph(
-                        figure= fig
-                        
-                        , config  =  dict (locale   =  constants.languageLocal   ) 
+                        figure= fig,
+                        config = dict (locale = constants.languageLocal) 
                     )
         )
-
-# **** IMPORTANT - ff.create_gantt is deprecated -> moved to px.timeline 
-#    studentData['StartStr'] = studentData['Start'].dt.strftime('%Y-%m-%d %H:%M:%S')
-#    studentData['FinishStr'] = studentData['Finish'].dt.strftime('%Y-%m-%d %H:%M:%S')
-#    
-#    fig = px.timeline(studentData, x_start="StartStr", x_end="FinishStr", y="Task"
-#                      , color = constants.featureTaskType,   
-#                        hover_data    = ['Description', 'Start', 'StartStr', 'Finish', 'FinishStr'] ,                   
-#                        height =   graphHeightRows 
-#    )
-#    graphs.append(
-#            dcc.Graph(
-#                figure= fig
-#        ))
-    
     
     except Exception as e:
         subprocess.Popen(['echo', 'plotStudent Exception'])
@@ -696,76 +654,71 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
         subprocess.Popen(['echo', str(traceback.format_exc())])
         print(e)
 
-    
     return graphs
 
 
-featuresToExclude = [
-             'PracticeTaskId',
-             'EnrolledId', 
-             'SkillId', 
-             'CourseId', 
-             'StudentId', 
-             'LearningActivity_LearningActivityId',  
-             'Difficulty', 
-             'PracticeStatisticsId', 
-             'TheoryStatisticsId',  
-             'EnrolledId', 'SkillId', 'TheoryTaskId', 
-             'LearningActivityId', 'CourseId', 'studentAttemptsTotal'
-             
-
-             # because complicated to explain
-             ,'runsHasVariablesNamedCount' , 'runsHasVariablesCount'
-             ,'hasVariablesNamed', 'hasVariables', 'hasVariable'
-]
-
-
+#----------------------------------------------------------------------------------------------------------------------
+# Function to generate the learning activity buttons (class buttons)
+# params:   none
+# returns:  list containing the class buttons the user has access to
 def createUserLAOptionsButtons():
-    buttons_list = []
+    buttonsList = []
 
-    user_LA_options = classes.getUserLAOptions()
-    for option in user_LA_options:
-        button_label = option["label"]
-        button_value = int(option["value"])
-        buttons_list.append(html.Button(button_label, id = {"button-type": "students-select-classes-button", "class-id": button_value}))
+    userLAOptions = classes.getUserLAOptions()
+    for option in userLAOptions:
+        buttonLabel = option["label"]
+        buttonValue = int(option["value"])
+        buttonsList.append(html.Button(buttonLabel, id = {"button-type": "students-select-classes-button", "class-id": buttonValue}))
 
-    return buttons_list
+    return buttonsList
 
 
-def getButtonLabel(button_id):
-    dfstudents = dfStudentDetails[dfStudentDetails[constants.STUDENT_ID_FEATURE].isin([button_id])][['StudentId', 'Name']].drop_duplicates(subset=['StudentId'], keep='first')
+#----------------------------------------------------------------------------------------------------------------------
+# Function to create button label (Student name)
+# params:   buttonId        (int) - integer containing the button id (here it is also the student id)
+# returns:  string containing the name of the student with right id (buttonId)
+def getButtonLabel(buttonId):
+    dfstudents = dfStudentDetails[dfStudentDetails[constants.STUDENT_ID_FEATURE].isin([buttonId])][['StudentId', 'Name']].drop_duplicates(subset=['StudentId'], keep='first')
 
     for index, row in dfstudents.iterrows():
-        student_id = row['StudentId']
-        student_name = row['Name']
+        studentId = row['StudentId']
+        studentName = row['Name']
 
-        if(student_id == button_id):
-            return student_name
+        if(studentId == buttonId):
+            return studentName
         
     return "something went wrong with button label function"
 
 
-def createStudentButtonsFromClassId(class_id):
+#----------------------------------------------------------------------------------------------------------------------
+# Function to create student selection buttons
+# params:   classId        (int) - integer containing the class id
+# returns:  list of html buttons whcih are the student slection buttons
+def createStudentButtonsFromClassId(classId):
 
-    student_buttons_list = []
-    students_id_list = getStudentsOfLearningActivity(class_id)
-    dfstudents = dfStudentDetails[dfStudentDetails[constants.STUDENT_ID_FEATURE].isin(students_id_list)][['StudentId', 'Name']].drop_duplicates(subset=['StudentId'], keep='first')
+    studentButtonsList = []
+    studentsIdList = getStudentsOfLearningActivity(classId)
+    dfstudents = dfStudentDetails[dfStudentDetails[constants.STUDENT_ID_FEATURE].isin(studentsIdList)][['StudentId', 'Name']].drop_duplicates(subset=['StudentId'], keep='first')
 
     for index, row in dfstudents.iterrows():
-        student_id = row['StudentId']
-        student_name = row['Name']
-        student_buttons_list.append(html.Button(student_name, id = {"button-type": "students-select-student-button", "student-id": student_id}))
+        studentId = row['StudentId']
+        studentName = row['Name']
+        studentButtonsList.append(html.Button(studentName, id = {"button-type": "students-select-student-button", "student-id": studentId}))
 
-    return student_buttons_list
+    return studentButtonsList
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Function to get current selected student name
+# params:   none
+# returns:  string containing the name of the student that is currently selected
 def getCurrentSelectedStudentName():
 
     studentName = ""
 
     try :
-        school                            = dfGroupedOriginal.get_group(current_class)
-        studentData                       = school[school['StudentId'] == current_student]
+        school                            = dfGroupedOriginal.get_group(currentClassGlobal)
+        studentData                       = school[school['StudentId'] == currentStudentGlobal]
         studentName                       = studentData["Name"].iloc[0]
         
     except Exception as e: 
@@ -776,14 +729,8 @@ def getCurrentSelectedStudentName():
     return studentName
 
 
-current_class = -1
-current_student = -1
-
-
-#-----------------------------------------
-# Layout-------------------------
-#-------------------------------------------
-
+#----------------------------------------------------------------------------------------------------------------------
+# students tab layout - used in main layout (located in index.py)
 layout = [
     html.Div([
 
@@ -847,10 +794,15 @@ layout = [
 ]
 
 
-#-----------------------------------------
-# callback functions---------------------
-#        ---------------------------------
 #----------------------------------------------------------------------------------------------------------------------
+# Callback function to control the content of the whole students tab (based on user actions)
+# params:   classes_n_clicks         (int)    - integer containing number of clicks on classes selection buttons
+#           students_n_clicks        (int)    - integer containing number of clicks on students selection buttons
+#           studentSelectedDate      (string) - string containing date dropdown value
+#           studentGraphDirection    (string) - string containing sort order dropdown value
+#           initialClassDate         (string) - string containing date dropdown className
+#           initialClassDir          (string) - string containing sort order dropdown value
+# returns:  list of classNames and childrens of various components
 @app.callback([Output('students-learning-activity-selection-div', 'className'), Output('students-select-a-class-heading', 'children'),
                Output('students-button-select-other-la-div', 'className'),      Output('students-select-a-student-heading-div', 'className'),
                Output('students-selection-div', 'children'),                    Output('students-selection-div', 'className'),
@@ -878,8 +830,9 @@ layout = [
 )
 def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clicks, studentSelectedDate, studentGraphDirection, initialClassDate, initialClassDir):
 
-    global current_class
-    global current_student
+    global currentClassGlobal
+    global currentStudentGlobal
+
     initialClassDateS = set()
     initialClassDirS = set()
 
@@ -892,30 +845,29 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
     initialClassDirS.add('disabled') 
 
     ctx = dash.callback_context
-    subprocess.Popen(['echo', 'callback - initial trigger ' + str(ctx.triggered[0]['prop_id'])])
     if ctx.triggered:
         triggered_id = ctx.triggered[0]['prop_id']        # triggered_id can be: {"button-type":"students-select-classes-button","class-id":1}.n_clicks OR 'students-date-dropdown.value' OR 'students-sort-order-dropdown.value'
-
-        subprocess.Popen(['echo', 'callback - ' + 'ctx triggered'])
-        subprocess.Popen(['echo', 'callback - ' + str(triggered_id)])
 
         if triggered_id == 'students-date-dropdown.value' or triggered_id == 'students-sort-order-dropdown.value':
             student_overview_graphs = []
             student_container_graphs = []
             student_date_dropdown_options = []
+
             if studentSelectedDate is None  or  studentSelectedDate == '':
                 studentSelectedDate = ''
-            if isStudentInGroup(current_student, current_class):
-                student_overview_graphs = plotStudentOverview(current_student, current_class)
-                student_container_graphs = plotStudent(current_student, current_class, format(studentSelectedDate), studentGraphDirection)
-                student_progress_tracker_graphs = createProgressChildren(current_student, current_class)
-                dfStudentData = getStudentData(current_student, current_class)
+
+            if isStudentInClass(currentStudentGlobal, currentClassGlobal):
+                student_overview_graphs = plotStudentOverview(currentStudentGlobal, currentClassGlobal)
+                student_container_graphs = plotStudent(currentStudentGlobal, currentClassGlobal, format(studentSelectedDate), studentGraphDirection)
+                student_progress_tracker_graphs = createProgressChildren(currentStudentGlobal, currentClassGlobal)
+                dfStudentData = getStudentData(currentStudentGlobal, currentClassGlobal)
+
                 if not (dfStudentData is None or dfStudentData.empty == True):
                     student_date_dropdown_options = [{'label': d, 'value': d} for d in dfStudentData['Start'].dt.date.unique()]
-
                 csv_string = ""
+
                 try:    
-                    csv_string = util.get_download_link_data_uri(getStudentData(current_student, current_class, format(studentSelectedDate)))
+                    csv_string = util.get_download_link_data_uri(getStudentData(currentStudentGlobal, currentClassGlobal, format(studentSelectedDate)))
                 except Exception as e:
                     subprocess.Popen(['echo', 'download - callback Exception 1'])
                     subprocess.Popen(['echo', str(e)]) 
@@ -929,7 +881,7 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
             return ["m-top_small m-left-right-small choose-learning-activity-buttons hidden", dash.no_update,
                     "m-top_small m-left-right-small choose-learning-activity-buttons", "stick-on-top-of-page",
                     [], "m-top_small m-left-right-small choose-students-buttons hidden",
-                    getButtonLabel(current_student), "m-top_small m-left-right-small choose-students-buttons", 
+                    getButtonLabel(currentStudentGlobal), "m-top_small m-left-right-small choose-students-buttons", 
                     "c-container m-left-right-medium",
                     "c-container", "c-container",
                     "m-left-right-medium", "c-container p-bottom_15 m-left-right-medium",
@@ -949,10 +901,8 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
         triggered_id_dict = json.loads(dictionary_str)
 
         if triggered_id_dict["button-type"] == "students-select-classes-button" and triggered_id_dict["class-id"] >= 0:
-            subprocess.Popen(['echo', 'callback - ' + str(triggered_id_dict["button-type"])])
-            subprocess.Popen(['echo', 'callback - return 1'])
             class_id = triggered_id_dict["class-id"]
-            current_class = class_id
+            currentClassGlobal = class_id
 
             return ["m-top_small m-left-right-small choose-learning-activity-buttons hidden", classes.getButtonLabel(class_id),
                     "m-top_small m-left-right-small choose-learning-activity-buttons", "stick-on-top-of-page",
@@ -971,27 +921,28 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
                     "hr_custom_style hidden", "hr_custom_style hidden"]
         
         elif triggered_id_dict["button-type"] == "students-select-student-button" and triggered_id_dict["student-id"] >= 0:
-            subprocess.Popen(['echo', 'callback - ' + str(triggered_id_dict["button-type"])])
-            subprocess.Popen(['echo', 'callback - return 2'])
             student_id = triggered_id_dict["student-id"]
-            current_student = student_id
+            currentStudentGlobal = student_id
 
             student_overview_graphs = []
             student_container_graphs = []
             student_date_dropdown_options = []
+
             if studentSelectedDate is None  or  studentSelectedDate == '':
                 studentSelectedDate = ''
-            if isStudentInGroup(student_id, current_class):
-                student_overview_graphs = plotStudentOverview(student_id, current_class)
-                student_container_graphs = plotStudent(student_id, current_class, format(studentSelectedDate), studentGraphDirection)
-                student_progress_tracker_graphs = createProgressChildren(current_student, current_class)
-                dfStudentData                     = getStudentData(student_id, current_class)
+
+            if isStudentInClass(student_id, currentClassGlobal):
+                student_overview_graphs = plotStudentOverview(student_id, currentClassGlobal)
+                student_container_graphs = plotStudent(student_id, currentClassGlobal, format(studentSelectedDate), studentGraphDirection)
+                student_progress_tracker_graphs = createProgressChildren(currentStudentGlobal, currentClassGlobal)
+                dfStudentData                   = getStudentData(student_id, currentClassGlobal)
+
                 if not (dfStudentData is None or dfStudentData.empty == True):
                     student_date_dropdown_options = [{'label': d, 'value': d} for d  in dfStudentData['Start'].dt.date.unique()]
-                
                 csv_string = ""
+
                 try:    
-                    csv_string = util.get_download_link_data_uri(getStudentData(student_id, current_class, format(studentSelectedDate)))
+                    csv_string = util.get_download_link_data_uri(getStudentData(student_id, currentClassGlobal, format(studentSelectedDate)))
                 except Exception as e:
                     subprocess.Popen(['echo', 'download - callback Exception 2'])
                     subprocess.Popen(['echo', str(e)]) 
@@ -1019,13 +970,11 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
                     "hr_custom_style", "hr_custom_style"]
         
         elif triggered_id_dict["button-type"] == "students-select-student-button" and triggered_id_dict["student-id"] == -1:
-            subprocess.Popen(['echo', 'callback - ' + str(triggered_id_dict["button-type"])])
-            subprocess.Popen(['echo', 'callback - return 3'])
-            current_student = -1
+            currentStudentGlobal = -1
 
             return ["m-top_small m-left-right-small choose-learning-activity-buttons hidden", dash.no_update,
                     "m-top_small m-left-right-small choose-learning-activity-buttons", "stick-on-top-of-page",
-                    createStudentButtonsFromClassId(current_class), "m-top_small m-left-right-small choose-students-buttons",
+                    createStudentButtonsFromClassId(currentClassGlobal), "m-top_small m-left-right-small choose-students-buttons",
                     "Select a Student", "m-top_small m-left-right-small choose-students-buttons hidden", 
                     "c-container m-left-right-medium hidden",
                     "c-container hidden", "c-container hidden",
@@ -1039,9 +988,9 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
                     "hr_custom_style", "hr_custom_style hidden",
                     "hr_custom_style hidden", "hr_custom_style hidden"]
 
-    current_class = -1
-    current_student = -1
-    subprocess.Popen(['echo', 'callback - return 4'])
+    currentClassGlobal = -1
+    currentStudentGlobal = -1
+
     return ["m-top_small m-left-right-small choose-learning-activity-buttons", "Select a Class",
             "m-top_small m-left-right-small choose-learning-activity-buttons hidden", "stick-on-top-of-page hidden",
             [], "m-top_small m-left-right-small choose-students-buttons hidden",
