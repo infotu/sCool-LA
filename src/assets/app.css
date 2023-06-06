@@ -85,23 +85,6 @@ html {
 	text-align: right;
 }
 
-.navbar-searchinput {
-	background-color: #f8f9fa;
-	font-size: 1.2em;
-  	color: #505050;
-	padding-left: 10px;
-	height: 48px;
-}
-
-.navbar-searchinput:focus {
-	background-color: #f8f9fa;
-}
-
-.navbar-searchinput::placeholder {
-	font-size: 1.2em;
-	color: #505050;
-}
-
 .navbar-searchbutton {
 	font-size: 1.2em;
 	color: #ffffff;

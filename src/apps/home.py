@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Jul 29 19:13:32 2020
 
-@author: tilan
-"""
-
-# -*- coding: utf-8 -*-
 """
 Created on Thu Jun 11 18:16:48 2020
+reworked on Mon Jun 05 10:30:00 2023
 
-@author: tilan
+@author: tilan, zangl
 """
+
+
+#----------------------------------------------------------------------------------------------------------------------
+# imports
 import numpy as np
 import plotly.express as px
 
@@ -24,29 +23,17 @@ import dash_bootstrap_components as dbc
 import chart_studio.plotly as py
 from plotly import graph_objs as go
 
-
-
 from app import app
-
 
 from data import studentGrouped
 import constants
 import util
 
 
-
-
-
+#----------------------------------------------------------------------------------------------------------------------
+# global constants
 idApp             = "home"
 
-
-
-
-
-   
-    
-
-    
 FeaturesCustom          = constants.FeaturesCustom
 
 FeaturesCustomPractice  = constants.FeaturesCustomPractice

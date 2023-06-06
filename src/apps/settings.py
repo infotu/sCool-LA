@@ -92,9 +92,9 @@ def setAppTheme(newTheme):
 
 
 #----------------------------------------------------------------------------------------------------------------------
-# Function that 
+# Function that creates the content of the second tab of the settings page.
 # params:   none
-# returns:  
+# returns:  list of html.Divs containing information about practice and theory tasks
 def getCourseTask():
     
     layoutModalBodyCourseTask = []
@@ -152,7 +152,8 @@ def getCourseTask():
     return layoutModalBodyCourseTask
 
 
-
+#----------------------------------------------------------------------------------------------------------------------
+# layout for the customize tab of the settings page
 layoutModalBodyCustomize =[
     html.H5( children = [ html.I(className="fas fas fa-palette p-right_xx-small"),   "Customize theme"  ] ),
     html.P("Customize application theme"),
@@ -180,6 +181,8 @@ layoutModalBodyCustomize = layoutModalBodyCustomize + [ html.Button(children=[
                                                             n_clicks    = 0 )   for i in THEME_COLOR_MAP ]
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# layout for the help center tab of the settings page
 layoutModalBodyHelp = [
         
     html.Iframe( src  = "https://www.youtube.com/embed/atfOw7CoJm0", width="420" , height="315" ),
@@ -282,7 +285,8 @@ layoutModalBodyHelp = [
 ]
 
 
-
+#----------------------------------------------------------------------------------------------------------------------
+# main layout of the settings page
 settingsLayout = [
         
     dbc.Tabs(
@@ -296,12 +300,10 @@ settingsLayout = [
 ]
 
 
-
-
-
-#------------------------------Customize Application ------------------------------
-
-
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function to set custom theme background color
+# params:   args         (tuple) - number of clicks on customize buttons (used as callback trigger)
+# returns:  tuple of dicts with new theme color
 @app.callback ( [ Output("setting-customize-theme-background-color-input", "value") ,
                     Output("setting-customize-theme-color-input", "value"), 
                  ], 
@@ -326,18 +328,18 @@ def onChangeCustomizeAppTheme(*args):
     return newValue  
 
 
-
-
-
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function render task tab content if opened
+# params:   pathname         (string) - containing current pathname (only used as trigger)
+# returns:  empty html.Div or list of html.Divs
 @app.callback(Output("tabCourseSkillTask", "children"), [Input("url", "pathname")],
     )
-def render_tab_task_content(pathname ):
+def render_tab_task_content(pathname):
 
     if current_user and current_user.is_authenticated  :
         return getCourseTask()
     
     return html.Div()
-
 
 
 app.clientside_callback(
