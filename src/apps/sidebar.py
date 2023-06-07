@@ -74,9 +74,7 @@ menuLink = {
                           keyOnlyForAdmin : False    },  
 
     "menu-link-5" : { keyLabel : 'Custom', keyHref : '/Custom' ,
-                  keySubmenu : [
-                          "menu-sub-link-3"
-                          ],  keyClassName : 'fas ' + iconNameCustom + ' m-right-small',
+                  keySubmenu : [],  keyClassName : 'fas ' + iconNameCustom + ' m-right-small',
                           keyOnlyForAdmin : False    }
 }
 
@@ -88,14 +86,13 @@ menuSubLink2Scroll = {
     "menu-sub-link-0"  :  {keyLabel : "Overview", keyScrollTo: ''}
     ,"menu-sub-link-1" :  {keyLabel : "Compare Groups", keyScrollTo: 'row-control-main-overview'}
     ,"menu-sub-link-2" :  {keyLabel : "Distribution", keyScrollTo: "Group-Distribution-Information"}
-    ,"menu-sub-link-3" :  {keyLabel : "Custom", keyScrollTo: ''}
     ,"menu-sub-link-4" :  {keyLabel : "Class Overview", keyScrollTo: 'classes-overview-hr'}
     ,"menu-sub-link-5" :  {keyLabel : "Task Information", keyScrollTo: 'classes-task-information-hr'}
     ,"menu-sub-link-6" :  {keyLabel : "Task Code Submissions", keyScrollTo: 'classes-code-submission-hr'}
     ,"menu-sub-link-7" :  {keyLabel : "Concept Information", keyScrollTo: 'classes-concept-hr'}
     ,"menu-sub-link-8" :  {keyLabel : "Class Statistics", keyScrollTo: 'classes-stats-hr'}
     ,"menu-sub-link-9" :  {keyLabel : "Student Overview", keyScrollTo: 'students-overview-hr'}
-    ,"menu-sub-link-10" :  {keyLabel : "Progress Tracker", keyScrollTo: 'students-progress-tracker-hr'}
+    ,"menu-sub-link-10" :  {keyLabel : "Courses Progress Tracker", keyScrollTo: 'students-progress-tracker-hr'}
     ,"menu-sub-link-11" :  {keyLabel : "Game Interactions/Timeline", keyScrollTo: 'students-game-interactions-hr'}
 }
 

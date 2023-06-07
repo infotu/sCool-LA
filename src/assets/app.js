@@ -26,4 +26,47 @@ window.dash_clientside.ui = {
 		bodyStyles.setProperty('--theme-background-color', newThemeBackgroundColor);
 		bodyStyles.setProperty('--theme-color', newThemeColor);
 	},
+
+	executeSearchRequest : function(newValue) {
+		if(newValue)
+		{
+			let newValueConst = newValue;
+			const newValueSplit = newValue.split('-');
+			if(newValueConst == "tab-menu-link-2") {
+				var button = document.getElementById("menu-link-2");
+				button.click();
+			} else if(newValueConst == "tab-menu-link-3") {
+				var button = document.getElementById("menu-link-3");
+				button.click();
+			} else if (newValueConst == "tab-menu-link-4") {
+				var button = document.getElementById("menu-link-4");
+				button.click();
+			} else if (newValueConst == "tab-menu-link-5") {
+				var button = document.getElementById("menu-link-5");
+				button.click();
+			} else if (newValueSplit[0] == "class") {
+				var button = document.getElementById("menu-link-3");
+				button.click();
+				var buttonString = '{"button-type":"select-classes-button","class-id":' + newValueSplit[1] + '}';
+				setTimeout(function() {
+					button = document.getElementById(buttonString);
+					button.click();
+				}, 800);
+			} else if (newValueSplit[0] == "student") {
+				var button = document.getElementById("menu-link-4");
+				button.click();
+				var buttonString = '{"button-type":"students-select-classes-button","class-id":' + newValueSplit[1] + '}';
+				setTimeout(function() {
+					button = document.getElementById(buttonString);
+					button.click();
+					buttonString = '{"button-type":"students-select-student-button","student-id":' + newValueSplit[2] + '}';
+					setTimeout(function() {
+						button = document.getElementById(buttonString);
+						button.click();
+					}, 800);
+				}, 800);
+			}
+		}
+        return "Learning Analytics Web Application";
+    },
 }

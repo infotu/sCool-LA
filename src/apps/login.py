@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
+
 """
 Created on Sat Aug 22 21:51:30 2020
 
 @author: tilan
 """
+
+
+#----------------------------------------------------------------------------------------------------------------------
+# imports
 import dash_html_components as html
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
@@ -23,11 +28,9 @@ from app import app, User, server
 import constants
 
 
-
-
-
+#----------------------------------------------------------------------------------------------------------------------
+# global constants
 dfUser                  =  studentGrouped.dfUser
-
 
 success_alert = dbc.Alert(
     'Logged in successfully. Taking you home!',
@@ -46,6 +49,8 @@ already_login_alert = dbc.Alert(
 )
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# login layout
 layout = dbc.Row(
         dbc.Col(
             [
@@ -56,8 +61,7 @@ layout = dbc.Row(
     )
 
 
-
-
+#----------------------------------------------------------------------------------------------------------------------
 # Adding this route allows us to use the POST method on our login app.
 # It also allows us to implement HTTP Redirect when the login form is submitted.
 @server.route('/login', methods=['POST'])

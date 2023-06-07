@@ -32,72 +32,51 @@ import util
 
 #----------------------------------------------------------------------------------------------------------------------
 # global constants
-idApp             = "home"
+idApp                                 = "home"
 
-FeaturesCustom          = constants.FeaturesCustom
+FeaturesCustom                        = constants.FeaturesCustom
 
-FeaturesCustomPractice  = constants.FeaturesCustomPractice
-FeaturesCustomTheory    = constants.FeaturesCustomTheory
+FeaturesCustomPractice                = constants.FeaturesCustomPractice
+FeaturesCustomTheory                  = constants.FeaturesCustomTheory
 
+FigureTypes                           = constants.FigureTypes 
 
-FigureTypes             = constants.FigureTypes 
+graphHeight                           =  constants.graphHeight
+graphHeight                           = graphHeight - 200
 
+hoverData                             = constants.hoverData.copy()
 
-graphHeight             =  constants.graphHeight
-graphHeight             =   graphHeight - 200
+selectedColorGroupDefault             = "Name"
 
+GroupSelector_options                 = studentGrouped.GroupSelector_options 
 
-hoverData               =  constants.hoverData.copy()
-#hoverData.remove("lineOfCodeCount")
+dfStudentDetails                      = studentGrouped.dfStudentDetails
 
+dfSkillDetails                        = studentGrouped.dfSkillDetails
+dfCourseDetails                       = studentGrouped.dfCourseDetails
+dfPracticeTaskDetails                 = studentGrouped.dfPracticeTaskDetails
+dfTheoryTaskDetails                   = studentGrouped.dfTheoryTaskDetails
 
+dfPlayerStrategyPracticeOriginal      = studentGrouped.dfPlayerStrategyPracticeOriginal
 
-selectedColorGroupDefault    = "Name"
+dfGroupedPractice                     = studentGrouped.dfGroupedPractice
+dfGroupedOriginal                     = studentGrouped.dfGroupedOriginal
+dfPlayerStrategyPractice              = studentGrouped.dfPlayerStrategyPractice  
+dfGroupedPracticeTaskWise             = studentGrouped.dfGroupedPracticeTaskWise
+dfGroupedPracticeDB                   = studentGrouped.dfGroupedPracticeDB
+dfRuns                                = studentGrouped.dfRuns
+dfPracticeDB                          = studentGrouped.dfPracticeDB
 
+dfPlayerStrategyTheory                = studentGrouped.dfPlayerStrategyTheory
+dfGroupedPlayerStrategyTheory         = studentGrouped.dfGroupedPlayerStrategyTheory
 
-
-#--------------------- school selection START ----------------------
-GroupSelector_options = studentGrouped.GroupSelector_options 
-#--------------------- school selection END ----------------------
-
-
-
-#--------------------------------- DataBase get data START ---------------------------
-dfStudentDetails                        = studentGrouped.dfStudentDetails
-
-dfSkillDetails                          = studentGrouped.dfSkillDetails
-dfCourseDetails                         = studentGrouped.dfCourseDetails
-dfPracticeTaskDetails                   = studentGrouped.dfPracticeTaskDetails
-dfTheoryTaskDetails                     = studentGrouped.dfTheoryTaskDetails
-
-
-dfPlayerStrategyPracticeOriginal        = studentGrouped.dfPlayerStrategyPracticeOriginal
-
-dfGroupedPractice                       = studentGrouped.dfGroupedPractice
-dfGroupedOriginal                       = studentGrouped.dfGroupedOriginal
-dfPlayerStrategyPractice                = studentGrouped.dfPlayerStrategyPractice  
-dfGroupedPracticeTaskWise               = studentGrouped.dfGroupedPracticeTaskWise
-dfGroupedPracticeDB                     = studentGrouped.dfGroupedPracticeDB
-dfRuns                                  = studentGrouped.dfRuns
-dfPracticeDB                            = studentGrouped.dfPracticeDB
-
-
-dfPlayerStrategyTheory                  = studentGrouped.dfPlayerStrategyTheory
-dfGroupedPlayerStrategyTheory           = studentGrouped.dfGroupedPlayerStrategyTheory
-
-
-
-
-
-
-#--------------------------------- DataBase get data END ---------------------------
-
-
-
-#-----------------------------------Functions START ----------------------------------------
 featuresCombined       =   constants.featuresCombined
 
-    
+
+#----------------------------------------------------------------------------------------------------------------------
+# Function to plot the Game Data Overview subsection
+# params:   none
+# returns:  List containing html and dbc components with relevant overview graphs
 def plotGameOverview():
     
     allGroups       = dfStudentDetails[constants.GROUPBY_FEATURE].unique()
@@ -121,7 +100,6 @@ def plotGameOverview():
                      className = "row")
     )
 
-
     dfAllData = pd.concat([dfPracticeDB[featuresCombined] , dfPlayerStrategyTheory[featuresCombined]], ignore_index=True, sort =False)
 
     plotRow = []    
@@ -130,14 +108,6 @@ def plotGameOverview():
                     util.generateCardBase([html.I(className="fas fa-clock m-right-small"),   'Game Time'], 
                                         '' + util.seconds_2_dhms(dfAllData['SessionDuration'].sum().round(decimals=2)), 
                                         )
-#                   util.generateCardDetail([html.I(className="fas fa-clock m-right-small"),   'Game Time'], 
-#                                        '' + util.seconds_2_dhms(dfAllData['SessionDuration'].sum().round(decimals=2)), 
-#                                        '' + str(dfAllData['SessionDuration'].mean().round(decimals=2)) + 's', 
-#                                        '' + str(dfAllData['SessionDuration'].std().round(decimals=2)) + 's', 
-#                                        'total',
-#                                        'mean',
-#                                        'std',
-#                                        )
                 ],
                 className="col-sm-4",
             ))
@@ -160,15 +130,6 @@ def plotGameOverview():
                 util.generateCardBase('Points Collected', 
                                         '' + util.millify(dfAllData['Points'].sum().round(decimals=2)), 
                                         )
-                    
-#                   util.generateCardDetail('Points Collected', 
-#                                        '' + util.millify(dfAllData['Points'].sum().round(decimals=2)), 
-#                                        '' + str(dfAllData['Points'].mean().round(decimals=2)), 
-#                                        '' + str(dfAllData['Points'].std().round(decimals=2)), 
-#                                        'total',
-#                                        'mean',
-#                                        'std',
-#                                        )
                 ],            
                 className="col-sm-4",
             ))
@@ -177,37 +138,52 @@ def plotGameOverview():
             html.Div(children  = plotRow,                
                      className = "row")
     )
-    
     return plots
 
 featureGroupByOptions   = [constants.featureStudent, constants.featureTask, constants.featureGroup, constants.featureSkill, constants.featureCourse]
 
 
-
+#----------------------------------------------------------------------------------------------------------------------
+# Function to get class dataframe based on filter options
+# params:   selectedGroupBy      (string) - string containing filter information (per default "LA")
+# returns:  List of dataframes or single dataframe
 def getGroupByFilterOptions(selectedGroupBy = constants.featureGroup):
     
-    if selectedGroupBy == constants.featureTask :
+    if selectedGroupBy == constants.featureTask:
         
         return list(dfPracticeTaskDetails[constants.featureTask].unique()) +  list(dfTheoryTaskDetails[constants.featureTask].unique())
     
-    elif selectedGroupBy == constants.featureGroup :
+    elif selectedGroupBy == constants.featureGroup:
         return studentGrouped.getGroups()
     
     elif selectedGroupBy == constants.featureStudent:
         return dfStudentDetails[constants.featureStudent].unique()
     
-    elif selectedGroupBy ==   constants.featureSkill :
+    elif selectedGroupBy ==   constants.featureSkill:
         return dfSkillDetails[constants.featureSkill].unique()
     
-    elif selectedGroupBy == constants.featureCourse :
+    elif selectedGroupBy == constants.featureCourse:
         return dfCourseDetails[constants.featureCourse].unique()
     
     else:
         return []
-    
-    
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Function to create custom plots of the game data tab
+# params:   feature1                (string)        - string containing feature info on x axis
+#           feature2                (string)        - string containing feature info on y axis
+#           feature3                (string)        - string containing third possible feature
+#           selectedAxis            (string)        - string containing information about wether plot should be horizonzal or vertical
+#           selectedFigureType      (string)        - string containing selected figure type (bar, scatter...)
+#           plotClassName           (string)        - string containing css stylings
+#           selectedDistribution    (string)        - string containing information about the selected distribution
+#           groupBy                 (string)        - 
+#           groupBySub              (string)        - 
+#           groupByFilter           (string)        - 
+#           selectedFeatureMulti    (string)        - 
+#           hoverData               (list[string])  - 
+# returns: list of custom generated plots based on user actions
 def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '', 
                    selectedAxis         = constants.AxisH, 
                    selectedFigureType   = constants.FigureTypeBar,
@@ -238,7 +214,6 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
     if selectedDistribution is None:
         selectedDistribution = []
     
-        
     gameData = pd.concat([dfPlayerStrategyPracticeOriginal, dfPlayerStrategyTheory], ignore_index=True)
     
     gameData[constants.featureStudent]     =    gameData['Name'].astype(str) + '-' +   gameData['StudentId'].astype(str) 
@@ -247,26 +222,20 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
     gameData[constants.featureSkill]       =    constants.TypeSkill  + '-' +   gameData['SkillId'].astype(str) 
     gameData[constants.featureTask]        =    gameData[constants.featureTaskId].astype(str)
             
-    
     gameData = gameData.drop_duplicates(subset=[constants.featureStudent, constants.featureTask], keep='last')
-    
     
     for hoverFeatureRemove in  featureGroupByOptions + [constants.featureTaskType]:
         if hoverFeatureRemove in hoverData:
             hoverData.remove( hoverFeatureRemove )
             
-    
     if groupByFilter and len(groupByFilter) > 0:
         gameData = gameData[gameData[groupBy].isin(groupByFilter)]
         
-    
 #--------------------------------Total of each Features ----------------------------------     
     
-        
     if selectedFeatureMulti is not None:
         selectedFeatureMulti = [groupBy] + groupBySub + selectedFeatureMulti
         
-    
     if    groupBy == constants.featureTask  :
         groupByAll = [ groupBy, constants.featureTaskType ]
         gameDataDfGroupedSum, hoverData, groupByAll = util.groupedBySelectedFeaturesDf(gameData, 
@@ -280,7 +249,7 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
         if selectedFeatureMulti is not None:
             selectedFeatureMulti = groupByAll + groupBySub + selectedFeatureMulti
     
-    elif   groupBy  in  [ constants.featureGroup, constants.featureSkill , constants.featureCourse , constants.featureStudent     ]  :
+    elif groupBy in [constants.featureGroup, constants.featureSkill, constants.featureCourse, constants.featureStudent]:
         
         gameDataDfGroupedSum, hoverData, groupByAll = util.groupedBySelectedFeaturesDf(gameData, 
                                                                groupBy = groupBy  , 
@@ -290,8 +259,7 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
         hoverName   = groupBy
         color       = groupBy
         
-        
-    else  :
+    else:
         groupByAll = [constants.GROUPBY_FEATURE, constants.featureGroup, 
                                                  constants.featureStudent ]
         gameDataDfGroupedSum = gameData.groupby(groupByAll, as_index=False).sum()
@@ -305,7 +273,6 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
         if not constants.featureGroup in hoverData:
             hoverData.append(constants.featureGroup)
             
-    
     if not constants.featureStudent in groupByAll :
         gameDataStudent = gameData.groupby(groupByAll + [constants.featureStudent], as_index=False).sum().round(decimals=2)
     else:    
@@ -319,8 +286,8 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
         dfOriginalStd.reset_index(level=0, inplace=True)
         dfOriginalStd = dfOriginalStd.round(decimals=2)
         dfOriginalStd.columns = dfOriginalStd.columns.droplevel(1)
+
     except Exception as e: 
-        
         print(e)
         try:
             list_df = []
@@ -337,10 +304,8 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
             print('plotGamePlots exception in second trial of creating dfOriginalStd !!!! ')
             print(e)
     
+    if 'gameDataDfGroupedSum' in locals()  and  (gameDataDfGroupedSum is not None)  and  (not gameDataDfGroupedSum.empty):
         
-    if 'gameDataDfGroupedSum' in locals()     and    ( gameDataDfGroupedSum is not None  )    and   ( not  gameDataDfGroupedSum.empty )   :
-        
-            
         plotTitle   = ' Details of students ' 
         plotTitle   = plotTitle + str( constants.feature2UserNamesDict.get(feature1) if feature1 in constants.feature2UserNamesDict.keys() else feature1 )
         plotTitle   = plotTitle + ' vs ' + str( constants.feature2UserNamesDict.get(feature2) if feature2 in constants.feature2UserNamesDict.keys() else feature2 )
@@ -370,15 +335,11 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
         graphs.append( html.Div( rows ,
                                 className = plotClassName ) )
         
-
     return graphs
 
 
 
 def generateControlCardCustomPlot():
-    
-#    featureGroupByOptionsCopyFeatures = featureGroupByOptions.copy()
-#    featureGroupByOptionsCopyFeatures = featureGroupByOptionsCopyFeatures.remove('Student')
     
     return util.generateControlCardCustomPlotForm(
             idApp                   = idApp, 
@@ -395,52 +356,41 @@ def generateControlCardCustomPlot():
             featureGroupByFilterOptionsDefault  = ['Group-1', 'Group-2', 'Group-3', 'Group-4','Group-5', 'Group-15',]
     )
 
-#----------------------------------Functions END --------------------------------------------
 
-
-
+#----------------------------------------------------------------------------------------------------------------------
+# game data/home tab layout - used in main layout (located in index.py)
 layout = [
             
     dbc.Row([
             dbc.Col(
-                # Left column
                 html.Div(
                     id="game-main-overview",
                     className="",
                     children=  [html.H2("Game Overview")]  ,
                 ),
         ),
-    ])
-    ,  dbc.Row([
+    ]),
+    dbc.Row([
             dbc.Col(
-                # Left column
                 html.Div(
                     className="game-overview m-bottom_medium",
                     children=  plotGameOverview()  ,
                 ),
         ),
-    ])    
-                        
-                        
-    , dbc.Row([
+    ]),
+    dbc.Row([
             dbc.Col(
-                # Left column
                 html.Div(
                     id= idApp + "-custom-plot-form",
                     className=" ",
                     children=[ generateControlCardCustomPlot() ]
                 ),
         ),
-    ])
-
-    , html.Div(id = idApp + "-custom-plot-container", className = "row custom-main-container m-top_small" )
-
+    ]),
+    html.Div(id = idApp + "-custom-plot-container", className = "row custom-main-container m-top_small")
 ]
                 
-      
-        
-        
-        
+
 #----------------------------------------------------------------------------------------------
 #                    CALL BACK
 #----------------------------------------------------------------------------------------------

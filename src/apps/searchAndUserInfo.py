@@ -95,6 +95,7 @@ def update_options(searchInput):
 
                 options.append({"label": studentName, "value": ("student-" + str(classId) + "-" + str(studentId)), "title": "Student"})
         
+        options.append({"label": "Tutorial", "value": "tab-menu-link-2",  "title": "Tab"})
         options.append({"label": "Classes",  "value": "tab-menu-link-3",  "title": "Tab"})
         options.append({"label": "Students", "value": "tab-menu-link-4",  "title": "Tab"})
         options.append({"label": "Custom",   "value": "tab-menu-link-5",  "title": "Tab"})
