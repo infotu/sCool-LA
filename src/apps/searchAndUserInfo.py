@@ -34,7 +34,28 @@ external_scripts = [
 
 #----------------------------------------------------------------------------------------------------------------------
 # global constants
-dfStudentDetails                        = studentGrouped.dfStudentDetails
+dfStudentDetails                      = studentGrouped.dfStudentDetails
+getStudentsOfLearningActivity         = studentGrouped.getStudentsOfLearningActivity
+
+
+"""
+#----------------------------------------------------------------------------------------------------------------------
+# Function to check wether student is in a class
+# params:   StudentId       (int) - integer containing student ID
+#           schoolKey       (int) - integer containing class ID
+# returns:  Boolean stating if student is in class or not
+def isStudentInClass(studentId, classId) :
+    try:
+        groupStudents = getStudentsOfLearningActivity(classId)
+        if not studentId in groupStudents:
+            return False
+        return True
+
+    except Exception as e:
+        subprocess.Popen(['echo', 'isStudentInClass Exception'])
+        subprocess.Popen(['echo', str(e)]) 
+        print(e)
+"""
 
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -53,8 +74,8 @@ navbar = html.Div(
                     dbc.Col(
                         dbc.Row(
                             [
-                                dbc.Col(dcc.Dropdown(id = "search-dropdown", options = [], placeholder = "", optionHeight = 48, style={"height": "48px", "font-size": "1.4em", "z-index": 15})),
-                                dbc.Col(dbc.Button("Search", color = "primary", className = "navbar-searchbutton"), width = "auto")
+                                dbc.Col(dcc.Dropdown(id = "search-dropdown", options = [], placeholder = "Search...", optionHeight = 38, style={"font-size": "1.1em", "z-index": 15})),
+                                dbc.Col(dbc.Button("Search", id = "navbar-search-button", color = "primary", className = "navbar-searchbutton"), width = "auto")
                             ],
                             id = "search-bar-row",
                             align = "center"
@@ -104,6 +125,21 @@ def update_options(searchInput):
     else:
         raise PreventUpdate
 
+
+@app.callback(
+    Output("search-dropdown", "value"),
+    Input("navbar-search-button", "n_clicks"),
+    State("search-dropdown", "search_value")
+)
+def update_options(n_clicks, searchValue):
+
+    ctx = dash.callback_context
+    if ctx.triggered:
+        triggered_id = ctx.triggered[0]['prop_id']
+
+        if triggered_id == 'navbar-search-button.n_clicks':
+            return searchValue
+    return dash.no_update
 
 
 app.clientside_callback(
