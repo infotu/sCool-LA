@@ -192,51 +192,49 @@ layoutModalBodyHelp = [
     html.Hr(),
     html.Br(),
     
-    html.H5( children = [ html.I(className="fas " + iconNameHome + " p-right_xx-small"),   "Game Details"  ] ),
-    html.P("This tab is only visible for admins"),
-    html.P("Information about the global game data"),
+    html.H5( children = [ html.I(className="fas " + iconNameHome + " p-right_xx-small"),   "Game Data"  ] ),
+    html.P("Only visible for admins!"),
+    html.P("The Game Data tab serves as a comprehensive resource for global game data for admins only. This tab offers an in-depth analysis of game statistics, player demographics, and emerging global trends inside the sCool environment."),
     
     html.Hr(),
     html.Br(),
     
     html.H5( children = [ html.I(className="fas " + iconNameGroups + " p-right_xx-small"),   "Groups"  ] ),
-    html.P("This tab is only visible for admins"),
-    html.P("Compare groups (classes) for quick informations"),
-    html.P("Main group (class) is highlighted with application theme"),
-    html.P("The minimum values of others are highlighted"),
-    html.P("Distribution : distribution of various features"),
+    html.P("Only visible for admins!"),
+    html.P("The Details tab empowers administrators with a powerful tool to compare classes and gain valuable insights into their performance. This tab offers a range of features that enable administrators to examine classes from different perspectives and make data-driven decisions for further development and other possible changes to the web application."),
     
     html.Hr(),
     html.Br(),
 
     html.H5( children = [ html.I(className="fas " + iconNameTutorial + " p-right_xx-small"),   "Tutorial"  ] ),
-    html.P("Starting screen where the UI is shortly explained"),
+    html.P("Visible for admins and educators!"),
+    html.P("The Tutorial serves as an introduction to the user interface (UI), ensuring a seamless and user-friendly experience right from the beginning. Designed for both new users and those seeking a refresher, this tab provides a concise overview of the key features and functionalities available. Users can quickly familiarize themselves with the layout, navigation options, and various interactive elements of the web app. "),
     
     html.Hr(),
     html.Br(),
     
     html.H5( children = [ html.I(className="fas " + iconNameDetails + " p-right_xx-small"),   "Classes"  ] ),
-    html.P("Learning Activity details"),
-    html.P("Information about the class selected. Information like task completed, points etc as a class."),
+    html.P("Visible for admins and educators!"),
+    html.P("The Classes tab offers users a convenient way to access and explore specific class-related information. With this tab, users can select a desired class from a list and gain access to high-value information and resources about the class. From class performances, current task assignments, and time spent in theory or practice, to granted points and much more."),
     
     html.Hr(),
     html.Br(),
     
     html.H5( children = [ html.I(className="fas " + iconNameStudents + " p-right_xx-small"),   "Students"  ] ),
-    html.P("Learning Activity Student details"),
-    html.P("Information about a student in a Class. Detailed information about the student. Select features to view more information from multi select picklist"),
-    html.P("Student Timeline :- shows the student game interactions at time details for each interaction"),
+    html.P("Visible for admins and educators!"),
+    html.P("The Students tab provides users with the ability to select a specific class and then access individual student profiles within that class. This powerful feature allows users to gain detailed insights into each student's performance, progress, and engagement. Users can access a wealth of personalized information such as learned skills, task submissions, and participation levels via a timeline."),
     
     html.Hr(),
     html.Br(),
     
     html.H5( children = [ html.I(className="fas " + iconNameCustom + " p-right_xx-small"),   "Custom"  ] ),
-    html.P("Create custom figures specifying various parameters"),
-    html.P( children = [ html.I(className="fas fa-chart-bar font-size_medium p-right_xx-small"),   "Bar"  ]),
-    html.P( children = [ html.I(className="fas fa-circle font-size_medium p-right_xx-small"),   "Scatter"  ] ),
-    html.P( children = [ html.I(className="fas fa-ellipsis-h font-size_medium p-right_xx-small"),   "Bubble" , " : values in third feature determines the size of points in the bubble plot (for e.g. Points1 = 50 has a larger point in the graph than Points2 = 10) " ] ),
-    html.P( children = [ html.I(className="fas fa-chart-line font-size_medium p-right_xx-small"),   "Line" ] ),
-    html.P( children = [ html.I(className="fas fa-table font-size_medium p-right_xx-small"),   "Table", " : multi select features to display values in a table " ] ),
+    html.P("Visible for admins and educators!"),
+    html.P("The Custom tab empowers users to create personalized and dynamic graphs that showcase information about the classes and/or students they have access. Users can create: "),
+    html.P( children = [ html.I(className="fas fa-chart-bar font-size_medium p-right_xx-small"),   "Barcharts"  ]),
+    html.P( children = [ html.I(className="fas fa-circle font-size_medium p-right_xx-small"),   "Scatterplots"  ] ),
+    html.P( children = [ html.I(className="fas fa-ellipsis-h font-size_medium p-right_xx-small"),   "Bubblecharts" ] ),
+    html.P( children = [ html.I(className="fas fa-chart-line font-size_medium p-right_xx-small"),   "Linecharts" ] ),
+    html.P( children = [ html.I(className="fas fa-table font-size_medium p-right_xx-small"),   "Tables" ] ),
     
        
     html.Hr(),
