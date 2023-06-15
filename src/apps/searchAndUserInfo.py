@@ -38,26 +38,6 @@ dfStudentDetails                      = studentGrouped.dfStudentDetails
 getStudentsOfLearningActivity         = studentGrouped.getStudentsOfLearningActivity
 
 
-"""
-#----------------------------------------------------------------------------------------------------------------------
-# Function to check wether student is in a class
-# params:   StudentId       (int) - integer containing student ID
-#           schoolKey       (int) - integer containing class ID
-# returns:  Boolean stating if student is in class or not
-def isStudentInClass(studentId, classId) :
-    try:
-        groupStudents = getStudentsOfLearningActivity(classId)
-        if not studentId in groupStudents:
-            return False
-        return True
-
-    except Exception as e:
-        subprocess.Popen(['echo', 'isStudentInClass Exception'])
-        subprocess.Popen(['echo', str(e)]) 
-        print(e)
-"""
-
-
 #----------------------------------------------------------------------------------------------------------------------
 # top navbar layout - used in main layout (located in index.py)
 navbar = html.Div(
@@ -82,7 +62,7 @@ navbar = html.Div(
                         ),
                         width = 4,
                     ),
-                    dbc.Col([html.Div(constants.navbarTestUsername, className="navbar-username"), html.Div(constants.navbarTestRole, className="navbar-userrole")], id = "user-info-name-role", width = 3),
+                    dbc.Col([html.Div(constants.navbarTestUsername, id = "navbar-username", className="navbar-username"), html.Div(constants.navbarTestRole, id = "navbar-userrole", className="navbar-userrole")], id = "user-info-name-role", width = 3),
                     dbc.Col(html.Img(src="/assets/user-icon.png", height="50px"), id = "user-info-icon", width = 1),
                 ],
                 align="center"
@@ -114,7 +94,7 @@ def update_options(searchInput):
                 studentName = row['Name']
                 studentId = row['StudentId']
 
-                options.append({"label": studentName, "value": ("student-" + str(classId) + "-" + str(studentId)), "title": "Student"})
+                options.append({"label": studentName, "value": ("student-" + str(classId) + "-" + str(studentId)), "title": "Student - " + className})
         
         options.append({"label": "Tutorial", "value": "tab-menu-link-2",  "title": "Tab"})
         options.append({"label": "Classes",  "value": "tab-menu-link-3",  "title": "Tab"})
@@ -140,6 +120,33 @@ def update_options(n_clicks, searchValue):
         if triggered_id == 'navbar-search-button.n_clicks':
             return searchValue
     return dash.no_update
+
+
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function to manipulate 
+# params:   pathname         (string) - string containing the pathname (used only as trigger)
+# returns:  
+@app.callback([Output("navbar-username", "children"), Output("navbar-userrole", "children")], 
+              [Input("url", "pathname")],
+)
+def setMenuClassOnLogin(pathname):   
+    
+    if current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated  :
+
+        isUserAdmin = False    
+        
+        userDB = studentGrouped.getUserFromUserId(current_user.id)
+        
+        if  userDB is not None:        
+            if userDB['IsAdmin']:
+                isUserAdmin = True
+
+        if isUserAdmin:
+            return [userDB['UserName'], constants.navbarAdmin]
+        else:
+            return [userDB['UserName'], constants.navbarEducator]
+            
+    return [dash.no_update, dash.no_update]
 
 
 app.clientside_callback(

@@ -30,9 +30,9 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State, ALL
 
-from flask_login import logout_user, current_user, LoginManager, UserMixin
+from flask_login import logout_user, current_user
 
-from app import app, login_manager, User
+from app import app
 import constants
 from data import studentGrouped
 
@@ -1540,6 +1540,18 @@ layout = html.Div(
 
 
 #----------------------------------------------------------------------------------------------------------------------
+# Callback function to manipulate 
+# params:   pathname         (string) - string containing the pathname (used only as trigger)
+# returns:  
+@app.callback(Output("learning-activity-selection-div", "children"), 
+              [Input("url", "pathname")],
+)
+def create_class_selection_buttons(pathname):
+    
+    return createUserLAOptionsButtons()
+
+
+#----------------------------------------------------------------------------------------------------------------------
 @app.callback([Output('learning-activity-selection-div', 'className'), Output('select-a-class-heading', 'children'),
                Output('button-select-other-la-div', 'className'), Output('classes-overview-container', 'className'),
                Output('classes-task-information-container', 'className'), Output('classes-general-container', 'className'),
@@ -1550,7 +1562,7 @@ layout = html.Div(
                Output('classes-code-submission-hr', 'className'), Output('classes-concept-hr', 'className'),
                Output('classes-stats-hr', 'className')],
               [Input({"button-type": "select-classes-button", "class-id": ALL}, "n_clicks"), Input({"button-type": "select-other-classes-button"}, "n_clicks")])
-def showHideLearningActivitySelectionButtons(*args):
+def show_hide_classes_tab_content(*args):
 
     ctx = dash.callback_context
     if ctx.triggered:
@@ -1562,7 +1574,14 @@ def showHideLearningActivitySelectionButtons(*args):
         dictionary_str = triggered_id[start_index:end_index]
         triggered_id_dict = json.loads(dictionary_str)
 
-        if triggered_id_dict["button-type"] == "select-classes-button":
+        someButtonWasPressed = False
+        for clickinfo in args[0]:
+            if clickinfo is not None:
+                someButtonWasPressed = True
+        if args[1] is not None:
+            someButtonWasPressed = True
+
+        if triggered_id_dict["button-type"] == "select-classes-button" and someButtonWasPressed:
             class_id = triggered_id_dict["class-id"]
             return ["m-top_small m-left-right-small choose-learning-activity-buttons hidden", getButtonLabel(class_id),
                     "m-top_small m-left-right-small choose-learning-activity-buttons", "c-table m-left-right-medium",
@@ -1585,7 +1604,7 @@ def showHideLearningActivitySelectionButtons(*args):
 #----------------------------------------------------------------------------------------------------------------------
 @app.callback(Output('classes-overview-container', 'children'), 
               Input({"button-type": "select-classes-button", "class-id": ALL}, "n_clicks"))
-def setClassOverview(n_clicks):
+def set_class_overview(n_clicks):
 
     graphs = []
     ctx = dash.callback_context
@@ -1598,7 +1617,12 @@ def setClassOverview(n_clicks):
         dictionary_str = triggered_id[start_index:end_index]
         triggered_id_dict = json.loads(dictionary_str)
 
-        if triggered_id_dict["button-type"] == "select-classes-button":
+        someButtonWasPressed = False
+        for clickinfo in n_clicks:
+            if clickinfo is not None:
+                someButtonWasPressed = True
+
+        if triggered_id_dict["button-type"] == "select-classes-button" and someButtonWasPressed:
             class_id = triggered_id_dict["class-id"]
             graphs = plotClassOverview(class_id, '')
             graphs = graphs + plotStudentsList(class_id, '')
@@ -1622,7 +1646,12 @@ def display_graphs(n_clicks):
         dictionary_str = triggered_id[start_index:end_index]
         triggered_id_dict = json.loads(dictionary_str)
 
-        if triggered_id_dict["button-type"] == "select-classes-button":
+        someButtonWasPressed = False
+        for clickinfo in n_clicks:
+            if clickinfo is not None:
+                someButtonWasPressed = True
+
+        if triggered_id_dict["button-type"] == "select-classes-button" and someButtonWasPressed:
             class_id = triggered_id_dict["class-id"]
             graphs = plotSingleClass('School', class_id, '')
 
@@ -1645,7 +1674,12 @@ def display_class_general(n_clicks):
         dictionary_str = triggered_id[start_index:end_index]
         triggered_id_dict = json.loads(dictionary_str)
 
-        if triggered_id_dict["button-type"] == "select-classes-button":
+        someButtonWasPressed = False
+        for clickinfo in n_clicks:
+            if clickinfo is not None:
+                someButtonWasPressed = True
+
+        if triggered_id_dict["button-type"] == "select-classes-button" and someButtonWasPressed:
             class_id = triggered_id_dict["class-id"]
             graphs = plotSingleClassGeneral('School', class_id, '')
 
@@ -1668,7 +1702,12 @@ def display_class_concept(n_clicks):
         dictionary_str = triggered_id[start_index:end_index]
         triggered_id_dict = json.loads(dictionary_str)
 
-        if triggered_id_dict["button-type"] == "select-classes-button":
+        someButtonWasPressed = False
+        for clickinfo in n_clicks:
+            if clickinfo is not None:
+                someButtonWasPressed = True
+
+        if triggered_id_dict["button-type"] == "select-classes-button" and someButtonWasPressed:
             class_id = triggered_id_dict["class-id"]
             graphs = plotGroupConceptDetails(class_id, '')
 
@@ -1679,7 +1718,7 @@ def display_class_concept(n_clicks):
 #On Select a Group - set Group Task Done Options - see task wise information             
 @app.callback([Output("classes-taskId-selector", "options")],
               Input({"button-type": "select-classes-button", "class-id": ALL}, "n_clicks"))
-def onSelectGroupSetTaskOptions(n_clicks):
+def on_select_group_set_task_options(n_clicks):
 
     ctx = dash.callback_context
     if ctx.triggered:
@@ -1691,7 +1730,12 @@ def onSelectGroupSetTaskOptions(n_clicks):
         dictionary_str = triggered_id[start_index:end_index]
         triggered_id_dict = json.loads(dictionary_str)
 
-        if triggered_id_dict["button-type"] == "select-classes-button":
+        someButtonWasPressed = False
+        for clickinfo in n_clicks:
+            if clickinfo is not None:
+                someButtonWasPressed = True
+
+        if triggered_id_dict["button-type"] == "select-classes-button" and someButtonWasPressed:
             class_id = triggered_id_dict["class-id"]
             clicked_button['buttonID'] = class_id
             return [getGroupPTaskDoneOptions(class_id , '')]
@@ -1702,7 +1746,7 @@ def onSelectGroupSetTaskOptions(n_clicks):
 #----------------------------------------------------------------------------------------------------------------------
 @app.callback([Output("classes-taskId-container", "children")],
               [Input("classes-taskId-selector", "value")])
-def onSelectTaskShowTaskWiseConcept(taskId):
+def on_select_task_show_task_wise_concept(taskId):
 
     graphs = []
     
@@ -1728,7 +1772,14 @@ def update_download_link__details_group(*args):
         dictionary_str = triggered_id[start_index:end_index]
         triggered_id_dict = json.loads(dictionary_str)
 
-        if triggered_id_dict["button-type"] == "select-classes-button":
+        someButtonWasPressed = False
+        for clickinfo in args[0]:
+            if clickinfo is not None:
+                someButtonWasPressed = True
+        if args[1] is not None:
+            someButtonWasPressed = True
+
+        if triggered_id_dict["button-type"] == "select-classes-button" and someButtonWasPressed:
             class_id = triggered_id_dict["class-id"]
             csv_string = ""
             try:

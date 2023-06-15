@@ -803,11 +803,11 @@ layout = [
 #           initialClassDate         (string) - string containing date dropdown className
 #           initialClassDir          (string) - string containing sort order dropdown value
 # returns:  list of classNames and childrens of various components
-@app.callback([Output('students-learning-activity-selection-div', 'className'), Output('students-select-a-class-heading', 'children'),
-               Output('students-button-select-other-la-div', 'className'),      Output('students-select-a-student-heading-div', 'className'),
-               Output('students-selection-div', 'children'),                    Output('students-selection-div', 'className'),
-               Output('students-select-a-student-heading', 'children'),         Output('students-button-select-other-student-div', 'className'),
-               Output('students-overview', 'className'),
+@app.callback([Output('students-learning-activity-selection-div', 'className'), Output('students-learning-activity-selection-div', 'children'),
+               Output('students-select-a-class-heading', 'children'),           Output('students-button-select-other-la-div', 'className'),
+               Output('students-select-a-student-heading-div', 'className'),    Output('students-selection-div', 'children'),
+               Output('students-selection-div', 'className'),                   Output('students-select-a-student-heading', 'children'),
+               Output('students-button-select-other-student-div', 'className'), Output('students-overview', 'className'),
                Output('students-date-dropdown-div', 'className'),               Output('students-sort-order-dropdown-div', 'className'),
                Output('students_details_download_link-A', 'className'),         Output('Students-Container', 'className'),
 
@@ -879,10 +879,10 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
             initialClassDirS.discard('disabled')
 
             return ["m-top_small m-left-right-small choose-learning-activity-buttons hidden", dash.no_update,
-                    "m-top_small m-left-right-small choose-learning-activity-buttons", "stick-on-top-of-page",
-                    [], "m-top_small m-left-right-small choose-students-buttons hidden",
-                    getButtonLabel(currentStudentGlobal), "m-top_small m-left-right-small choose-students-buttons", 
-                    "c-container m-left-right-medium",
+                    dash.no_update, "m-top_small m-left-right-small choose-learning-activity-buttons",
+                    "stick-on-top-of-page", [],
+                    "m-top_small m-left-right-small choose-students-buttons hidden", getButtonLabel(currentStudentGlobal),
+                    "m-top_small m-left-right-small choose-students-buttons", "c-container m-left-right-medium",
                     "c-container", "c-container",
                     "m-left-right-medium", "c-container p-bottom_15 m-left-right-medium",
                     student_overview_graphs, "c-container m-left-right-medium m-bottom_medium",
@@ -900,15 +900,20 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
         dictionary_str = triggered_id[start_index:end_index]
         triggered_id_dict = json.loads(dictionary_str)
 
-        if triggered_id_dict["button-type"] == "students-select-classes-button" and triggered_id_dict["class-id"] >= 0:
+        someClassesButtonWasPressed = False
+        for clickinfo in classes_n_clicks:
+            if clickinfo is not None:
+                someClassesButtonWasPressed = True
+
+        if triggered_id_dict["button-type"] == "students-select-classes-button" and triggered_id_dict["class-id"] >= 0 and someClassesButtonWasPressed:
             class_id = triggered_id_dict["class-id"]
             currentClassGlobal = class_id
 
-            return ["m-top_small m-left-right-small choose-learning-activity-buttons hidden", classes.getButtonLabel(class_id),
-                    "m-top_small m-left-right-small choose-learning-activity-buttons", "stick-on-top-of-page",
-                    createStudentButtonsFromClassId(class_id), "m-top_small m-left-right-small choose-students-buttons",
-                    "Select a Student", "m-top_small m-left-right-small choose-students-buttons hidden", 
-                    "c-container m-left-right-medium hidden",
+            return ["m-top_small m-left-right-small choose-learning-activity-buttons hidden", createUserLAOptionsButtons(),
+                    classes.getButtonLabel(class_id), "m-top_small m-left-right-small choose-learning-activity-buttons",
+                    "stick-on-top-of-page", createStudentButtonsFromClassId(class_id),
+                    "m-top_small m-left-right-small choose-students-buttons", "Select a Student",
+                    "m-top_small m-left-right-small choose-students-buttons hidden", "c-container m-left-right-medium hidden",
                     "c-container hidden", "c-container hidden",
                     "m-left-right-medium hidden", "c-container p-bottom_15 m-left-right-medium hidden",
                     [], "c-container m-left-right-medium m-bottom_medium hidden",
@@ -954,10 +959,10 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
             initialClassDirS.discard('disabled')
 
             return ["m-top_small m-left-right-small choose-learning-activity-buttons hidden", dash.no_update,
-                    "m-top_small m-left-right-small choose-learning-activity-buttons", "stick-on-top-of-page",
-                    [], "m-top_small m-left-right-small choose-students-buttons hidden",
-                    getButtonLabel(student_id), "m-top_small m-left-right-small choose-students-buttons", 
-                    "c-container m-left-right-medium",
+                    dash.no_update, "m-top_small m-left-right-small choose-learning-activity-buttons",
+                    "stick-on-top-of-page", [],
+                    "m-top_small m-left-right-small choose-students-buttons hidden", getButtonLabel(student_id),
+                    "m-top_small m-left-right-small choose-students-buttons", "c-container m-left-right-medium",
                     "c-container", "c-container",
                     "m-left-right-medium", "c-container p-bottom_15 m-left-right-medium",
                     student_overview_graphs, "c-container m-left-right-medium m-bottom_medium",
@@ -973,10 +978,10 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
             currentStudentGlobal = -1
 
             return ["m-top_small m-left-right-small choose-learning-activity-buttons hidden", dash.no_update,
-                    "m-top_small m-left-right-small choose-learning-activity-buttons", "stick-on-top-of-page",
-                    createStudentButtonsFromClassId(currentClassGlobal), "m-top_small m-left-right-small choose-students-buttons",
-                    "Select a Student", "m-top_small m-left-right-small choose-students-buttons hidden", 
-                    "c-container m-left-right-medium hidden",
+                    dash.no_update, "m-top_small m-left-right-small choose-learning-activity-buttons",
+                    "stick-on-top-of-page", createStudentButtonsFromClassId(currentClassGlobal),
+                    "m-top_small m-left-right-small choose-students-buttons", "Select a Student",
+                    "m-top_small m-left-right-small choose-students-buttons hidden", "c-container m-left-right-medium hidden",
                     "c-container hidden", "c-container hidden",
                     "m-left-right-medium hidden", "c-container p-bottom_15 m-left-right-medium hidden",
                     [], "c-container m-left-right-medium m-bottom_medium hidden",
@@ -991,11 +996,11 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
     currentClassGlobal = -1
     currentStudentGlobal = -1
 
-    return ["m-top_small m-left-right-small choose-learning-activity-buttons", "Select a Class",
-            "m-top_small m-left-right-small choose-learning-activity-buttons hidden", "stick-on-top-of-page hidden",
-            [], "m-top_small m-left-right-small choose-students-buttons hidden",
-            "Select a Student", "m-top_small m-left-right-small choose-students-buttons hidden", 
-            "c-container m-left-right-medium hidden",
+    return ["m-top_small m-left-right-small choose-learning-activity-buttons", createUserLAOptionsButtons(),
+            "Select a Class", "m-top_small m-left-right-small choose-learning-activity-buttons hidden",
+            "stick-on-top-of-page hidden", [],
+            "m-top_small m-left-right-small choose-students-buttons hidden", "Select a Student",
+            "m-top_small m-left-right-small choose-students-buttons hidden", "c-container m-left-right-medium hidden",
             "c-container hidden", "c-container hidden",
             "m-left-right-medium hidden", "c-container p-bottom_15 m-left-right-medium hidden",
             [], "c-container m-left-right-medium m-bottom_medium hidden",

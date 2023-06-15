@@ -111,7 +111,7 @@ def getMenu():
     countMenuSubLink = 0
     
     isUserAdmin = False  
-    
+
     if current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated:
         userDB = studentGrouped.getUserFromUserId(current_user.id)
         
@@ -312,7 +312,7 @@ def setMenuClassOnLogin(pathname):
 
     menuLinksCount = len(menuLink.keys())
     newClasses = ['m-top_x-small'] * menuLinksCount
-    
+
     if current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated  :
 
         isUserAdmin = False    
@@ -322,7 +322,7 @@ def setMenuClassOnLogin(pathname):
         if  userDB is not None:        
             if userDB['IsAdmin']:
                 isUserAdmin = True
-        
+
         for index, menuKey in enumerate(menuLink):
             currentMenu = menuLink.get(menuKey)
             newClasses[index] = "hidden-v "  if    not isUserAdmin   and   currentMenu.get(keyOnlyForAdmin)   else   "m-top_x-small"

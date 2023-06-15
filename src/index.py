@@ -12,7 +12,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 
-from flask_login import logout_user, current_user, LoginManager, UserMixin
+from flask_login import logout_user, current_user
 
 from app import app, server, login_manager, User
 from apps import groups, custom, home, sidebar, login, searchAndUserInfo, classes, students, tutorial
@@ -34,7 +34,7 @@ dfUser                  =  studentGrouped.dfUser
 def load_user(usernameOrId):
     userDB = studentGrouped.getUserFromUserId(usernameOrId)
     
-    if  userDB is not None:        
+    if  userDB is not None:
         return User(userDB['UserName'], userDB['Id'], active = True, isAdmin = userDB['IsAdmin'], securityStamp = userDB['SecurityStamp'])
 
 

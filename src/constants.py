@@ -674,8 +674,8 @@ labelSelectLA = 'Select Learning Activity'
 navbarEducator = "Educator"
 navbarAdmin = "Admin"
 
-navbarTestUsername = "Markus Zangl"
-navbarTestRole = "Admin"
+navbarTestUsername = "Username"
+navbarTestRole = "Role"
 
 
 
