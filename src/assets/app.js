@@ -51,7 +51,7 @@ window.dash_clientside.ui = {
 				setTimeout(function() {
 					button = document.getElementById(buttonString);
 					button.click();
-				}, 800);
+				}, 900);
 			} else if (newValueSplit[0] == "student") {
 				var button = document.getElementById("menu-link-4");
 				button.click();
@@ -63,8 +63,8 @@ window.dash_clientside.ui = {
 					setTimeout(function() {
 						button = document.getElementById(buttonString);
 						button.click();
-					}, 800);
-				}, 800);
+					}, 900);
+				}, 900);
 			}
 		}
         return "Learning Analytics Web Application";

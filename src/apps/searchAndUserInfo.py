@@ -23,20 +23,19 @@ from app import app
 import constants
 from data import studentGrouped
 
-from apps import settings, classes
+from apps import settings, classes, advancedUserInfo
 import subprocess
 
-external_scripts = [
-    {
-        'src': '/assets/clickClassesButton.js'
-    }
-]
 
 #----------------------------------------------------------------------------------------------------------------------
 # global constants
 dfStudentDetails                      = studentGrouped.dfStudentDetails
 getStudentsOfLearningActivity         = studentGrouped.getStudentsOfLearningActivity
 
+
+
+def getUserInfoLayout():
+    return advancedUserInfo.layout
 
 #----------------------------------------------------------------------------------------------------------------------
 # top navbar layout - used in main layout (located in index.py)
@@ -63,15 +62,38 @@ navbar = html.Div(
                         width = 4,
                     ),
                     dbc.Col([html.Div(constants.navbarTestUsername, id = "navbar-username", className="navbar-username"), html.Div(constants.navbarTestRole, id = "navbar-userrole", className="navbar-userrole")], id = "user-info-name-role", width = 3),
-                    dbc.Col(html.Img(src="/assets/user-icon.png", height="50px"), id = "user-info-icon", width = 1),
+                    dbc.Col(html.Button(html.Img(src="/assets/user-icon.png", height="50px"), id = "user-info-button", className = "welcome-button"), id = "user-info-icon", width = 1),
                 ],
                 align="center"
+            ),
+            dbc.Modal(
+                    [
+                        dbc.ModalHeader("User Information"),
+                        dbc.ModalBody(children = getUserInfoLayout()),
+                        dbc.ModalFooter(
+                            dbc.Button("Close", id="user-info-button-close", className="ml-auto")
+                        ),
+                    ],
+                    id="user-info-modal",
+                    className = "c-modal-large"
             )
         ],
         className="page-navbar-margin-top"
     ),
     className="page-navbar"
 )
+
+
+@app.callback(
+    Output("user-info-modal", "is_open"),
+    [Input("user-info-button", "n_clicks"), Input("user-info-button-close", "n_clicks")],
+    [State("user-info-modal", "is_open")],
+)
+def toggle_user_info_modal(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
+
 
 
 @app.callback(

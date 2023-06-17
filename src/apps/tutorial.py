@@ -19,29 +19,31 @@ import constants
 # welcome tab layout - used in main layout (located in index.py)
 layout = html.Div([
 
-    html.H1(constants.welcomeHeading, className = "welcome-heading"),
-    html.P(constants.welcomeText, className = "welcome-paragraph"),
+    html.Div(html.H1('Tutorial', id = 'tutorial-heading', className = "align-center"), className = "stick-on-top-of-page"),
 
-    html.H2(constants.tutorialHeading, className = "welcome-heading-tutorial"),
-    html.P(constants.tutorialText, className = "welcome-paragraph"),
+    html.H1(constants.welcomeHeading, className = "welcome-heading m-left-right-medium m-top_small"),
+    html.P(constants.welcomeText, className = "welcome-paragraph m-left-right-medium"),
 
-    html.Button(html.H3(constants.searchBarHeading, className = "welcome-heading-smaller"), id = "search-bar-heading-button", className = "welcome-button"),
-    html.P(constants.searchBarText, id = "search-bar-text", className = "welcome-paragraph"),
+    html.H2(constants.tutorialHeading, className = "welcome-heading-tutorial m-left-right-medium"),
+    html.P(constants.tutorialText, className = "welcome-paragraph m-left-right-medium"),
 
-    html.Button(html.H3(constants.userInformationHeading, className = "welcome-heading-smaller"), id = "user-information-heading-button", className = "welcome-button"),
-    html.P(constants.userInformationText, className = "welcome-paragraph"),
+    html.Button(html.H3(constants.searchBarHeading, className = "welcome-heading-smaller"), id = "search-bar-heading-button", className = "welcome-button m-left-right-medium"),
+    html.P(constants.searchBarText, id = "search-bar-text", className = "welcome-paragraph m-left-right-medium"),
 
-    html.Button(html.H3(constants.websiteTabsHeading, className = "welcome-heading-smaller"), id = "website-tabs-heading-button", className = "welcome-button"),
-    html.P(constants.websiteTabsText, className = "welcome-paragraph"),
-    html.P(constants.tutorialTabText, className = "welcome-paragraph"),
-    html.P(constants.classesTabText, className = "welcome-paragraph"),
-    html.P(constants.studentsTabText, className = "welcome-paragraph"),
-    html.P(constants.customTabText, className = "welcome-paragraph"),
+    html.Button(html.H3(constants.userInformationHeading, className = "welcome-heading-smaller"), id = "user-information-heading-button", className = "welcome-button m-left-right-medium"),
+    html.P(constants.userInformationText, className = "welcome-paragraph m-left-right-medium"),
 
-    html.Button(html.H3(constants.infoIconHeading, className = "welcome-heading-smaller"), id = "info-icon-heading-button", className = "welcome-button"),
-    html.P(constants.infoIconText, className = "welcome-paragraph")
+    html.Button(html.H3(constants.websiteTabsHeading, className = "welcome-heading-smaller"), id = "website-tabs-heading-button", className = "welcome-button m-left-right-medium"),
+    html.P(constants.websiteTabsText, className = "welcome-paragraph m-left-right-medium"),
+    html.P(constants.tutorialTabText, className = "welcome-paragraph m-left-right-medium"),
+    html.P(constants.classesTabText, className = "welcome-paragraph m-left-right-medium"),
+    html.P(constants.studentsTabText, className = "welcome-paragraph m-left-right-medium"),
+    html.P(constants.customTabText, className = "welcome-paragraph m-left-right-medium"),
 
-    ], id = "welcome-div", className = "m_medium"
+    html.Button(html.H3(constants.infoIconHeading, className = "welcome-heading-smaller"), id = "info-icon-heading-button", className = "welcome-button m-left-right-medium"),
+    html.P(constants.infoIconText, className = "welcome-paragraph m-left-right-medium")
+
+    ], id = "welcome-div"
 )
 
 
