@@ -949,6 +949,10 @@ html {
 	border: 3px solid rgb(255, 0, 0);
 }
 
+.custom-span {
+	font-size: 18px;
+}
+
 .normal-paragraph {
 	font-size: 16px;
 	margin-bottom: 8px;

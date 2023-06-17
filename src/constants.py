@@ -44,24 +44,30 @@ languageLocal               = "en"
 #-- main key value
 #---------------------------------------------------------------
 
-keyLabel                    = 'label'
-keyHref                     = 'href'
-keySubmenu                  = 'submenu'
-keyValue                    = 'value'
-keyScrollTo                 = 'scrollTo'
-keyClassName                = 'className'
-keyHasMeanStd               = 'hasMeanStd'
-keyIsAxisEnabled            = 'isAxisEnabled'
-keyIsFeature3Enabled        = 'isFeature3Enabled'
-keyIsDistributionEnabled    = 'isDistributionEnabled'
-keyIsMultiFeatureEnabled    = 'isMultiFeatureEnabled'
-keyIsDccGraph               = 'isDccGraph'
-keyColor                    = 'color'
-keyBackgroundColor          = 'backgroundColor'
-keyExpress                  = 'express'
-keyLight                    = 'light'
-keyIsDefault                = 'isDefault'
-keyOnlyForAdmin             = 'onlyForAdmin'
+keyLabel                    		= 'label'
+keyHref                     		= 'href'
+keySubmenu                  		= 'submenu'
+keyValue                    		= 'value'
+keyScrollTo                 		= 'scrollTo'
+keyClassName                		= 'className'
+keyHasMeanStd               		= 'hasMeanStd'
+keyIsDataBasedOn					= 'keyIsDataBasedOn'
+keyIsAxisDataLabelEnabled			= 'keyIsAxisDataLabelEnabled'
+keyIsAxisDataRowEnabled				= 'keyIsAxisDataRowEnabled'
+keyIsAxisEnabled            		= 'isAxisEnabled'
+keyIsFeature3Enabled        		= 'isFeature3Enabled'
+keyIsGraphOrientationLabelEnabled 	= 'keyIsGraphOrientationLabelEnabled'
+keyIsDistributionLabelEnabled 		= 'isDistributionLabelEnabled'
+keyIsDistributionEnabled    		= 'isDistributionEnabled'
+keyIsMultiFeatureLabelEnabled		= 'keyIsMultiFeatureLabelEnabled'
+keyIsMultiFeatureEnabled    		= 'isMultiFeatureEnabled'
+keyIsDccGraph               		= 'isDccGraph'
+keyColor                    		= 'color'
+keyBackgroundColor          		= 'backgroundColor'
+keyExpress                  		= 'express'
+keyLight                    		= 'light'
+keyIsDefault                		= 'isDefault'
+keyOnlyForAdmin             		= 'onlyForAdmin'
 
 
 
@@ -555,7 +561,7 @@ labelStudentTimeline        = "Student Timeline"
 
 
 FigureTypeScatter           = 'Scatter'
-FigureTypePie               = 'Pie.'
+FigureTypePie               = 'Pie'
 FigureTypeBar               = 'Bar'
 FigureTypeLine              = 'Line'
 FigureTypeBubble            = 'Bubble'
@@ -572,50 +578,75 @@ PlotDistributionAll         = "all"
 
 
 FigureTypes                 = {
-     FigureTypeBar      : { keyLabel        : FigureTypeBar, 
-                   keyValue                 : FigureTypeBar,
-                  keyIsAxisEnabled          : True,
-                  keyIsFeature3Enabled      : False,
-                  keyIsDistributionEnabled  : False  ,
-                  keyIsMultiFeatureEnabled  : False ,
-                  keyIsDccGraph             : True,       }
+     FigureTypeBar      : { keyLabel        		: FigureTypeBar,
+                   keyValue                 		: FigureTypeBar,
+				  keyIsDataBasedOn					: False,
+                  keyIsAxisEnabled          		: True,
+                  keyIsAxisDataLabelEnabled			: True,
+                  keyIsAxisDataRowEnabled			: True,
+                  keyIsFeature3Enabled      		: False,
+                  keyIsGraphOrientationLabelEnabled : True,
+                  keyIsDistributionLabelEnabled 	: False,
+                  keyIsDistributionEnabled  		: False,
+                  keyIsMultiFeatureLabelEnabled 	: False,
+                  keyIsMultiFeatureEnabled  		: False,
+                  keyIsDccGraph             		: True,     }
     ,   
-     FigureTypeScatter : { keyLabel             : FigureTypeScatter, 
-                  keyValue                      : FigureTypeScatter,
-                  keyIsAxisEnabled              : True,
-                  keyIsFeature3Enabled          : False,
-                  keyIsDistributionEnabled      : True  ,
-                  keyIsMultiFeatureEnabled      : False  ,
-                  keyIsDccGraph                 : True,       }
-#    ,   
-#     FigureTypePie      : { keyLabel      : FigureTypePie, 
-#                   keyValue     : FigureTypePie,
-#                  keyIsAxisEnabled : False,
-#                  keyIsFeature3Enabled : False  }
+     FigureTypeScatter : { keyLabel             	: FigureTypeScatter, 
+                  keyValue                      	: FigureTypeScatter,
+				  keyIsDataBasedOn					: False,
+                  keyIsAxisEnabled              	: True,
+                  keyIsAxisDataLabelEnabled			: True,
+                  keyIsAxisDataRowEnabled			: True,
+                  keyIsFeature3Enabled          	: False,
+                  keyIsGraphOrientationLabelEnabled : True,
+                  keyIsDistributionLabelEnabled 	: True,
+                  keyIsDistributionEnabled      	: True,
+                  keyIsMultiFeatureLabelEnabled 	: False,
+                  keyIsMultiFeatureEnabled      	: False,
+                  keyIsDccGraph                 	: True,     }
     ,   
-     FigureTypeBubble     : { keyLabel      : FigureTypeBubble, 
-                   keyValue                 : FigureTypeBubble,
-                  keyIsAxisEnabled          : True,
-                  keyIsFeature3Enabled      : True,
-                  keyIsDistributionEnabled  : False ,
-                  keyIsMultiFeatureEnabled  : False   }
+     FigureTypeBubble     : { keyLabel      		: FigureTypeBubble, 
+                   keyValue                 		: FigureTypeBubble,
+				  keyIsDataBasedOn					: False,
+                  keyIsAxisEnabled          		: True,
+                  keyIsAxisDataLabelEnabled			: True,
+                  keyIsAxisDataRowEnabled			: True,
+                  keyIsFeature3Enabled      		: True,
+                  keyIsGraphOrientationLabelEnabled : True,
+                  keyIsDistributionLabelEnabled 	: False,
+                  keyIsDistributionEnabled  		: False,
+                  keyIsMultiFeatureLabelEnabled 	: False,
+                  keyIsMultiFeatureEnabled  		: False   	}
     ,   
-     FigureTypeLine     : { keyLabel        : FigureTypeLine, 
-                   keyValue                 : FigureTypeLine,
-                  keyIsAxisEnabled          : True,
-                  keyIsFeature3Enabled      : False ,
-                  keyIsDistributionEnabled  : False ,
-                  keyIsMultiFeatureEnabled  : False,
-                  keyIsDccGraph             : True,      }
-    ,   
-     FigureTypeTable     : { keyLabel       : FigureTypeTable, 
-                   keyValue                 : FigureTypeTable,
-                  keyIsAxisEnabled          : False,
-                  keyIsFeature3Enabled      : False ,
-                  keyIsDistributionEnabled  : False ,
-                  keyIsMultiFeatureEnabled  : True,
-                  keyIsDccGraph             : False, 
-                  keyClassName              : " col-sm-12 " }
+     FigureTypeLine     : { keyLabel        		: FigureTypeLine, 
+                   keyValue                 		: FigureTypeLine,
+				  keyIsDataBasedOn					: False,
+                  keyIsAxisEnabled          		: True,
+                  keyIsAxisDataLabelEnabled			: True,
+                  keyIsAxisDataRowEnabled			: True,
+                  keyIsFeature3Enabled      		: False,
+                  keyIsGraphOrientationLabelEnabled : True,
+                  keyIsDistributionLabelEnabled 	: False,
+                  keyIsDistributionEnabled  		: False,
+                  keyIsMultiFeatureLabelEnabled 	: False,
+                  keyIsMultiFeatureEnabled  		: False,
+                  keyIsDccGraph             		: True,     }
+    ,
+     FigureTypeTable     : { keyLabel       		: FigureTypeTable, 
+                   keyValue                 		: FigureTypeTable,
+				  keyIsDataBasedOn					: True,
+                  keyIsAxisEnabled          		: False,
+                  keyIsAxisDataLabelEnabled			: False,
+                  keyIsAxisDataRowEnabled			: False,
+                  keyIsFeature3Enabled      		: False,
+                  keyIsGraphOrientationLabelEnabled : False,
+                  keyIsDistributionLabelEnabled 	: False,
+                  keyIsDistributionEnabled  		: False,
+                  keyIsMultiFeatureLabelEnabled 	: True,
+                  keyIsMultiFeatureEnabled  		: True,
+                  keyIsDccGraph             		: False, 
+                  keyClassName              		: " col-sm-12 " }
 }
      
      
@@ -661,7 +692,7 @@ studentsGameInteractionParagraph = "This section shows you how much time a stude
 #------------------------------------
 #-- Label
 #------------------------------------
-labelSelectLA = 'Select Learning Activity'
+labelSelectLA = 'Choose the Class you are interested in for your custom graphs/tables'
 
 
 

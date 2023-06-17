@@ -25,6 +25,7 @@ from flask_login import current_user
 from data import studentGrouped
 import constants
 import util
+import subprocess
 
 
 
@@ -255,6 +256,7 @@ def generateLearningActivityControlCard():
             dcc.Dropdown(
                 id = "custom-selector-main",
                 className = "dropdown-main",
+                placeholder = "Choose Class..."
             ),
         ]
     )
@@ -290,6 +292,12 @@ def getUserLAOptions():
 
 layout = [
 
+    html.Div(html.H1('Custom Data Visualization', id = 'custom-heading', className = "align-center"), className = "stick-on-top-of-page"),
+
+    html.Div(html.P("Welcome to the custom data visualizations tab! Here you can create your own graphs and tables based on your personal interest! Simply select the class you're interested in. Then, choose the data visualization type that fits your needs the best. The application will then present you with additional input options, tailored to your chosen visualization, allowing you to explore the data more extensively. Have fun!", className = "welcome-paragraph m-left-right-medium m-top_small")),
+
+    html.Hr(id = 'custom-paragraph-hr', className = "hr_custom_style"),
+
     dbc.Row([
             dbc.Navbar(
                 children = [
@@ -308,35 +316,33 @@ layout = [
                                     ),
                             ),
                         ],
-                            className = "row w-100  selector-main-row"
+                            className = "row w-100 selector-main-row"
                         ),                
                 ],
                 id="custom-page-topbar", 
                 sticky          = "top" ,
                 light           = False ,
-                className       = "navbar-main p-bottom_medium",
+                className       = "navbar-main p-bottom_medium m-left-right-small",
                 style           = {'width': '100%'}
             ),
     ], className = "p-top_medium p-bottom_medium"),
 
-    dbc.Row([
-            dbc.Col(
-                # Left column
-                html.Div(
-                    id= "custom-row-control-main",
-                    className="",
-                    children=[ generateControlCardCustomPlotForm() ]
-                ),
-        ),
-    ])
 
-    , html.Div(id = "custom-main-container", className = "row custom-main-container m-top_small" )
+    html.Div(id= "custom-row-control-main", className = "hidden", children=[generateControlCardCustomPlotForm()], style = {"border": "2px groove grey", "margin": "1rem", "padding-top": "0.5rem"}),
+
+    html.Div(id = "custom-main-container", className = "row custom-main-container m-top_small hidden"),
     
-    , html.A(children=[html.I(className="fas fa-download font-size_medium p_small"),
-                       "download data",], 
-                    id = "custom-download-main-link", className = "disabled" ,
-                                               href="", target =  "_blank",
-                                               download='data.csv' )
+    html.Div(
+        html.A( children=[html.I(className="fas fa-download font-size_medium p_small"),
+                "download data",], 
+                id = "custom-download-main-link",
+                className = "disabled",
+                href="",
+                target =  "_blank",
+                download='data.csv'),
+        id = "custom-download-div",
+        className = "hidden"                                  
+    )
 ]
 
 
@@ -346,6 +352,17 @@ layout = [
 #----------------------------------------------------------------------------------------------
     
     
+@app.callback([Output("custom-row-control-main", "className"), Output("custom-main-container", "className"),
+               Output("custom-download-div", "className")],
+               Input("custom-selector-main", "value"))
+def show_hide_custom_content(value):
+
+    if value is not '':
+        return ["m-left-right-small", "row custom-main-container m-top_small", ""]
+
+    return ["m-left-right-small hidden", "row custom-main-container m-top_small hidden", "hidden"]
+
+
 @app.callback([Output("custom-selector-main", "options"), Output("custom-selector-main", "value")], 
               [Input("url", "pathname")],
               state=[State(component_id = "custom-selector-main", component_property='options'),
@@ -427,6 +444,41 @@ def update_bar(n_clicks, groupMain, selectedFeature, selectedFeature1, selectedF
 
 
 # Form Submission  - Update plot container with new selected plot
+
+
+@app.callback(
+    Output("custom-data-based-on-selection", "className"),
+    [
+        Input("custom-form-figure-type", "value")
+    ],
+    state=[ State(component_id = "custom-data-based-on-selection", component_property='className') ]
+)
+def update_axis_selector_disabled(selectedFigureType, initialClass):  
+    return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsDataBasedOn) 
+
+
+@app.callback(
+    Output("custom-graph-axis-data-label", "className"),
+    [
+        Input("custom-form-figure-type", "value")
+    ],
+    state=[ State(component_id = "custom-graph-axis-data-label", component_property='className') ]
+)
+def update_axis_selector_disabled(selectedFigureType, initialClass):  
+    return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsAxisDataLabelEnabled) 
+
+
+@app.callback(
+    Output("custom-graph-axis-data-row", "className"),
+    [
+        Input("custom-form-figure-type", "value")
+    ],
+    state=[ State(component_id = "custom-graph-axis-data-row", component_property='className') ]
+)
+def update_axis_selector_disabled(selectedFigureType, initialClass):  
+    return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsAxisDataRowEnabled) 
+
+
 @app.callback(
     Output("custom-form-feature-axis", "className"),
     [
@@ -450,6 +502,28 @@ def update_feature_size_disabled(selectedFigureType, initialClass):
 
 
 @app.callback(
+    Output("custom-graph-orientation-label", "className"),
+    [
+        Input("custom-form-figure-type", "value")
+    ],
+    state=[ State(component_id = "custom-graph-orientation-label", component_property='className') ]
+)
+def update_axis_selector_disabled(selectedFigureType, initialClass):  
+    return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsGraphOrientationLabelEnabled) 
+
+
+@app.callback(
+    Output("custom-distribution-label", "className"),
+    [
+        Input("custom-form-figure-type", "value")
+    ],
+    state=[ State(component_id = "custom-distribution-label", component_property='className') ]
+)
+def update_axis_selector_disabled(selectedFigureType, initialClass):  
+    return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsDistributionLabelEnabled) 
+
+
+@app.callback(
     Output("custom-form-feature-distribution", "className"),
     [
         Input("custom-form-figure-type", "value")
@@ -458,6 +532,17 @@ def update_feature_size_disabled(selectedFigureType, initialClass):
 )
 def update_feature_distribution_disabled(selectedFigureType, initialClass):   
     return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsDistributionEnabled)
+
+
+@app.callback(
+    Output("custom-table-columns-label", "className"),
+    [
+        Input("custom-form-figure-type", "value")
+    ],
+    state=[ State(component_id = "custom-table-columns-label", component_property='className') ]
+)
+def update_axis_selector_disabled(selectedFigureType, initialClass):  
+    return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsMultiFeatureLabelEnabled) 
 
 
 @app.callback(

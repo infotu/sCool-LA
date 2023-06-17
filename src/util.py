@@ -19,6 +19,7 @@ import plotly.graph_objects as go
 import dash_table
 import math
 import constants
+import subprocess
 
 
 featureDescription = constants.featureDescription
@@ -323,12 +324,29 @@ def generateControlCardCustomPlotForm(idApp                 = "",
     :return: A Div containing controls for feature selection for plotting graphs.
     """
     
-    layout = [                   
+    layout = [
+
             dbc.Row([
                     dbc.Col(
                       html.Div([
-                              
-                                html.Span("Select Group By ")  ,
+                              html.Span("Visualization Type", className = "custom-span"),
+                                
+                                dcc.RadioItems(
+                                    id          = idApp + "-form-figure-type",
+                                    options     = constants.getFigureTypesOptions(),
+                                    value       = figureTypeDefault ,
+                                    className   = "radio-items-inline"
+                                 )
+                            ],
+                            className = "c-container"
+                       ) , width=6
+                ),
+            ])  ,
+
+            dbc.Row([
+                    dbc.Col(
+                      html.Div([
+                                html.Span("Data dependency column for the table", className = "custom-span"),
                                 dcc.RadioItems(
                                     id          =   idApp + "-form-feature-color-group",
                                     options     =   BuildOptionsFeatures( featureGroupByOptions ),                                    
@@ -343,7 +361,7 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                     dbc.Col(
                       html.Div([
                               
-                                html.Span("Select Sub Group By ")  ,
+                                html.Span("Select Sub Group By ", className = "custom-span"),
                                 dcc.Dropdown(
                                     id              = idApp + "-form-feature-color-group-sub",
                                     placeholder     = "Select features",
@@ -352,11 +370,11 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                                     className   =   " " + ( ' disabled ' if colorGroupIsDisabled else ' ')
                                 ),
                             ],
-                            className = "c-container"
+                            className = "c-container hidden"
                        )
                         , width=4
                     ),
-            ])  ,
+            ], id = idApp + "-data-based-on-selection", className = "m-top_small"),
         ]
     
     if featureGroupByFilterOptionsDefault and len(featureGroupByFilterOptionsDefault) > 0:
@@ -365,7 +383,7 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                         dbc.Col(
                           html.Div([
                                   
-                                    html.Span("Select Filter By ")  ,
+                                    html.Span("Select Filter By ", className = "custom-span"),
                                     dcc.Dropdown(
                                         id          =   idApp + "-form-feature-color-group-filter",
                                         placeholder     = "Select group by filter by",
@@ -382,27 +400,27 @@ def generateControlCardCustomPlotForm(idApp                 = "",
             ]
                     
     layout = layout + [             
-            html.P("Select Features")  ,   
+            html.Span("Graph Axis Data", id = idApp + "-graph-axis-data-label", className = "custom-span", style = {"padding-left": "0.9rem"})  ,   
             
             dbc.Row([
                     dbc.Col(
                       html.Div([ 
                                 dcc.Dropdown(
                                     id              = idApp + "-form-feature-1",
-                                    placeholder     = "Select feature X",
+                                    placeholder     = "Select X-Axis Data",
                                     options         = BuildOptionsFeatures( feature1Options ),
                                     value           = feature1ValueDefault
                                 )
                             ],
                             className = "c-container"
                        )
-                        , width=5
+                        , width=4
                     ),
                     dbc.Col(
                         html.Div([
                             dcc.Dropdown(
                                     id              = idApp + "-form-feature-2", 
-                                    placeholder     = "Select feature Y",
+                                    placeholder     = "Select Y-Axis Data",
                                     options         = BuildOptionsFeatures( feature2Options ),
                                     value           = feature2ValueDefault
                                 )
@@ -420,37 +438,22 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                                     value           = feature3ValueDefault
                                 )
                             ],
-                            className = "c-container"
+                            className = "c-container hidden"
                         )
-                        , width=3
+                        , width=4
                     )
-            ])  ,
+            ], id = idApp + "-graph-axis-data-row", className = "m-top_small m-bottom_small p-left_medium p-right_medium")  ,
+            
             
             dbc.Row([
                     dbc.Col(
                       html.Div([
-                              html.Span("Type")  ,
-                                
-                                dcc.RadioItems(
-                                    id          = idApp + "-form-figure-type",
-                                    options     = constants.getFigureTypesOptions(),
-                                    value       = figureTypeDefault ,
-                                    className   = "radio-items-inline"
-                                 )
-                            ],
-                            className = "c-container"
-                       ) , width=6
-                ),
-            ])  ,
-            
-            dbc.Row([
-                    dbc.Col(
-                      html.Div([
+                                html.Span("Graph Orientation", id = idApp + "-graph-orientation-label", className = "custom-span"),
                                 dcc.RadioItems(
                                     id      =   idApp + "-form-feature-axis",
                                     options = [
-                                        {'label': 'Horizontal (x-axis)', 'value': constants.AxisH},
-                                        {'label': 'Vertical (y-axis)', 'value': constants.AxisV},
+                                        {'label': 'Horizontal', 'value': constants.AxisH},
+                                        {'label': 'Vertical', 'value': constants.AxisV},
                                     ],
                                     value       = featureAxisDefault ,
                                     className   = "radio-items-inline"
@@ -463,7 +466,7 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                     dbc.Col(
                         html.Div([
                             dbc.FormGroup([
-                                    dbc.Label("Distribution"),
+                                    dbc.Label("Distribution", id = idApp + "-distribution-label", className = "m-bottom_small"),
                                     dbc.Checklist(
                                         options=[
                                             {"label": constants.labelMean, "value": constants.PlotDistributionMean},
@@ -488,18 +491,20 @@ def generateControlCardCustomPlotForm(idApp                 = "",
             dbc.Row([
                     dbc.Col(
                       html.Div([
+                                html.Span("Table Columns", id = idApp + "-table-columns-label", className = "custom-span m-bottom_small"),
                                 dcc.Dropdown(
                                     id              = idApp + "-form-feature-multi",
-                                    placeholder     = "Select features",
+                                    placeholder     = "Select table columns...",
                                     options         = BuildOptionsFeatures( featureMultiOptions ),
-                                    multi           = True
+                                    multi           = True,
+                                    className       = "m-top_small p-left_medium p-right_medium"
                                 )
                             ],
                             className = "c-container"
                        )
                         , width=12
                     ),
-            ])  ,
+            ]),
             
             dbc.Row([
                     dbc.Col(
@@ -826,7 +831,17 @@ def getCustomPlot( df, dfOriginal, dfOriginalMean = None, dfOriginalMedian = Non
             
         elif     selectedFigureType == constants.FigureTypeTable :
             print('Inside Table Figure')
-            plotTitle = ' Details '             
+
+            selectedFeatures = []
+
+            if selectedFeatureMulti is not None :
+                selectedFeatures = list(set(selectedFeatures + selectedFeatureMulti))
+            selectedFeatures = list(set(selectedFeatures))
+
+            plotTitle = ' Details '            
+
+            subprocess.Popen(["echo", "Now in table custom thing"]) 
+            subprocess.Popen(["echo", f"{str(selectedFeatures)}"]) 
             
             if    groupBy  and    groupBy  in selectedFeatures  :
                 selectedFeatures.remove(groupBy)
@@ -989,9 +1004,9 @@ def updateSelectorDisabled(selectedFigureType, initialClass, isEnabledKey):
         initialClassS = set(initialClass.split(' '))  
     
     if selectedFigureType in constants.FigureTypes   and   not  constants.FigureTypes.get(selectedFigureType).get(isEnabledKey):
-        initialClassS.add('disabled')
+        initialClassS.add('hidden')
     else:
-        initialClassS.discard('disabled')
+        initialClassS.discard('hidden')
 
     return  ' '.join(initialClassS)
 

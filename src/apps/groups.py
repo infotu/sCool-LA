@@ -698,7 +698,7 @@ layout = [
                 id="groups-page-topbar", 
                 sticky          = "top" ,
                 light           = False ,
-                className       = "navbar-main p-bottom_medium",
+                className       = "navbar-main p-bottom_medium m-left-right-small",
                 style           = {'width': '100%'}
             ),
     ], className = "p-top_medium p-bottom_medium",),
