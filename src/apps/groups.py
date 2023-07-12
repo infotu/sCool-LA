@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Jul 30 21:01:42 2020
+reworked on Mon Jun 05 10:30:00 2023
 
-@author: tilan
+@author: tilan, zangl
 """
 
+
+#----------------------------------------------------------------------------------------------------------------------
+# imports
 import numpy as np
 import plotly.express as px
 import io
@@ -25,19 +29,17 @@ from data import studentGrouped
 import constants
 import util
 
+
 #--------------------- school selection START ----------------------
 GroupSelector_options = studentGrouped.GroupSelector_options 
 #--------------------- school selection END ----------------------
 
 
-
 #--------------------------------- DataBase get data START ---------------------------
 dfStudentDetails                        = studentGrouped.dfStudentDetails
 
-
 dfPracticeTaskDetails                   = studentGrouped.dfPracticeTaskDetails
 dfTheoryTaskDetails                     = studentGrouped.dfTheoryTaskDetails
-
 
 dfGroupedPractice                       = studentGrouped.dfGroupedPractice
 dfGroupedOriginal                       = studentGrouped.dfGroupedOriginal
@@ -47,11 +49,10 @@ dfGroupedPracticeDB                     = studentGrouped.dfGroupedPracticeDB
 dfRuns                                  = studentGrouped.dfRuns
 dfPracticeDB                            = studentGrouped.dfPracticeDB
 
-
 dfPlayerStrategyTheory                  = studentGrouped.dfPlayerStrategyTheory
 dfGroupedPlayerStrategyTheory           = studentGrouped.dfGroupedPlayerStrategyTheory
-
 #--------------------------------- DataBase get data END ---------------------------
+
 
 #--------------------------- helper functions START -----------------------    
 getTaskWiseSuccessFail                  =  studentGrouped.getTaskWiseSuccessFail
@@ -60,7 +61,6 @@ getPracticeConceptsUsedDetailsStr          =  studentGrouped.getPracticeConcepts
 getStudentWiseData                      =  studentGrouped.getStudentWiseData
 
 #--------------------------- helper functions END -----------------------  
-
 
 
 #-----------------------------------Functions START ----------------------------------------
@@ -73,10 +73,24 @@ featuresOverviewAvgNames =  constants.featuresOverviewAvgNames
 
 featuresOverviewGeneralNames = {constants.COUNT_STUDENT_FEATURE: 'No. of Students'}
 
+
+#----------------------------------------------------------------------------------------------------------------------
+# Function to merge all the elements from a nested list into a single list, without duplicates.
+# params:   values (any)  -  input data
+# returns:  List containing passed values as elements
 def get_merge_list(values):
     return list(set([a for b in values.tolist() for a in b]))
 
 
+
+#----------------------------------------------------------------------------------------------------------------------
+# Function to create a Dash DataTable.
+# params:   df                  (DataFrame)  -  input data
+#           groupKey            (int)        -  school id
+#           isMinNotHighlight   (bool)       -  highlighting option
+#           isMean              (bool)       -  mean option
+#           featureAdder        (string)     -  string with additional feature name
+# returns:  Dash DataTable based on given parameters.
 def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
     
     return dash_table.DataTable(
@@ -230,6 +244,10 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
 
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Function to create the class overview.
+# params:   groupSelected         (int)  -  the ID of the class which the user wants to see
+# returns:  A list filled with html components that hold the required plots.
 def plotClassOverview(groupSelected):
     
     groupStudents     =  getStudentsOfLearningActivity(groupSelected)
@@ -241,6 +259,11 @@ def plotClassOverview(groupSelected):
 
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Function to get group data.
+# params:   schoolKey               (int)        -  the ID of the class
+#           schoolKeys2Compare      (list(int))  -  the IDs of the classes to compare to
+# returns:  A DataFrame containing student data.
 def getGroupData(schoolKey, schoolKeys2Compare):
     
     studentDataDf = pd.DataFrame()
@@ -272,9 +295,14 @@ def getGroupData(schoolKey, schoolKeys2Compare):
         print(e)    
     
     return studentDataDf
-    
 
-#Student Interaction with Game - TIMELINE
+
+
+#----------------------------------------------------------------------------------------------------------------------
+# Function to plot the class overview.
+# params:   schoolKey               (int)        -  the ID of the class
+#           schoolKeys2Compare      (list(int))  -  the IDs of the classes to compare to
+# returns:  A list containing html components holding various graphs.
 def plotClassOverview(schoolKey, schoolKeys2Compare):
 
     graphs = []
@@ -601,10 +629,12 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
     return graphs
 
 
+
+#----------------------------------------------------------------------------------------------------------------------
+# Function to generate the control card.
+# params:   none
+# returns:  A html.Div() containing controls for graphs.
 def generateControlCard():
-    """
-    :return: A Div containing controls for graphs.
-    """
     return html.Div(
         id="groups-Control-Card-Overview",
         children=[
@@ -627,10 +657,12 @@ def generateControlCard():
     )
 
 
+
+#----------------------------------------------------------------------------------------------------------------------
+# Function to generate the Learing Activity control card.
+# params:   none
+# returns:  A html.Div containing Learning Analytics Selection.
 def generateLearningActivityControlCard():
-    """
-    :return: A Div containing Learning Analytics Selection.
-    """
     return html.Div(
         id="groups-control-card-index",
         children=[
@@ -643,6 +675,10 @@ def generateLearningActivityControlCard():
     )
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Function to retrieve the classes the current user has access to.
+# params:   none
+# returns:  The unique values of classes ids.
 def getUserLA():
     if current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated:
         currentUserId = current_user.id
@@ -657,7 +693,10 @@ def getUserLA():
 
 
 
-
+#----------------------------------------------------------------------------------------------------------------------
+# Function to call the BuildOptionsLA() function with the right classes.
+# params:   none
+# returns:  List of dictionaries containing the classes the user has access to.
 def getUserLAOptions():
     userLA = getUserLA()
     
@@ -671,7 +710,8 @@ def getUserLAOptions():
 
 
 
-
+#----------------------------------------------------------------------------------------------------------------------
+# groups tab layout - used in main layout (located in index.py)
 layout = [
 
     dbc.Row([
@@ -740,13 +780,16 @@ layout = [
         ),
     ]),
         
-                    
-
     html.Div(id='groups-comparision-container', className = "row groups-comparision-container c-table" )
-    
-    
 ]
-                
+
+
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function for updating the group selector dropdown options.
+# params:   pathname                (string)   -   string containing the url - used as trigger for this callback
+#           selectorOptions         (string)   -   current state of dropdown options
+#           selectorValue           (string)   -   current state of dropdown values
+# returns:  list of string representing new options and values for dropdown
 @app.callback([Output("groups-selector-main", "options"), Output("groups-selector-main", "value")], 
               [Input("url", "pathname")],
               state=[State(component_id = "groups-selector-main", component_property='options'),
@@ -768,7 +811,12 @@ def render_main_selector_content(pathname, selectorOptions, selectorValue ):
     
     
     return [], ''
-                                
+
+
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function for reseting the comparison overview value on button click.
+# params:   reset_click      (int)   -   amount of clicks on reset button (used as trigger for callback)
+# returns:  new value of groups-selector-comparision-overview
 @app.callback(
     [ 
          Output("groups-selector-comparision-overview", "value"), 
@@ -795,7 +843,11 @@ def on_reset(reset_click):
 
 
 
-# Update bar plot
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function for changing the comparison container children. (control content)
+# params:   groupMain            (int)        -  the ID of the class
+#           groupComparision     (list(int))  -  the IDs of the classes to compare to
+# returns:  html.Div() containing the new children of the comparison container
 @app.callback(
     Output("groups-comparision-container", "children"),
     [
@@ -819,7 +871,10 @@ def update_bar(groupMain, groupComparision ):
                      className = "col")
     
 
-# Update bar plot
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function for changing the overview content children.
+# params:   groupMain   (int)  -  the ID of the class
+# returns:  html.Div() containing the new children of the overview content
 @app.callback(
     Output("groups-main-overview-content", "children"),
     [
@@ -843,6 +898,12 @@ def update_main_overview(groupMain):
                      )
 
 
+
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function for changing groups download link.
+# params:   groupMain            (int)        -  the ID of the class
+#           groupComparision     (list(int))  -  the IDs of the classes to compare to
+# returns:  new groups download link
 @app.callback(
     Output('groups_download_overview_link', 'href'),
     [ Input("groups-selector-main", "value"),

@@ -27,10 +27,17 @@ from apps import settings, classes, advancedUserInfo
 import subprocess
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# advancedUserInfo tab layout - used in main layout (located in index.py)
 layout = [
     html.Div(children = [], id = "user-info-div")
 ]
 
+
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function to update user info if user info gets opened.
+# params:   is_open     (bool) - bool indicaating wether user info is open or not
+# returns:  html.Div() containing user info
 @app.callback(Output("user-info-div", "children"),
               Input("user-info-modal", "is_open")
 )

@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun Jul 19 10:34:38 2020
+reworked on Mon Jun 05 10:30:00 2023
 
-@author: tilan
+@author: tilan, zangl
 """
+
+
+#----------------------------------------------------------------------------------------------------------------------
+# imports
 import numpy as np
 import plotly.express as px
 
@@ -18,8 +23,6 @@ import chart_studio.plotly as py
 from plotly import graph_objs as go
 
 from app import app
-
-
 
 from flask_login import current_user
 from data import studentGrouped
@@ -102,7 +105,21 @@ featureGroupByDefault   = 'Student'
 
 
 
-#Student Interaction with Game - TIMELINE
+#----------------------------------------------------------------------------------------------------------------------
+# Function to create custom plots of the game data tab
+# params:   schoolKey               (int)           - int containing school ID
+#           feature1                (string)        - string containing feature info on x axis
+#           feature2                (string)        - string containing feature info on y axis
+#           feature3                (string)        - string containing third possible feature
+#           selectedAxis            (string)        - string containing information about wether plot should be horizonzal or vertical
+#           selectedFigureType      (string)        - string containing selected figure type (bar, scatter...)
+#           plotClassName           (string)        - string containing css stylings
+#           selectedDistribution    (string)        - string containing information about the selected distribution
+#           groupBy                 (string)        - string containing information on which data the visualization should depend on
+#           groupBySub              (string)        - string containing information on which sub-data the visualization should depend on
+#           groupByFilter           (string)        - string containing filter information
+#           hoverData               (list(string))  - list of strings containing hoverData constant
+# returns: list of custom generated plots based on user actions
 def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType, 
                       feature2              = '', 
                       feature3              = '',
@@ -229,6 +246,19 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
     return graphs
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Function to generate the custom plot form control card.
+# params:   idApp                      (string)        - string containing id of the app tab
+#           feature1Options            (string)        - string containing feature options for x axis
+#           feature2Options            (string)        - string containing feature options for y axis
+#           feature3Options            (string)        - string containing feature options for third possible feature
+#           feature1ValueDefault       (string)        - default x axis
+#           feature2ValueDefault       (string)        - default y axis
+#           feature3ValueDefault       (string)        - default third possible feature
+#           featureMultiOptions        (string)        - string containing information on multi options
+#           featureGroupByDefault      (string)        - default group by
+#           featureGroupByOptions      (string)        - string containing group by options
+# returns:  A html.Div containing controls for feature selection for plotting graphs.
 def generateControlCardCustomPlotForm():
     
     return util.generateControlCardCustomPlotForm(
@@ -245,10 +275,12 @@ def generateControlCardCustomPlotForm():
     )
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Function to generate the Learing Activity control card.
+# params:   none
+# returns:  A html.Div containing Learning Analytics Selection.
 def generateLearningActivityControlCard():
-    """
-    :return: A Div containing Learning Analytics Selection.
-    """
+
     return html.Div(
         id="custom-control-card-index",
         children=[
@@ -262,6 +294,10 @@ def generateLearningActivityControlCard():
     )
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Function to retrieve the classes the current user has access to.
+# params:   none
+# returns:  The unique values of classes ids.
 def getUserLA():
     if current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated:
         currentUserId = current_user.id
@@ -276,7 +312,10 @@ def getUserLA():
 
 
 
-
+#----------------------------------------------------------------------------------------------------------------------
+# Function to call the BuildOptionsLA() function with the right classes.
+# params:   none
+# returns:  List of dictionaries containing the classes the user has access to.
 def getUserLAOptions():
     userLA = getUserLA()
     
@@ -286,10 +325,9 @@ def getUserLAOptions():
     return studentGrouped.BuildOptionsLA( [ groupId for groupId in  userLA  ] , isAdmin = True  )
 
 
-#------------------------------------------------------------------------------------------------
-#---------------------------LAYOUT --------------------------------------------------------------
 
-
+#----------------------------------------------------------------------------------------------------------------------
+# custom tab layout - used in main layout (located in index.py)
 layout = [
 
     html.Div(html.H1('Custom Data Visualization', id = 'custom-heading', className = "align-center"), className = "stick-on-top-of-page"),
@@ -350,8 +388,12 @@ layout = [
 #----------------------------------------------------------------------------------------------
 #                    CALL BACK
 #----------------------------------------------------------------------------------------------
-    
-    
+
+
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function for updating the visibility of the custom-row-control-main, custom-main-container and custom-download-div.
+# params:   value       (string)   -   string containing the value of the dropdown menu custom-selector-main (trigger)
+# returns:  list of string representing the information on wether the components should be visible or not
 @app.callback([Output("custom-row-control-main", "className"), Output("custom-main-container", "className"),
                Output("custom-download-div", "className")],
                Input("custom-selector-main", "value"))
@@ -363,6 +405,12 @@ def show_hide_custom_content(value):
     return ["m-left-right-small hidden", "row custom-main-container m-top_small hidden", "hidden"]
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function for updating the custom selector dropdown options.
+# params:   pathname                         (string)   -   string containing the url - used as trigger for this callback
+#           selectorOptions                  (string)   -   current state of dropdown options
+#           selectorValue                    (string)   -   current state of dropdown values
+# returns:  list of string representing new options and values for dropdown
 @app.callback([Output("custom-selector-main", "options"), Output("custom-selector-main", "value")], 
               [Input("url", "pathname")],
               state=[State(component_id = "custom-selector-main", component_property='options'),
@@ -386,7 +434,22 @@ def render_main_selector_content(pathname, selectorOptions, selectorValue ):
     return [], ''
 
 
-# Form Submission  - Update plot container with new selected plot
+
+#----------------------------------------------------------------------------------------------------------------------
+# Function to create custom plots of the game data tab after user action
+# params:   n_clicks                        (int)           - int containing amount of clicks on the submit button (trigger for this callback)
+#           groupMain                       (string)        - string containing the selected class ID 
+#           selectedFeature                 (string)        - string containing feature info on x axis
+#           selectedFeature1                (string)        - string containing feature info on y axis
+#           selectedFeature3                (string)        - string containing third possible feature
+#           selectedAxis                    (string)        - string containing information about wether plot should be horizonzal or vertical
+#           selectedFigureType              (string)        - string containing selected figure type (bar, scatter...)
+#           selectedDistribution            (string)        - string containing information about the selected distribution
+#           selectedFeatureColorGroupBy     (string)        - string containing information on which data the visualization should depend on
+#           selectedFeatureColorGroupBySub  (string)        - string containing information on which sub-data the visualization should depend on
+#           selectedFeatureMulti            (string)        - string containing information on multi feature
+#           containerChildren               (list(html.Div()))  - list containing the htm components of the main container
+# returns: list of custom generated plots based on user actions
 @app.callback(
     Output( "custom-main-container", "children"),
     [
@@ -443,9 +506,11 @@ def update_bar(n_clicks, groupMain, selectedFeature, selectedFeature1, selectedF
 
 
 
-# Form Submission  - Update plot container with new selected plot
-
-
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function for updating the visibility of the custom-data-based-on-selection component.
+# params:   selectedFigureType      (string)   -   type of data visualization the user selected
+#           initialClass            (string)   -   current class selected by user
+# returns:  updated className of custom-data-based-on-selection
 @app.callback(
     Output("custom-data-based-on-selection", "className"),
     [
@@ -457,6 +522,11 @@ def update_axis_selector_disabled(selectedFigureType, initialClass):
     return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsDataBasedOn) 
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function for updating the visibility of the custom-graph-axis-data-label component.
+# params:   selectedFigureType      (string)   -   type of data visualization the user selected
+#           initialClass            (string)   -   current class selected by user
+# returns:  updated className of custom-graph-axis-data-label
 @app.callback(
     Output("custom-graph-axis-data-label", "className"),
     [
@@ -468,6 +538,11 @@ def update_axis_selector_disabled(selectedFigureType, initialClass):
     return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsAxisDataLabelEnabled) 
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function for updating the visibility of the custom-graph-axis-data-row component.
+# params:   selectedFigureType      (string)   -   type of data visualization the user selected
+#           initialClass            (string)   -   current class selected by user
+# returns:  updated className of custom-graph-axis-data-row
 @app.callback(
     Output("custom-graph-axis-data-row", "className"),
     [
@@ -479,6 +554,11 @@ def update_axis_selector_disabled(selectedFigureType, initialClass):
     return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsAxisDataRowEnabled) 
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function for updating the visibility of the custom-form-feature-axis component.
+# params:   selectedFigureType      (string)   -   type of data visualization the user selected
+#           initialClass            (string)   -   current class selected by user
+# returns:  updated className of custom-form-feature-axis
 @app.callback(
     Output("custom-form-feature-axis", "className"),
     [
@@ -490,6 +570,11 @@ def update_axis_selector_disabled(selectedFigureType, initialClass):
     return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsAxisEnabled) 
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function for updating the visibility of the custom-form-feature-3 component.
+# params:   selectedFigureType      (string)   -   type of data visualization the user selected
+#           initialClass            (string)   -   current class selected by user
+# returns:  updated className of custom-form-feature-3
 @app.callback(
     Output("custom-form-feature-3", "className"),
     [
@@ -501,6 +586,11 @@ def update_feature_size_disabled(selectedFigureType, initialClass):
     return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsFeature3Enabled)
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function for updating the visibility of the custom-graph-orientation-label component.
+# params:   selectedFigureType      (string)   -   type of data visualization the user selected
+#           initialClass            (string)   -   current class selected by user
+# returns:  updated className of custom-graph-orientation-label
 @app.callback(
     Output("custom-graph-orientation-label", "className"),
     [
@@ -512,6 +602,11 @@ def update_axis_selector_disabled(selectedFigureType, initialClass):
     return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsGraphOrientationLabelEnabled) 
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function for updating the visibility of the custom-distribution-label component.
+# params:   selectedFigureType      (string)   -   type of data visualization the user selected
+#           initialClass            (string)   -   current class selected by user
+# returns:  updated className of custom-distribution-label
 @app.callback(
     Output("custom-distribution-label", "className"),
     [
@@ -523,6 +618,11 @@ def update_axis_selector_disabled(selectedFigureType, initialClass):
     return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsDistributionLabelEnabled) 
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function for updating the visibility of the custom-form-feature-distribution component.
+# params:   selectedFigureType      (string)   -   type of data visualization the user selected
+#           initialClass            (string)   -   current class selected by user
+# returns:  updated className of custom-form-feature-distribution
 @app.callback(
     Output("custom-form-feature-distribution", "className"),
     [
@@ -534,6 +634,11 @@ def update_feature_distribution_disabled(selectedFigureType, initialClass):
     return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsDistributionEnabled)
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function for updating the visibility of the custom-table-columns-label component.
+# params:   selectedFigureType      (string)   -   type of data visualization the user selected
+#           initialClass            (string)   -   current class selected by user
+# returns:  updated className of custom-table-columns-label
 @app.callback(
     Output("custom-table-columns-label", "className"),
     [
@@ -545,6 +650,11 @@ def update_axis_selector_disabled(selectedFigureType, initialClass):
     return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsMultiFeatureLabelEnabled) 
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function for updating the visibility of the custom-form-feature-multi component.
+# params:   selectedFigureType      (string)   -   type of data visualization the user selected
+#           initialClass            (string)   -   current class selected by user
+# returns:  updated className of custom-form-feature-multi
 @app.callback(
     Output("custom-form-feature-multi", "className"),
     [
@@ -556,6 +666,10 @@ def update_feature_multi_disabled(selectedFigureType, initialClass):
     return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsMultiFeatureEnabled)
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function for updating the custom-download-main-link and it's visibility.
+# params:   groupMain      (string)   -   current selected class ID
+# returns:  updated link and className of the custom-download-main-link
 @app.callback(
     [ Output("custom-download-main-link", 'href'),
      Output("custom-download-main-link", 'className'),

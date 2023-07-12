@@ -178,11 +178,10 @@ def getGroupByFilterOptions(selectedGroupBy = constants.featureGroup):
 #           selectedFigureType      (string)        - string containing selected figure type (bar, scatter...)
 #           plotClassName           (string)        - string containing css stylings
 #           selectedDistribution    (string)        - string containing information about the selected distribution
-#           groupBy                 (string)        - 
-#           groupBySub              (string)        - 
-#           groupByFilter           (string)        - 
-#           selectedFeatureMulti    (string)        - 
-#           hoverData               (list[string])  - 
+#           groupBy                 (string)        - string containing information on which data the visualization should depend on
+#           groupBySub              (string)        - string containing information on which sub-data the visualization should depend on
+#           groupByFilter           (string)        - string containing filter information
+#           selectedFeatureMulti    (string)        - string containing all features the user selected in dropdown menu
 # returns: list of custom generated plots based on user actions
 def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '', 
                    selectedAxis         = constants.AxisH, 
@@ -339,6 +338,10 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
 
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Function to call util function generateControlCardCustomPlotForm()
+# params:  none
+# returns: a html.Div containing controls for feature selection for plotting graphs
 def generateControlCardCustomPlot():
     
     return util.generateControlCardCustomPlotForm(
@@ -394,7 +397,24 @@ layout = [
 #----------------------------------------------------------------------------------------------
 #                    CALL BACK
 #----------------------------------------------------------------------------------------------
-# Form Submission  - Update plot container with new selected plot
+
+
+
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function for Form Submission  - Update plot container with new selected plot
+# params:   n_clicks                            (int)      - integer as trigger condition for callback function (contains amount of clicks on form-submit-btn)
+#           selectedFeature1                    (string)   - string containing feature info on x axis
+#           selectedFeature2                    (string)   - string containing feature info on y axis
+#           selectedFeature3                    (string)   - string containing third possible feature
+#           selectedAxis                        (string)   - string containing information about wether plot should be horizonzal or vertical
+#           selectedFigureType                  (string)   - string containing selected figure type (bar, scatter...)
+#           selectedDistribution                (string)   - string containing information about the selected distribution
+#           selectedFeatureColorGroupBy         (string)   - string containing information on which data the visualization should depend on
+#           selectedFeatureColorGroupBySub      (string)   - string containing information on which sub-data the visualization should depend on
+#           selectedFeatureColorGroupByFilter   (string)   - string containing filter information
+#           selectedFeatureMulti                (string)   - string containing all features the user selected in dropdown menu
+#           containerChildren                   (html.Div) - Div containing all custom generated plots
+# returns:  list of custom generated plots based on user actions
 @app.callback(
     Output( idApp + "-custom-plot-container", "children"),
     [
@@ -461,8 +481,11 @@ def update_bar(n_clicks, selectedFeature1, selectedFeature2, selectedFeature3, s
 
 
 
-
-# Form Submission  - Update plot container with new selected plot
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function to change visibility of the form feature axis
+# params:   selectedFigureType          (string) - string containing the type of figure selected by user
+#           initialClass                (string) - string containing state of the initial form feature axis
+# returns:  string containing visibility information (for className property)
 @app.callback(
     Output(idApp + "-form-feature-axis", "className"),
     [
@@ -474,6 +497,12 @@ def update_axis_selector_disabled(selectedFigureType, initialClass):
     return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsAxisEnabled)
 
 
+
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function to change visibility of the form feature 3
+# params:   selectedFigureType          (string) - string containing the type of figure selected by user
+#           initialClass                (string) - string containing state of the initial form feature 3
+# returns:  string containing visibility information (for className property)
 @app.callback(
     Output(idApp + "-form-feature-3", "className"),
     [
@@ -484,6 +513,13 @@ def update_axis_selector_disabled(selectedFigureType, initialClass):
 def update_feature_size_disabled(selectedFigureType, initialClass):   
     return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsFeature3Enabled)
 
+
+
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function to change visibility of the form feature distribution
+# params:   selectedFigureType          (string) - string containing the type of figure selected by user
+#           initialClass                (string) - string containing state of the initial form feature distribution
+# returns:  string containing visibility information (for className property)
 @app.callback(
     Output(idApp + "-form-feature-distribution", "className"),
     [
@@ -495,6 +531,12 @@ def update_feature_distribution_disabled(selectedFigureType, initialClass):
     return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsDistributionEnabled)
 
 
+
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function to change visibility of the form feature multi
+# params:   selectedFigureType          (string) - string containing the type of figure selected by user
+#           initialClass                (string) - string containing state of the initial form feature multi
+# returns:  string containing visibility information (for className property)
 @app.callback(
     Output(idApp + "-form-feature-multi", "className"),
     [
@@ -507,9 +549,10 @@ def update_feature_multi_disabled(selectedFigureType, initialClass):
 
 
 
-
-
- 
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function to change value and options of the form feature color-group-filter
+# params:   selectedGroupBy          (string) - string containing the filter option which is the selected group
+# returns:  list of strings containing value and options for the color group filter
 @app.callback(
     [Output(idApp + "-form-feature-color-group-filter", "value"),
      Output(idApp + "-form-feature-color-group-filter", "options"),

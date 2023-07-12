@@ -222,9 +222,9 @@ sidebar = html.Div(
                 type="text", 
                 style={'display':'none'},
                 value="Groups"
-            )
+            ),
         
-        , html.Div(
+        html.Div(
             [
                 html.Button(html.I(className="fas fa-info font-size_medium p-right_xx-small"),
                                    id='menu-modal-setting-open', 
@@ -244,8 +244,7 @@ sidebar = html.Div(
             ],
             id = "menu-modal-help-div",
             className = "menu-modal-help"
-        ) 
-        , 
+        ), 
     ],
     className = " page-sidebar p-bottom_x-large hidden",
     id="page-sidebar",
@@ -308,7 +307,7 @@ def toggle_accordion(*args):
 @app.callback(  [  Output(f"{i}-li-container", "className") for i in menuLink   ], 
                 [  Input("url", "pathname")   ],
 )
-def setMenuClassOnLogin(pathname):   
+def set_menu_class_on_login(pathname):   
 
     menuLinksCount = len(menuLink.keys())
     newClasses = ['m-top_x-small'] * menuLinksCount
@@ -336,7 +335,7 @@ def setMenuClassOnLogin(pathname):
 # returns:  new className of buttons (if they are currently selected or not)
 @app.callback(  [ Output(f"{i}", "className") for i in menuLink ], 
                  [Input(f"{i}-collapse", "is_open") for i in menuLink] )
-def setMenuClassOnChangeOpen(*args):   
+def set_menu_class_on_change_open(*args):   
     return  np.where(args,"open highlight",'').tolist()
 
      
@@ -346,11 +345,10 @@ def setMenuClassOnChangeOpen(*args):
 # returns:  new value of button with id menu-sub-link-input (indicating wehter button is pressed)
 @app.callback ( Output("menu-sub-link-input", "value") , 
               [Input(f"{j}", "n_clicks")   for j in menuSubLink2Scroll ])
-def changeMenuSetInput(*args):
+def change_menu_set_input(*args):
     ctx = dash.callback_context
     newValue = ""
 
-    
     if not ctx.triggered or not any(args):
         return newValue
     
@@ -362,7 +360,7 @@ def changeMenuSetInput(*args):
          return menuSubLink2Scroll.get(clickedButton_id).get('scrollTo')
         
     return newValue    
-    
+
 
 #----------------------------------------------------------------------------------------------------------------------
 # Callback function to update the property "is_open" of the menu-modal-setting component.

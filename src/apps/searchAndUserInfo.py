@@ -33,9 +33,13 @@ dfStudentDetails                      = studentGrouped.dfStudentDetails
 getStudentsOfLearningActivity         = studentGrouped.getStudentsOfLearningActivity
 
 
-
+#----------------------------------------------------------------------------------------------------------------------
+# Function that calles the layout of the advancedUserInfo.py to generate the Pop Up
+# params:   none
+# returns:  layout of user info Modal
 def getUserInfoLayout():
     return advancedUserInfo.layout
+
 
 #----------------------------------------------------------------------------------------------------------------------
 # top navbar layout - used in main layout (located in index.py)
@@ -84,6 +88,12 @@ navbar = html.Div(
 )
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function to open and close user information Modal
+# params:   n1      (int)     - integer containing the amount of clicks on the user info icon
+#           n2      (int)     - integer containing the amount of clicks on the user info close button
+#           is_open (boolean) - bool indicating wether Modal is open or not
+# returns:  bool that equals the state of the Modal
 @app.callback(
     Output("user-info-modal", "is_open"),
     [Input("user-info-button", "n_clicks"), Input("user-info-button-close", "n_clicks")],
@@ -95,7 +105,10 @@ def toggle_user_info_modal(n1, n2, is_open):
     return is_open
 
 
-
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function to create search button suggestions and options for user
+# params:   searchInput     (string) - containing the search input of user    
+# returns:  list of options for user based on his/her input
 @app.callback(
     Output("search-dropdown", "options"),
     Input("search-dropdown", "search_value")
@@ -128,6 +141,11 @@ def update_options(searchInput):
         raise PreventUpdate
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function to perform search functionality when search button was pressed
+# params:   n_clicks         (int)      - integer containing the information how often the search bar button was cklicked
+#           search_value     (string)   - user input into the dearch bar when button was clicked
+# returns:  string containing the search value
 @app.callback(
     Output("search-dropdown", "value"),
     Input("navbar-search-button", "n_clicks"),
@@ -145,9 +163,9 @@ def update_options(n_clicks, searchValue):
 
 
 #----------------------------------------------------------------------------------------------------------------------
-# Callback function to manipulate 
+# Callback function to manipulate the user info on the top right of the screen
 # params:   pathname         (string) - string containing the pathname (used only as trigger)
-# returns:  
+# returns:  two strings containing the user information
 @app.callback([Output("navbar-username", "children"), Output("navbar-userrole", "children")], 
               [Input("url", "pathname")],
 )
@@ -171,6 +189,10 @@ def setMenuClassOnLogin(pathname):
     return [dash.no_update, dash.no_update]
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Clientside callback function to perform search request (with javascript code in /src/assets/app.js)
+# params:   newValue         (string)  - string containing ID of item the user is searching for
+# returns:  nothing
 app.clientside_callback(
     ClientsideFunction('ui', 'executeSearchRequest'),
     Output("navbar-la-heading", "children"),

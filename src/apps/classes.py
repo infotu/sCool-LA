@@ -7,6 +7,9 @@ Reworked on  Mar 14 10:25:00 2023
 @authors: tilan, zangl
 """
 
+
+#----------------------------------------------------------------------------------------------------------------------
+# imports
 import math
 import json
 from datetime import date
@@ -134,8 +137,12 @@ def convert_list_column_tostr_NL(val) :
 #--------------------------- helper functions  END -----------------------
 
 
-#------------------------------------
-
+#----------------------------------------------------------------------------------------------------------------------
+# Function to create graphs for a single selected class.
+# params:   titleTextAdd      (string)        - string with title text
+#           school            (string)        - ID of selected class
+#           filterByDate      (string)        - string containing possible filter option
+# returns:  list of graphs representing a whole class
 def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
      
     graphIndex = 1
@@ -533,6 +540,14 @@ featureX = 'Students Count'
 featureY = 'Details'
 featurePracticeTaskGroup = 'Task-Id'            
 
+
+#----------------------------------------------------------------------------------------------------------------------
+# Function to create task related graphs for a single selected class.
+# params:   groupId           (string)        - ID of selected class
+#           isGrouped         (bool)          - bool indicating wether data is grouped
+#           taskId            (int)           - integer holding the ID of the wanted task
+#           filterByDate      (string)        - string containing possible filter option
+# returns:  list of graphs representing task wise details of a class
 def getGroupTaskWiseDetails(groupId, isGrouped = True, taskId = 0 , filterByDate = '' ) :
     
     graphs = []
@@ -630,6 +645,13 @@ def getGroupTaskWiseDetails(groupId, isGrouped = True, taskId = 0 , filterByDate
     return graphs
     
     
+#----------------------------------------------------------------------------------------------------------------------
+# Function to create task related concept graphs for a single selected class.
+# params:   groupId           (string)        - ID of selected class
+#           isGrouped         (bool)          - bool indicating wether data is grouped
+#           taskId            (int)           - integer holding the ID of the wanted task
+#           filterByDate      (string)        - string containing possible filter option
+# returns:  list of graphs representing task wise concepts of a class
 def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 , filterByDate = '' ) :
     
     graphs = []
@@ -764,6 +786,11 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 , filterByDa
         print(e)               
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Function to get the done tasks options of a selected class.
+# params:   groupId           (string)        - ID of selected class
+#           filterByDate      (string)        - string containing possible filter option
+# returns:  list of done task options
 def getGroupPTaskDoneOptions(groupId , filterByDate = '' ) :
     options = []
     
@@ -800,8 +827,11 @@ def getGroupPTaskDoneOptions(groupId , filterByDate = '' ) :
 
 
         
-        
-        
+#----------------------------------------------------------------------------------------------------------------------
+# Function to create concept details graphs.
+# params:   groupId           (string)        - ID of selected class
+#           filterByDate      (string)        - string containing possible filter option
+# returns:  list of html.Div() holding various data visualizations
 def plotGroupConceptDetails(groupId, filterByDate = '' ):
     
     graphs = []
@@ -874,6 +904,20 @@ def plotGroupConceptDetails(groupId, filterByDate = '' ):
     return graphs
 
 
+
+#----------------------------------------------------------------------------------------------------------------------
+# Function to create plot of a given feature.
+# params:   df                  (DataFrame) - dataframe containing the data
+#           featureX            (string)    - x axis information
+#           featureY            (string)    - y axis information
+#           title               (string)    - title string
+#           hoverData           (string)    - string containing hover information for the user hovering over plot
+#           isColored           (bool)      - bool stating wether plot is colored or not
+#           hasMeanStd          (bool)      - bool stating wether plot has mean and standard derivation
+#           hoverName           (string)    - string holding hover name info
+#           hasDistribution     (bool)      - bool stating wether plot has distribution
+#           isThemeSizePlot     (bool)      - bool stating wether the plot represents a theme size
+# returns:  list of graphs of the given feature and their distributions
 def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, hasMeanStd = True, hoverName = "Name", hasDistribution = False, isThemeSizePlot = False):
     graphs = []
     
@@ -994,15 +1038,7 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
             print('getFeaturePlot  2nd  ')
             print('title  ' + title)
             print(e)
-                    
-    
-    
-                    
-                    
-                    
-                
-                    
-                    
+
                     
     graphDistributions = []
       
@@ -1061,6 +1097,19 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
     return graphs, graphDistributions
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Function to create plot of a given feature.
+# params:   df                  (DataFrame) - dataframe containing the data
+#           featureX            (string)    - x axis information
+#           featureY            (string)    - y axis information
+#           title               (string)    - title string
+#           hoverData           (string)    - string containing hover information for the user hovering over plot
+#           isColored           (bool)      - bool stating wether plot is colored or not
+#           hasMeanStd          (bool)      - bool stating wether plot has mean and standard derivation
+#           hoverName           (string)    - string holding hover name info
+#           hasDistribution     (bool)      - bool stating wether plot has distribution
+#           isThemeSizePlot     (bool)      - bool stating wether the plot represents a theme size
+# returns:  list of graphs of the given feature and their distributions
 def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
     
     graphs = []
@@ -1070,15 +1119,9 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                        children = [html.H2('Class Statistics')], 
                        className = "c-container p_medium p-top_large", 
             ))
-    
       
     featuresPractice            = dfPlayerStrategyPractice.columns
                              
-    
-    
-        
-     
-        
     try :
         groupPractice = dfGroupedPractice.get_group(school)
         groupOriginal = dfGroupedOriginal.get_group(school)
@@ -1089,7 +1132,6 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
             dateGroup = groupOriginal.groupby(  [ groupOriginal['CreatedAt'].dt.date ] )
             groupOriginal = dateGroup.get_group(filterByDate)
 
-        
         
         try :
             groupOriginalTheory = dfGroupedPlayerStrategyTheory.get_group(school)
@@ -1200,11 +1242,7 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                                             children = featurePlot
                                     )
                             )
-                            """
-                            graphs.append(  html.Div( getPlotDistributionPlotChildrens(graphDistributions, quantileIndex) ,
-                                className = "c-container"
-                            ))
-                            """
+
                             quantileIndex += 1
                             
                             
@@ -1220,11 +1258,7 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                                             children = featurePlot
                                     )
                             )
-                            """
-                            graphs.append(  html.Div( getPlotDistributionPlotChildrens(graphDistributions, quantileIndex) ,
-                                className = "c-container"
-                            ))
-                            """
+
                             quantileIndex += 1
                          
 #    Graphs only for PRACTICE
@@ -1239,11 +1273,7 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                                             children = featurePlot
                                     )
                             )
-                            """
-                            graphs.append(  html.Div( getPlotDistributionPlotChildrens(graphDistributions, quantileIndex) ,
-                                className = "c-container"
-                            ))
-                            """
+
                             quantileIndex += 1
     
 #    Graphs only for THEORY
@@ -1268,11 +1298,7 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                                             children = featurePlot
                                     )
                     )
-                    """
-                    graphs.append(  html.Div(getPlotDistributionPlotChildrens(graphDistributions, quantileIndex) ,
-                        className = "c-container"
-                    ))
-                    """
+
                     quantileIndex += 1
                     
                 except Exception as e: 
@@ -1291,18 +1317,11 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
     return graphsMain      
 
 
-def getPlotDistributionPlotChildrens(graphDistributions, quantileIndex = 0):
-    return [
-        html.Details(
-            children = [
-                    html.Summary([  html.I(className="fas fa-info m-right-small"),
-                    "Distribution" ]),
-                    html.Div(graphDistributions),
-                ],
-        ),
-    ]
 
-
+#----------------------------------------------------------------------------------------------------------------------
+# Function that turns a number (of seconds) into a fancy timestamp looking like xxh xxm xxs
+# params:   totalSeconds      (int) - integer holding amount of seconds
+# returns:  string - fancy timestamp
 def turnSecondsIntoFancyTimestamp(totalSeconds):
     hours = totalSeconds // 3600
     minutes = (totalSeconds % 3600) // 60
@@ -1312,6 +1331,10 @@ def turnSecondsIntoFancyTimestamp(totalSeconds):
     return timeString
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Function that turns a fancy timestamp looking like xxh xxm xxs into a number (of seconds)
+# params:   timeString      (string) - fancy timestamp
+# returns:  integer holding amount of seconds
 def turnFancyTimestampIntoSeconds(timeString):
     splitUpString = timeString.split()
     hours = int(splitUpString[0].rstrip('h'))
@@ -1322,7 +1345,12 @@ def turnFancyTimestampIntoSeconds(timeString):
     return totalSeconds
 
 
-#Student Interaction with Game - TIMELINE
+
+#----------------------------------------------------------------------------------------------------------------------
+# Function that plots the list of students of a selected class.
+# params:   schoolKey         (string)        - ID of selected class
+#           filterByDate      (string)        - string containing possible filter option
+# returns:  Dash DataTable containing students in class
 def plotStudentsList(schoolKey, filterByDate = '' ):
     
     graphs = []
@@ -1416,6 +1444,12 @@ def plotStudentsList(schoolKey, filterByDate = '' ):
     return graphs
 
 
+
+#----------------------------------------------------------------------------------------------------------------------
+# Function that plots the class overview.
+# params:   groupId           (string)        - ID of selected class
+#           filterByDate      (string)        - string containing possible filter option
+# returns:  list of html.Div() containing plots.
 def plotClassOverview(groupId, filterByDate = '' ):
     plots               = []
     try:    
@@ -1437,6 +1471,10 @@ def plotClassOverview(groupId, filterByDate = '' ):
     return plots
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Function to retrieve the classes the current user has access to.
+# params:   none
+# returns:  The unique values of classes ids.
 def getUserLA():
     if current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated:
         currentUserId = current_user.id
@@ -1451,6 +1489,10 @@ def getUserLA():
     return studentGrouped.dfLearningActivityDetails[constants.GROUPBY_FEATURE].unique()
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Function to call the BuildOptionsLA() function with the right classes.
+# params:   none
+# returns:  List of dictionaries containing the classes the user has access to.
 def getUserLAOptions():
     userLA = getUserLA()
     
@@ -1460,6 +1502,10 @@ def getUserLAOptions():
     return studentGrouped.BuildOptionsLA( [ groupId for groupId in  userLA  ] , isAdmin = True  )
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Function to generate the learning activity buttons (class buttons)
+# params:   none
+# returns:  list containing the class buttons the user has access to
 def createUserLAOptionsButtons():
     buttons_list = []
 
@@ -1472,6 +1518,10 @@ def createUserLAOptionsButtons():
     return buttons_list
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Function to get a button Label.
+# params:   class_id   (int) - integer holding class id
+# returns:  Button label for selected class.
 def getButtonLabel(class_id):
     user_LA_options = getUserLAOptions()
     for option in user_LA_options:
@@ -1483,6 +1533,8 @@ def getButtonLabel(class_id):
 clicked_button = {}
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# classes tab layout - used in main layout (located in index.py)
 layout = html.Div(
     [
     html.Div(html.H1('Select a Class', id = 'select-a-class-heading', className = "align-center"),
@@ -1540,9 +1592,9 @@ layout = html.Div(
 
 
 #----------------------------------------------------------------------------------------------------------------------
-# Callback function to manipulate 
+# Callback function to manipulate the generated class buttons.
 # params:   pathname         (string) - string containing the pathname (used only as trigger)
-# returns:  
+# returns:  newly generated class buttons.
 @app.callback(Output("learning-activity-selection-div", "children"), 
               [Input("url", "pathname")],
 )
@@ -1552,6 +1604,9 @@ def create_class_selection_buttons(pathname):
 
 
 #----------------------------------------------------------------------------------------------------------------------
+# Callback function to manipulate the content of the classes tab. (if it should be visible or not)
+# params:   *args     (tuple) - tuple containing info on how often select-classes-button or select-other-classes-button was pressed (used only as trigger)
+# returns:  list of newly set styling strings for className property
 @app.callback([Output('learning-activity-selection-div', 'className'), Output('select-a-class-heading', 'children'),
                Output('button-select-other-la-div', 'className'), Output('classes-overview-container', 'className'),
                Output('classes-task-information-container', 'className'), Output('classes-general-container', 'className'),
@@ -1601,7 +1656,11 @@ def show_hide_classes_tab_content(*args):
             "hr_custom_style hidden", "hr_custom_style hidden",
             "hr_custom_style hidden"]
 
+
 #----------------------------------------------------------------------------------------------------------------------
+# Callback function to change the children of the classes-overview-container based on user actions.
+# params:   n_clicks     (int) - integer holding information on how often button was clicked (used as trigger)
+# returns:  list of newly created children
 @app.callback(Output('classes-overview-container', 'children'), 
               Input({"button-type": "select-classes-button", "class-id": ALL}, "n_clicks"))
 def set_class_overview(n_clicks):
@@ -1631,6 +1690,9 @@ def set_class_overview(n_clicks):
 
 
 #----------------------------------------------------------------------------------------------------------------------
+# Callback function to change the children of the classes-task-information-container based on user actions.
+# params:   n_clicks     (int) - integer holding information on how often button was clicked (used as trigger)
+# returns:  list of newly created children
 @app.callback(Output('classes-task-information-container', 'children'), 
               Input({"button-type": "select-classes-button", "class-id": ALL}, "n_clicks"))
 def display_graphs(n_clicks):
@@ -1659,6 +1721,9 @@ def display_graphs(n_clicks):
 
 
 #----------------------------------------------------------------------------------------------------------------------
+# Callback function to change the children of the classes-general-container based on user actions.
+# params:   n_clicks     (int) - integer holding information on how often button was clicked (used as trigger)
+# returns:  list of newly created children
 @app.callback(Output('classes-general-container', 'children'), 
               Input({"button-type": "select-classes-button", "class-id": ALL}, "n_clicks"))
 def display_class_general(n_clicks):
@@ -1687,6 +1752,9 @@ def display_class_general(n_clicks):
 
 
 #----------------------------------------------------------------------------------------------------------------------
+# Callback function to change the children of the classes-concept-container based on user actions.
+# params:   n_clicks     (int) - integer holding information on how often button was clicked (used as trigger)
+# returns:  list of newly created children
 @app.callback(Output('classes-concept-container', 'children'), 
               Input({"button-type": "select-classes-button", "class-id": ALL}, "n_clicks"))
 def display_class_concept(n_clicks):
@@ -1715,7 +1783,9 @@ def display_class_concept(n_clicks):
     
 
 #----------------------------------------------------------------------------------------------------------------------
-#On Select a Group - set Group Task Done Options - see task wise information             
+# Callback function to set Group Task Done Options - see task wise information.
+# params:   n_clicks     (int) - integer holding information on how often button was clicked (used as trigger)
+# returns:  list of newly created options          
 @app.callback([Output("classes-taskId-selector", "options")],
               Input({"button-type": "select-classes-button", "class-id": ALL}, "n_clicks"))
 def on_select_group_set_task_options(n_clicks):
@@ -1744,6 +1814,9 @@ def on_select_group_set_task_options(n_clicks):
     
 
 #----------------------------------------------------------------------------------------------------------------------
+# Callback function to change the children of the classes-taskId-container based on user actions.
+# params:   taskId     (int) - integer holding task id
+# returns:  list of newly created children
 @app.callback([Output("classes-taskId-container", "children")],
               [Input("classes-taskId-selector", "value")])
 def on_select_task_show_task_wise_concept(taskId):
@@ -1757,7 +1830,9 @@ def on_select_task_show_task_wise_concept(taskId):
 
 
 #----------------------------------------------------------------------------------------------------------------------
-#--------------------- data download callback
+# Callback function to change the classes download link and visibility of this download link.
+# params:   *args     (tuple) - tuple containing info on how often select-classes-button or select-other-classes-button was pressed (used only as trigger)
+# returns:  new classes download link and string representing visibility of this download link
 @app.callback([Output('classes_download_overview_link', 'href'), Output('classes_download_overview_link', 'className')],
               [Input({"button-type": "select-classes-button", "class-id": ALL}, "n_clicks"), Input({"button-type": "select-other-classes-button"}, "n_clicks")])
 def update_download_link__details_group(*args):
@@ -1795,6 +1870,11 @@ def update_download_link__details_group(*args):
     return "", "m-left-right-medium hidden"
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# Callback function that sorts the data displayed in the table based on the sorting parameters received.
+# params:   sortBy     (string)    - sorting information
+#           data       (DataFrame) - students-list-table data
+# returns:  sorted data as dictionary
 @app.callback(Output('students-list-table', 'data'),
               Input('students-list-table', 'sort_by'),
               State('students-list-table', 'data')
