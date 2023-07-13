@@ -185,7 +185,7 @@ layoutModalBodyCustomize = layoutModalBodyCustomize + [ html.Button(children=[
 # layout for the help center tab of the settings page
 layoutModalBodyHelp = [
         
-    html.Iframe( src  = "https://www.youtube.com/embed/atfOw7CoJm0", width="420" , height="315" ),
+    html.Iframe( src  = "https://www.youtube.com/embed/70tjR3JYQ5A", width="420" , height="315" ),
         
     html.Br(),
     html.Br(),
