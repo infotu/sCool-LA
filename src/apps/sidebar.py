@@ -338,7 +338,7 @@ def set_menu_class_on_login(pathname):
 def set_menu_class_on_change_open(*args):   
     return  np.where(args,"open highlight",'').tolist()
 
-     
+
 #----------------------------------------------------------------------------------------------------------------------
 # Callback function to set the value of the Imput field with the id menu-sub-link-input.
 # params:   args         (tuple) - click information of all sub-menu buttons

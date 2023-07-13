@@ -37,7 +37,6 @@ from apps import classes
 from data import studentGrouped
 import constants
 import util
-import subprocess
 import traceback
 import datetime
 
@@ -146,8 +145,6 @@ def getStudentData(studentId, schoolKey, selectedDate = '' ):
         
         studentData[constants.featureTaskType] = constants.TaskTypePractice
     except Exception as e: 
-        subprocess.Popen(['echo', 'getStudentData first Exception'])
-        subprocess.Popen(['echo', str(e)])
         print(e)
 
 
@@ -182,8 +179,6 @@ def getStudentData(studentId, schoolKey, selectedDate = '' ):
         if schoolTheoryStudent is not None and schoolTheoryStudent.empty == False:
             studentData = pd.concat([studentData, schoolTheoryStudent], ignore_index=True)
     except Exception as e:
-        subprocess.Popen(['echo', 'getStudentData second Exception'])
-        subprocess.Popen(['echo', str(e)]) 
         print(e)
 
     if studentData is None         or     studentData.empty   :
@@ -212,8 +207,6 @@ def isStudentInClass(studentId, classId) :
         return True
 
     except Exception as e:
-        subprocess.Popen(['echo', 'isStudentInClass Exception'])
-        subprocess.Popen(['echo', str(e)]) 
         print(e)
 
 
@@ -332,8 +325,6 @@ def plotStudentOverview(studentId, classId):
                                             className="col-sm-6",
                                     ))
             except Exception as e:
-                subprocess.Popen(['echo', 'student overview Concepts Used Error'])
-                subprocess.Popen(['echo', str(e)]) 
                 print(' student overview Concepts Used Error ')
                 print(e)
         
@@ -343,8 +334,6 @@ def plotStudentOverview(studentId, classId):
         )
     
     except Exception as e:
-        subprocess.Popen(['echo', 'plotStudentOverview big Exception'])
-        subprocess.Popen(['echo', str(e)]) 
         print(e)
 
     return graphs
@@ -385,8 +374,6 @@ def createProgressChildren(studentId, classId):
                 graphs.append( getCourseProgressCard(courseIdAttempt, dfTasksCompleted))
 
     except Exception as e:
-        subprocess.Popen(['echo', 'createProgressChildren Exception'])
-        subprocess.Popen(['echo', str(e)]) 
         print(e)
 
     return graphs
@@ -512,8 +499,6 @@ def getCourseProgressCard(courseId, dfTasksCompleted):
         className = "col-sm-12 m-bottom_medium" )
     
     except Exception as e:
-        subprocess.Popen(['echo', 'getCoursePProgressCard Exception'])
-        subprocess.Popen(['echo', str(e)]) 
         print(e)
         
 
@@ -649,9 +634,6 @@ def plotStudent(studentId, schoolKey, studentSelectedDate = '', studentGraphDire
         )
     
     except Exception as e:
-        subprocess.Popen(['echo', 'plotStudent Exception'])
-        subprocess.Popen(['echo', str(e)])
-        subprocess.Popen(['echo', str(traceback.format_exc())])
         print(e)
 
     return graphs
@@ -722,8 +704,6 @@ def getCurrentSelectedStudentName():
         studentName                       = studentData["Name"].iloc[0]
         
     except Exception as e: 
-        subprocess.Popen(['echo', 'getSelectedStudent exception'])
-        subprocess.Popen(['echo', str(e)])
         print(e)
 
     return studentName
@@ -869,9 +849,6 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
                 try:    
                     csv_string = util.get_download_link_data_uri(getStudentData(currentStudentGlobal, currentClassGlobal, format(studentSelectedDate)))
                 except Exception as e:
-                    subprocess.Popen(['echo', 'download - callback Exception 1'])
-                    subprocess.Popen(['echo', str(e)]) 
-                    subprocess.Popen(['echo', str(traceback.format_exc())])
                     print('groupStudents update_download_link__details_student ')
                     print(e)
 
@@ -949,9 +926,6 @@ def ClassesAndStudentsSelectionButtonsControls(classes_n_clicks, students_n_clic
                 try:    
                     csv_string = util.get_download_link_data_uri(getStudentData(student_id, currentClassGlobal, format(studentSelectedDate)))
                 except Exception as e:
-                    subprocess.Popen(['echo', 'download - callback Exception 2'])
-                    subprocess.Popen(['echo', str(e)]) 
-                    subprocess.Popen(['echo', str(traceback.format_exc())])
                     print('groupStudents update_download_link__details_student ')
                     print(e)
 

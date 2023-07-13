@@ -28,7 +28,6 @@ from flask_login import current_user
 from data import studentGrouped
 import constants
 import util
-import subprocess
 
 
 

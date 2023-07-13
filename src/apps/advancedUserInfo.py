@@ -24,7 +24,6 @@ import constants
 from data import studentGrouped
 
 from apps import settings, classes, advancedUserInfo
-import subprocess
 
 
 #----------------------------------------------------------------------------------------------------------------------

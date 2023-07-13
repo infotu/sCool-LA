@@ -19,7 +19,6 @@ import plotly.graph_objects as go
 import dash_table
 import math
 import constants
-import subprocess
 
 
 featureDescription = constants.featureDescription
@@ -839,9 +838,6 @@ def getCustomPlot( df, dfOriginal, dfOriginalMean = None, dfOriginalMedian = Non
             selectedFeatures = list(set(selectedFeatures))
 
             plotTitle = ' Details '            
-
-            subprocess.Popen(["echo", "Now in table custom thing"]) 
-            subprocess.Popen(["echo", f"{str(selectedFeatures)}"]) 
             
             if    groupBy  and    groupBy  in selectedFeatures  :
                 selectedFeatures.remove(groupBy)

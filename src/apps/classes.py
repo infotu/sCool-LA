@@ -41,7 +41,6 @@ from data import studentGrouped
 
 from apps import settings
 import util
-import subprocess
 
 
 #--------------------------------- Const values START ----------------------------
@@ -166,9 +165,7 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                 dateGroup = groupOriginalTheory.groupby(  [ groupOriginalTheory['CreatedAt'].dt.date ] )
                 groupOriginalTheory = dateGroup.get_group(filterByDate)
             
-        except Exception as e: 
-            subprocess.Popen(['echo', 'plotSingleClass 1 '])
-            subprocess.Popen(['echo', str(e)])
+        except Exception as e:
             print('plotSingleClass 1 ')
             print(e)
         
@@ -218,9 +215,7 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
             graphs.append(html.Div(html.Div(figStudents, className = "p-top_medium")))
             
             graphIndex = graphIndex + 1
-        except Exception as e: 
-                subprocess.Popen(['echo', 'plotSingleClass 1 '])
-                subprocess.Popen(['echo', str(e)])
+        except Exception as e:
                 print('plotSingleClass 1 ')
                 print(e)
         
@@ -337,9 +332,7 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
 
             graphs.append(html.Div(table ,className = "c-table c-table-oddeven font-size_small p-top_medium"))
 
-        except Exception as e:   
-            subprocess.Popen(['echo', 'ERROR - practice'])
-            subprocess.Popen(['echo', str(e)])          
+        except Exception as e:     
             print( 'ERROR - practice')
             print(e)
 
@@ -398,8 +391,6 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                     index_dfTaskWiseSuccessFailTheory += 1
 
             except Exception as e: 
-                subprocess.Popen(['echo', 'in the theory exception '])
-                subprocess.Popen(['echo', str(e)])
                 print('in the theory exception ')
                 print(e)
             
@@ -439,8 +430,6 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
             
         
         except Exception as e: 
-                subprocess.Popen(['echo', 'plotSingleClass 2 '])
-                subprocess.Popen(['echo', str(e)])
                 print('plotSingleClass 2 ')
                 print(e)
         
@@ -508,16 +497,12 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
             graphs.append(html.Div(table ,className = "c-table c-table-oddeven font-size_small p-top_medium"))        
             
         except Exception as e: 
-            subprocess.Popen(['echo', 'ERROR - theory'])
-            subprocess.Popen(['echo', str(e)])
             print( 'ERROR - theory')  
             print(e)
         
         
 
     except Exception as e: 
-        subprocess.Popen(['echo', 'ERROR - plotSingleClass '])
-        subprocess.Popen(['echo', str(e)])
         print( 'ERROR - plotSingleClass ')
         print(e)
 
@@ -570,11 +555,6 @@ def getGroupTaskWiseDetails(groupId, isGrouped = True, taskId = 0 , filterByDate
         if not taskId is None and  taskId > 0 and taskId in taskWiseConceptPracticeGrouped.groups.keys():
             taskData = taskWiseConceptPracticeGrouped.get_group(taskId)
 
-            #subprocess.Popen(["echo", "STARTSTARTSTART 2"])
-            #with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-            #    subprocess.Popen(["echo", str(taskData.iloc[:2])])
-            #subprocess.Popen(["echo", "ENDENDEND 2"])
-            
             table_header = [
                 html.Thead(html.Tr([html.Th('Student'), html.Th('Submitted Code'), html.Th('Time spent writing Code'), html.Th("Used Code Concepts")]))
             ]
@@ -628,8 +608,6 @@ def getGroupTaskWiseDetails(groupId, isGrouped = True, taskId = 0 , filterByDate
               
             
     except Exception as e: 
-                subprocess.Popen(['echo', 'plotGroupTaskWiseConcepts 1 '])
-                subprocess.Popen(['echo', str(e)])
                 print('plotGroupTaskWiseConcepts 1 ')
                 print(e)
             
@@ -637,8 +615,6 @@ def getGroupTaskWiseDetails(groupId, isGrouped = True, taskId = 0 , filterByDate
     #    Step 2 :- add the plot - concepts used by count of students
         graphs = graphs + plotGroupTaskWiseConcepts( groupId, isGrouped = isGrouped, taskId = taskId , filterByDate = filterByDate)    
     except Exception as e: 
-        subprocess.Popen(['echo', 'plotGroupTaskWiseConcepts 2 '])
-        subprocess.Popen(['echo', str(e)])
         print('plotGroupTaskWiseConcepts 2 ')
         print(e)
     
@@ -696,8 +672,6 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 , filterByDa
             try :
                 taskTitle =  dfPracticeTaskDetails[ dfPracticeTaskDetails['PracticeTaskId'] == taskId ]['Title'].astype(str).values[0]
             except Exception as e: 
-                subprocess.Popen(['echo', 'plotGroupTaskWiseConcepts 1 '])
-                subprocess.Popen(['echo', str(e)])
                 print('plotGroupTaskWiseConcepts 1 ')
                 print(e)
                 
@@ -759,8 +733,6 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 , filterByDa
             try :
                 taskTitle =  dfPracticeTaskDetails[ dfPracticeTaskDetails['PracticeTaskId'] == int(groupKeyTaskId) ]['Title'].astype(str).values[0]
             except Exception as e: 
-                subprocess.Popen(['echo', 'plotGroupTaskWiseConcepts 1 last '])
-                subprocess.Popen(['echo', str(e)])
                 print('plotGroupTaskWiseConcepts 1 last ')
                 print(e)
         
@@ -780,8 +752,6 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 , filterByDa
                 
         return graphs
     except Exception as e: 
-        subprocess.Popen(['echo', 'plotGroupTaskWiseConcepts  last '])
-        subprocess.Popen(['echo', str(e)])
         print('plotGroupTaskWiseConcepts  last ')
         print(e)               
 
@@ -817,8 +787,6 @@ def getGroupPTaskDoneOptions(groupId , filterByDate = '' ) :
                     
         return options
     except Exception as e: 
-        subprocess.Popen(['echo', 'getGroupPTaskDoneOptions'])
-        subprocess.Popen(['echo', str(e)])
         print('getGroupPTaskDoneOptions')
         print(e)    
     
@@ -890,14 +858,10 @@ def plotGroupConceptDetails(groupId, filterByDate = '' ):
             )   
 
         except Exception as e: 
-                subprocess.Popen(['echo', 'Task Concepts used'])
-                subprocess.Popen(['echo', str(e)])
                 print('Task Concepts used')
                 print(e)                
       
     except Exception as e: 
-            subprocess.Popen(['echo', 'Task Concepts used'])
-            subprocess.Popen(['echo', str(e)])
             print('Task Concepts used')
             print(e)
 
@@ -979,9 +943,6 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
                 )
             )
         except Exception as e: 
-            subprocess.Popen(['echo', 'getFeaturePlot  1st  '])
-            subprocess.Popen(['echo', 'title  ' + title])
-            subprocess.Popen(['echo', str(e)])
             print('getFeaturePlot  1st  ')
             print('title  ' + title)
             print(e)
@@ -1032,9 +993,6 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
                 )
             )
         except Exception as e: 
-            subprocess.Popen(['echo', 'getFeaturePlot  2nd  '])
-            subprocess.Popen(['echo', 'title  ' + title])
-            subprocess.Popen(['echo', str(e)])
             print('getFeaturePlot  2nd  ')
             print('title  ' + title)
             print(e)
@@ -1087,8 +1045,6 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
                 
             ))
     except Exception as e: 
-        subprocess.Popen(['echo', 'getFeaturePlot  hasDistribution '])
-        subprocess.Popen(['echo', str(e)])
         print('getFeaturePlot  hasDistribution ')
         print('title  ' + title)
         print(e)
@@ -1140,8 +1096,6 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                 dateGroup = groupOriginalTheory.groupby(  [ groupOriginalTheory['CreatedAt'].dt.date ] )
                 groupOriginalTheory = dateGroup.get_group(filterByDate)
         except Exception as e: 
-            subprocess.Popen(['echo', ' plotSingleClassGeneral  groupOriginalTheory value set error '])
-            subprocess.Popen(['echo', str(e)])
             print(' plotSingleClassGeneral  groupOriginalTheory value set error ')
             print(e)
         
@@ -1202,8 +1156,6 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
             
             
         except Exception as e: 
-            subprocess.Popen(['echo', ' plotSingleClassGeneral  studentWiseDataTheory value set error !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! '])
-            subprocess.Popen(['echo', str(e)])
             print(' plotSingleClassGeneral  studentWiseDataTheory value set error !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ')
             print(e)
         
@@ -1302,14 +1254,11 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                     quantileIndex += 1
                     
                 except Exception as e: 
-                    subprocess.Popen(['echo', ' plotSingleClassGeneral  rowTheory Theory plots '])
-                    subprocess.Popen(['echo', str(e)])
                     print(' plotSingleClassGeneral  rowTheory Theory plots ')
                     print(e)
 
 
     except Exception as e: 
-        subprocess.Popen(['echo', str(e)])
         print(e)
 
     graphsMain.append(html.Div(html.Div(graphs, className = " p-top_medium "), className = "c-container "))
@@ -1436,8 +1385,6 @@ def plotStudentsList(schoolKey, filterByDate = '' ):
         graphs.append(html.Div(children = [html.H2("Students in this Class", className = "p-left_medium"), fig1Table], className = "p-top_medium"))
 
     except Exception as e: 
-        subprocess.Popen(['echo', 'plotStudentsList 2 '])
-        subprocess.Popen(['echo', str(e)])
         print('plotStudentsList 2 ')
         print(e)
 
@@ -1463,8 +1410,6 @@ def plotClassOverview(groupId, filterByDate = '' ):
     #    if not studentDataDf is None and not studentDataDf.empty:
         plots = util.plotClassOverview(groupId, groupStudents, studentDataDf, classes = "c-card-medium")
     except Exception as e: 
-        subprocess.Popen(['echo', 'plotClassOverview '])
-        subprocess.Popen(['echo', str(e)])
         print('plotClassOverview ')
         print(e)
 
@@ -1860,8 +1805,6 @@ def update_download_link__details_group(*args):
             try:
                 csv_string = util.get_download_link_data_uri( studentGrouped.getStudentsOfLearningActivityDF(class_id))
             except Exception as e: 
-                subprocess.Popen(['echo', 'update_download_link__details_group '])
-                subprocess.Popen(['echo', str(e)])
                 print('update_download_link__details_group ')
                 print(e)
     

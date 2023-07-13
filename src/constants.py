@@ -327,11 +327,6 @@ feature2UserNamesDict = {
         ,"StudentId" : "StudentId"
         , "Result" : "Result"
         
-		,"runsErrorAttribiteCount" : "Number of Attribute Errors in Code Runs"
-		,"runsErrorTypeCount" : "Number of Type Errors in Code Runs"
-		,"runsErrorNameCount" : "Number of Name Errors in Code Runs"
-		,"runsErrorSyntaxCount" : "Number of Syntax Errors in Code Runs"
-        
 		,"runsSuccessCount" : "Number of Successful Code Runs"
 		,"runsErrorCount" : "Number of Code Errors in Code Runs"
 		,"runsCount" : "Number of Code Executions in Code Runs"
