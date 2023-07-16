@@ -1054,19 +1054,12 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
 
 
 #----------------------------------------------------------------------------------------------------------------------
-# Function to create plot of a given feature.
-# params:   df                  (DataFrame) - dataframe containing the data
-#           featureX            (string)    - x axis information
-#           featureY            (string)    - y axis information
-#           title               (string)    - title string
-#           hoverData           (string)    - string containing hover information for the user hovering over plot
-#           isColored           (bool)      - bool stating wether plot is colored or not
-#           hasMeanStd          (bool)      - bool stating wether plot has mean and standard derivation
-#           hoverName           (string)    - string holding hover name info
-#           hasDistribution     (bool)      - bool stating wether plot has distribution
-#           isThemeSizePlot     (bool)      - bool stating wether the plot represents a theme size
-# returns:  list of graphs of the given feature and their distributions
-def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
+# Function to create plots of a selected class - representing the Class Statistics Section.
+# params:   titleTextAdd      (string) - string containing a possible title text
+#           school            (string) - Id of selected class
+#           filterByDate      (string) - string containing possible filter option
+# returns:  list of graphs of the selected class
+def plotSingleClassStatistics( titleTextAdd, school, filterByDate = '' ):
     
     graphs = []
     graphsMain = []
@@ -1096,7 +1089,7 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                 dateGroup = groupOriginalTheory.groupby(  [ groupOriginalTheory['CreatedAt'].dt.date ] )
                 groupOriginalTheory = dateGroup.get_group(filterByDate)
         except Exception as e: 
-            print(' plotSingleClassGeneral  groupOriginalTheory value set error ')
+            print(' plotSingleClassStatistics  groupOriginalTheory value set error ')
             print(e)
         
         
@@ -1156,7 +1149,7 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
             
             
         except Exception as e: 
-            print(' plotSingleClassGeneral  studentWiseDataTheory value set error !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ')
+            print(' plotSingleClassStatistics  studentWiseDataTheory value set error !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ')
             print(e)
         
     #            2. other features        
@@ -1254,7 +1247,7 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                     quantileIndex += 1
                     
                 except Exception as e: 
-                    print(' plotSingleClassGeneral  rowTheory Theory plots ')
+                    print(' plotSingleClassStatistics  rowTheory Theory plots ')
                     print(e)
 
 
@@ -1691,7 +1684,7 @@ def display_class_general(n_clicks):
 
         if triggered_id_dict["button-type"] == "select-classes-button" and someButtonWasPressed:
             class_id = triggered_id_dict["class-id"]
-            graphs = plotSingleClassGeneral('School', class_id, '')
+            graphs = plotSingleClassStatistics('School', class_id, '')
 
     return html.Div(graphs)
 
