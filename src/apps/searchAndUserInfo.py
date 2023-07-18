@@ -49,23 +49,42 @@ navbar = html.Div(
                 [
                     dbc.Col(
                         [
-                            html.Div("Learning Analytics Web Application", id = "navbar-la-heading", className="navbar-heading"),
+                            html.Div("Learning Analytics Web Application",
+                                     id = "navbar-la-heading",
+                                     className="navbar-heading"),
                         ],
                         width = 4,
                     ),
                     dbc.Col(
                         dbc.Row(
                             [
-                                dbc.Col(dcc.Dropdown(id = "search-dropdown", options = [], placeholder = "Search...", optionHeight = 38, style={"font-size": "1.1em", "z-index": 15})),
-                                dbc.Col(dbc.Button("Search", id = "navbar-search-button", color = "primary", className = "navbar-searchbutton"), width = "auto")
+                                dbc.Col(dcc.Dropdown(id = "search-dropdown",
+                                                     options = [],
+                                                     placeholder = "Search...",
+                                                     optionHeight = 38,
+                                                     style={"font-size": "1.1em", "z-index": 15})),
+                                dbc.Col(dbc.Button("Search", id = "navbar-search-button",
+                                                   color = "primary",
+                                                   className = "navbar-searchbutton"),
+                                                   width = "auto")
                             ],
                             id = "search-bar-row",
                             align = "center"
                         ),
                         width = 4,
                     ),
-                    dbc.Col([html.Div(constants.navbarTestUsername, id = "navbar-username", className="navbar-username"), html.Div(constants.navbarTestRole, id = "navbar-userrole", className="navbar-userrole")], id = "user-info-name-role", width = 3),
-                    dbc.Col(html.Button(html.Img(src="/assets/user-icon.png", height="50px"), id = "user-info-button", className = "welcome-button"), id = "user-info-icon", width = 1),
+                    dbc.Col([html.Div("username placeholder",
+                                      id = "navbar-username",
+                                      className="navbar-username"),
+                             html.Div("userrole placeholder",
+                                      id = "navbar-userrole",
+                                      className="navbar-userrole")],
+                            id = "user-info-name-role",
+                            width = 3),
+                    dbc.Col(html.Button(html.Img(src="/assets/user-icon.png", height="50px"),
+                                        id = "user-info-button",
+                                        className = "welcome-button"),
+                            id = "user-info-icon", width = 1),
                 ],
                 align="center"
             ),
