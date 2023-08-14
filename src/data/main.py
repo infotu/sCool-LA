@@ -243,7 +243,7 @@ def getConceptFeaturesFromCode(df, featureCode, featureError, featureOutput):
 
     dfFeature = pd.DataFrame.from_records(dFeature,  columns = columnsFeatures )
     
-    print("___________________DATAFRAME CREATED WOHO___________________")
+    #print("___________________DATAFRAME CREATED WOHO___________________")
 
     return dfFeature    
 

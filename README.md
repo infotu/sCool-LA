@@ -1,5 +1,17 @@
 # sCool Learning Analytics application
 
+All of the following commands are for the initial version of the website, however they also apply to the new version, but be aware that 
+
+```
+aniltilanthe/scool-la-app 
+```
+
+is the name of the OLD docker image. The NEW docker image is called:
+
+```
+infotu/scool-la-mz
+```
+
 
 (*) Run me 
 

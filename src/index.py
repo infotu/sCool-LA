@@ -19,7 +19,6 @@ from apps import groups, custom, home, sidebar, login, searchAndUserInfo, classe
 from data import studentGrouped
 
 import constants
-import subprocess
 
 
 
@@ -35,8 +34,6 @@ def load_user(usernameOrId):
     userDB = studentGrouped.getUserFromUserId(usernameOrId)
     
     if  userDB is not None:
-        subprocess.Popen(["echo", "____________SHIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIT_______________"])
-        subprocess.Popen(["echo", f"str({usernameOrId})"])
         return User(userDB['UserName'], userDB['Id'], active = True, isAdmin = userDB['IsAdmin'], securityStamp = userDB['SecurityStamp'])
 
 
@@ -140,4 +137,4 @@ def show_hide_sidebar(pathname, currentClasses):
 
 # For deployment
 if __name__ == "__main__":
-    app.run_server(port=8080, host="0.0.0.0", debug=False)
+    app.run_server(port=8090, host="0.0.0.0", debug=False)
