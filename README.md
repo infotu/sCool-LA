@@ -1,12 +1,12 @@
 # sCool Learning Analytics application
 
-All of the following commands are for the initial version of the website, however they also apply to the new version, but be aware that 
+All of the following commands are for the initial version of the website, however they also apply to the new version, be aware that this is the name of the OLD docker image:
 
 ```
 aniltilanthe/scool-la-app 
 ```
 
-is the name of the OLD docker image. The NEW docker image is called:
+The NEW docker image is called:
 
 ```
 infotu/scool-la-mz
@@ -16,11 +16,11 @@ infotu/scool-la-mz
 (*) Run me 
 
 ```
-docker run -p 8090:8090 aniltilanthe/scool-la-app
+docker run -p 8090:8090 *insert_image_name*
 ```
 (*) Run me in detached mode with -d  
 ```
-docker run -d -p 8090:8090 aniltilanthe/scool-la-app
+docker run -d -p 8090:8090 *insert_image_name*
 ```
 
 
@@ -28,14 +28,14 @@ docker run -d -p 8090:8090 aniltilanthe/scool-la-app
 
 ```
 #map localhost:8090 to the container 8090        -    127.0.0.1 is the localhost
-docker run -d -p 127.0.0.1:8090:8090 aniltilanthe/scool-la-app
+docker run -d -p 127.0.0.1:8090:8090 *insert_image_name*
 ```
 
 
 (*) also   
 
 ```
-docker run -d -p 0.0.0.0:8090:8090 aniltilanthe/scool-la-app
+docker run -d -p 0.0.0.0:8090:8090 *insert_image_name*
 ```
 
 
@@ -44,7 +44,7 @@ OR
 (*) -P Automatically publish all ports exposed by container and binds them to random port on the host machine
 ```
 #1 Automatically publish all ports exposed by container and binds them to random port on the host machine
-docker container run -P -d aniltilanthe/scool-la-app
+docker container run -P -d *insert_image_name*
 
 #2.a Find the host machine port using container_uuid
 docker container port *insert container_uuid*
@@ -65,21 +65,23 @@ curl -v 0.0.0.0:8090
 Build me: 
 
 ```
-docker build -t aniltilanthe/scool-la-app .
+docker build -t *insert_image_name* .
 ```
 
 Clone me from docker hub :  
 
 ```
-docker pull aniltilanthe/scool-la-app
+docker pull *insert_image_name*
 ```
 
-Docker hub repo :  
+
+Docker hub repo old:  
 
 * aniltilanthe/scool-la-app
 
+Docker gub repo new:
 
-
+* infotu/scool-la-mz
 
 
 
