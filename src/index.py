@@ -19,7 +19,7 @@ from apps import groups, custom, home, sidebar, login, searchAndUserInfo, classe
 from data import studentGrouped
 
 import constants
-
+import subprocess
 
 
 
@@ -29,12 +29,14 @@ dfUser                  =  studentGrouped.dfUser
 #--------------------- school selection END ----------------------
 
 
-    
+
 @login_manager.user_loader
 def load_user(usernameOrId):
     userDB = studentGrouped.getUserFromUserId(usernameOrId)
     
     if  userDB is not None:
+        subprocess.Popen(["echo", "____________SHIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIT_______________"])
+        subprocess.Popen(["echo", f"str({usernameOrId})"])
         return User(userDB['UserName'], userDB['Id'], active = True, isAdmin = userDB['IsAdmin'], securityStamp = userDB['SecurityStamp'])
 
 
@@ -78,14 +80,14 @@ def render_page_content(pathname):
         elif pathname == "/Students":
             return students.layout
 
-        return classes.layout
+        return tutorial.layout
 
     
     # DEFAULT NOT LOGGED IN: /login
     return login.layout
 
 
-# Update bar plot
+
 @app.callback(
     Output("page-sidebar", "className"),
     [
@@ -109,11 +111,33 @@ def show_hide_sidebar(pathname, currentClasses):
 
 
 
+@app.callback(
+    Output("page-navbar-searchengine-userinfo", "className"),
+    [
+        Input("url", "pathname")
+    ],
+     state=[ State(component_id='page-navbar-searchengine-userinfo', component_property='className')
+                ]
+)
+def show_hide_sidebar(pathname, currentClasses):
+    currentClassesS = set()
+    
+    if not (None is currentClasses) and not ('' == currentClasses) :
+        currentClassesS = set(currentClasses.split(' '))
+
+    currentClassesS.discard('hidden')
+    
+    if  pathname in  ["/login"]    or   not  ( current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated) :
+        currentClassesS.add('hidden')
+        
+    return  ' '.join(currentClassesS) 
+
+
 
 # For Debug Mode
-if __name__ == "__main__":
-    app.run_server(port=8080, debug=True)
+#if __name__ == "__main__":
+#    app.run_server(port=8080, debug=True)
 
 # For deployment
-#if __name__ == "__main__":
-#    app.run_server(port=8090, host="0.0.0.0", debug=False)
+if __name__ == "__main__":
+    app.run_server(port=8080, host="0.0.0.0", debug=False)

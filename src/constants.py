@@ -10,22 +10,26 @@ Created on Mon Jul  6 22:42:22 2020
 #-- Database Connection
 #---------------------------------------------------------------
 
-'''
+
 Driver = 'MySQL ODBC 8.0 Driver'
 Server = 'codislabgraz.org'
 DatabaseName = 'thesesweb'
 Uid = 'scool'
 Pwd = '6R45gynw429wCIXO'
 Port = '3306'
-'''
 
+
+#----------------------------------------------------------------
+#-- Example local database connection
+#---------------------------------------------------------------
+'''
 Driver = 'MySQL ODBC 8.0 Driver'
 Server = '127.0.0.1'
 DatabaseName = 'scoolDev'
 Uid = 'root'
 Pwd = 'sturm321graz.'
 Port = '3306'
-
+'''
 
 #----------------------------------------------------------------
 #-- app settings

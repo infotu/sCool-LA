@@ -96,7 +96,7 @@ html {
 
 .choose-learning-activity-buttons button {
 	background-color: #eeeeee;
-	border: 1px solid #7c7c7c;
+	border: 2px solid #7c7c7c;
 	color: black;
 	padding: 10px 24px;
 	cursor: pointer;
@@ -116,7 +116,7 @@ html {
 
 .choose-students-buttons button {
 	background-color: #eeeeee;
-	border: 1px solid #7c7c7c;
+	border: 2px solid #7c7c7c;
 	color: black;
 	padding: 10px 24px;
 	cursor: pointer;

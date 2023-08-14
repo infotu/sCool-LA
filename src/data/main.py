@@ -59,6 +59,8 @@ conn = pyodbc.connect('Driver={' + Driver +'};'
                       'Trusted_Connection=yes;')
 
 
+# Server connection check (prints Simon users into the console)
+"""
 # just some print outs for checking the connection to local db
 print("_______________________________CONNECTION PASSED_______________________________")
 
@@ -66,7 +68,7 @@ print("_______________________________CONNECTION PASSED_________________________
 cursor123 = conn.cursor()
 
 # Execute a simple SQL query to fetch data from the database
-cursor123.execute('SELECT * FROM Students WHERE Name = "MarkusZangl";')
+cursor123.execute('SELECT * FROM Students WHERE Name = "Simon";')
 
 # Fetch the results and print them to the console
 results = cursor123.fetchall()
@@ -74,7 +76,7 @@ for row in results:
     print(row)
 
 print("_______________________________CONNECTION PASSED_______________________________")
-
+"""
 
 #---------------------------------------------------------------------------------------------
 #------------------------------------Library functions Start----------------------------

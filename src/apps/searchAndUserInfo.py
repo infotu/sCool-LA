@@ -102,7 +102,8 @@ navbar = html.Div(
         ],
         className="page-navbar-margin-top"
     ),
-    className="page-navbar"
+    className="page-navbar hidden",
+    id="page-navbar-searchengine-userinfo"
 )
 
 
@@ -187,7 +188,7 @@ def update_options(n_clicks, searchValue):
 @app.callback([Output("navbar-username", "children"), Output("navbar-userrole", "children")], 
               [Input("url", "pathname")],
 )
-def setMenuClassOnLogin(pathname):   
+def set_username_and_userrole(pathname):   
     
     if current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated  :
 
